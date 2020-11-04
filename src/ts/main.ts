@@ -28,7 +28,7 @@ Parameters.addClearObserver(() => {
 
 function update(): void {
     if (needToAddItems) {
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 100; i++) {
             let newItem: PatternBase;
             if (Parameters.primitive === EPrimitive.CIRCLE) {
                 newItem = new PatternCircle();
