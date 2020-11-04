@@ -60,6 +60,15 @@ const data = {
                     step: 0.01
                 },
                 {
+                    type: Demopage.supportedControls.Range,
+                    title: "Min size",
+                    id: "min-size-range-id",
+                    min: 1,
+                    max: 20,
+                    value: 6,
+                    step: 1
+                },
+                {
                     type: Demopage.supportedControls.Button,
                     id: "new-item-button-id",
                     label: "New item",

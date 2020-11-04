@@ -11,6 +11,7 @@ import { PatternSquare } from "./patterns/pattern-square";
 import * as Helper from "./utils/helper";
 
 import "./page-interface-generated";
+import { NumberRange } from "./utils/number-range";
 
 const items: PatternBase[] = [];
 
@@ -40,9 +41,10 @@ function update(): void {
         needToAddItems = false;
     }
 
+    const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
     for (const item of items) {
         if (item.needInitialization) {
-            item.reset(canvasPlotter.size, items, Parameters.spacing);
+            item.reset(canvasPlotter.size, items, Parameters.spacing, acceptedSizesForNewItems);
         }
     }
 

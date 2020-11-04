@@ -5,6 +5,7 @@ const controlId = {
     PRIMITIVE: "primitive-tab-id",
     DENSITY: "density-range-id",
     SPACING: "spacing-range-id",
+    MIN_SIZE: "min-size-range-id",
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
     DOWNLOAD: "result-download-id",
@@ -41,6 +42,11 @@ Page.Range.addObserver(controlId.SPACING, () => {
         triggerClear();
     }
 });
+Page.Range.addObserver(controlId.MIN_SIZE, () => {
+    if (!Parameters.isZooming) {
+        triggerClear();
+    }
+});
 
 enum EPrimitive {
     SQUARE = "square",
@@ -54,6 +60,10 @@ abstract class Parameters {
 
     public static get spacing(): number {
         return Page.Range.getValue(controlId.SPACING);
+    }
+
+    public static get minSize(): number {
+        return Page.Range.getValue(controlId.MIN_SIZE);
     }
 
     public static get primitive(): EPrimitive {

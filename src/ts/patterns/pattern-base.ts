@@ -4,6 +4,7 @@ import { ISize } from "../utils/i-size";
 import { PlotterBase } from "../plotter/plotter-base";
 
 import * as Helper from "../utils/helper";
+import { NumberRange } from "../utils/number-range";
 
 const MAX_RESET_TRIES = 100;
 
@@ -33,7 +34,7 @@ abstract class PatternBase {
         }
     }
 
-    public reset(domainSize: ISize, existingItems: PatternBase[], spacing: number): void {
+    public reset(domainSize: ISize, existingItems: PatternBase[], spacing: number, acceptedSizes: NumberRange): void {
         this.color = Helper.randomHexColor();
 
         const sizeFactor = 1 - spacing;
@@ -42,7 +43,7 @@ abstract class PatternBase {
             this.randomizePosition(domainSize);
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(existingItems);
-            if (maxSize >= 8) {
+            if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.needInitialization = false;
                 return;
