@@ -34,21 +34,26 @@ abstract class PatternBase {
         }
     }
 
-    public reset(domainSize: ISize, existingItems: PatternBase[], spacing: number, acceptedSizes: NumberRange): void {
+    public reset(domainSize: ISize, existingItems: PatternBase[], spacing: number, acceptedSizes: NumberRange): number {
         this.color = Helper.randomHexColor();
 
         const sizeFactor = 1 - spacing;
 
-        for (let iTry = 0; iTry < MAX_RESET_TRIES; iTry++) {
+        let iTry = 0;
+        while (iTry < MAX_RESET_TRIES) {
             this.randomizePosition(domainSize);
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(existingItems);
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.needInitialization = false;
-                return;
+                break;
             }
+
+            iTry++;
         }
+
+        return iTry;
     }
 
     public isInDomain(domainSize: ISize): boolean {

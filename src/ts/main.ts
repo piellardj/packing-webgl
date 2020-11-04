@@ -17,36 +17,60 @@ import "./page-interface-generated";
 let needToRedraw = false;
 let needToAddItems = false;
 
-function update(items: PatternBase[], domainSize: ISize): void {
-    if (needToAddItems) {
-        for (let i = 0; i < 100; i++) {
-            let newItem: PatternBase;
-            if (Parameters.primitive === EPrimitive.CIRCLE) {
-                newItem = new PatternCircle();
-            } else {
-                newItem = new PatternSquare();
-            }
-            items.push(newItem);
+function performZooming(items: PatternBase[], domainSize: ISize): void {
+    const zoomSpeed = 1 + 0.01 * Parameters.zoomSpeed;
+    for (const item of items) {
+        item.zoomIn(zoomSpeed);
+
+        if (!item.isInDomain(domainSize)) { // recycle items that are out of view
+            item.needInitialization = true;
         }
-        needToAddItems = false;
     }
+}
+
+let iRecycling = 0;
+function performRecycling(items: PatternBase[], domainSize: ISize): void {
+    let nbItemsRecycled = 0;
+    let triesTotal = 0;
 
     const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
     for (const item of items) {
         if (item.needInitialization) {
-            item.reset(domainSize, items, Parameters.spacing, acceptedSizesForNewItems);
+            triesTotal += item.reset(domainSize, items, Parameters.spacing, acceptedSizesForNewItems);
+            nbItemsRecycled++;
         }
     }
 
-    if (Parameters.isZooming) {
-        const zoomSpeed = 1 + 0.01 * Parameters.zoomSpeed;
-        for (const item of items) {
-            item.zoomIn(zoomSpeed);
+    iRecycling++;
+    if (iRecycling % 100 === 0) {
+        console.log(`Recycled "${nbItemsRecycled}" with an average nbTries of "${triesTotal / nbItemsRecycled}".`);
+    }
+}
 
-            if (!item.isInDomain(domainSize)) { // recycle items that are out of view
-                item.needInitialization = true;
-            }
-        }
+function generateItems(items: PatternBase[], amount: number): void {
+    let instanciate: () => PatternBase;
+    if (Parameters.primitive === EPrimitive.CIRCLE) {
+        instanciate = () => new PatternCircle();
+    } else {
+        instanciate = () => new PatternSquare();
+    }
+
+    for (let i = 0; i < amount; i++) {
+        const newItem = instanciate();
+        items.push(newItem);
+    }
+}
+
+function update(items: PatternBase[], domainSize: ISize): void {
+    if (needToAddItems) {
+        generateItems(items, 100);
+        needToAddItems = false;
+    }
+
+    performRecycling(items, domainSize);
+
+    if (Parameters.isZooming) {
+        performZooming(items, domainSize);
         needToRedraw = true;
     }
 }
