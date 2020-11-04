@@ -46,8 +46,6 @@ abstract class PatternBase {
                 return;
             }
         }
-
-        console.log(`Failed to reset item after ${MAX_RESET_TRIES} tries.`);
     }
 
     public isInDomain(domainSize: ISize): boolean {
