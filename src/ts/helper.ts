@@ -25,7 +25,7 @@ function downloadTextFile(fileName: string, content: string): void {
 }
 
 function randomHexColor(): string {
-    const randInt = Math.floor(255 * 255 * 255 * Math.random());
+    const randInt = Math.floor(256 * 256 * 256 * Math.random());
     return "#" + randInt.toString(16);
 }
 
