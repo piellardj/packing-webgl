@@ -28,7 +28,7 @@ abstract class PatternBase {
     }
 
     public draw(plotter: PlotterBase): void {
-        if (this.needInitialization) {
+        if (!this.needInitialization) {
             this.drawInternal(plotter);
         }
     }
