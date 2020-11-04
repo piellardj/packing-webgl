@@ -8,7 +8,7 @@ import { PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternSquare } from "./patterns/pattern-square";
 
-import * as Helper from "./helper";
+import * as Helper from "./utils/helper";
 
 import "./page-interface-generated";
 

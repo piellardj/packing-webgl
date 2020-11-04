@@ -1,5 +1,5 @@
-import { IPoint } from "../interfaces/i-point";
-import { ISize } from "../interfaces/i-size";
+import { IPoint } from "../utils/i-point";
+import { ISize } from "../utils/i-size";
 import { PlotterBase } from "./plotter-base";
 
 class PlotterSVG extends PlotterBase {

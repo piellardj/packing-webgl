@@ -1,9 +1,9 @@
-import { IPoint } from "../interfaces/i-point";
-import { ISize } from "../interfaces/i-size";
+import { IPoint } from "../utils/i-point";
+import { ISize } from "../utils/i-size";
 
 import { PlotterBase } from "../plotter/plotter-base";
 
-import * as Helper from "../helper";
+import * as Helper from "../utils/helper";
 
 const MAX_RESET_TRIES = 100;
 
