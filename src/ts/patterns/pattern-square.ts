@@ -16,7 +16,9 @@ class PatternSquare extends PatternBase {
         let maxSize = Math.max(maxSizeX, maxSizeY); // avoid center of the canvas
 
         for (const item of itemsToAvoid) {
-            maxSize = Math.min(maxSize, this.computeDistanceToEdge(item));
+            if (!item.needInitialization) {
+                maxSize = Math.min(maxSize, this.computeDistanceToEdge(item));
+            }
         }
 
         return 2 * maxSize;

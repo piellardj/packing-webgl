@@ -15,7 +15,9 @@ class PatternCircle extends PatternBase {
         let maxSize = distanceFromCanvasCenter; // avoid center of the canvas
 
         for (const item of existingItems) {
-            maxSize = Math.min(maxSize, this.computeDistanceToEdge(item));
+            if (!item.needInitialization) {
+                maxSize = Math.min(maxSize, this.computeDistanceToEdge(item));
+            }
         }
 
         return 2 * maxSize;
