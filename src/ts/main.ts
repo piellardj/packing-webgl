@@ -8,49 +8,16 @@ import { PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternSquare } from "./patterns/pattern-square";
 
-import { IPoint } from "./interfaces/i-point";
-import { ISize } from "./interfaces/i-size";
-
 import * as Helper from "./helper";
 
 import "./page-interface-generated";
 
 const items: PatternBase[] = [];
 
-function randomPointInDomain(domainSize: ISize): IPoint {
-    return {
-        x: Math.round(domainSize.width * (Math.random() - 0.5)),
-        y: Math.round(domainSize.height * (Math.random() - 0.5)),
-    };
-}
-
-type AddItemFunction = (domainSize: ISize) => unknown;
-function addSquare(domainSize: ISize): void {
-    const center = randomPointInDomain(domainSize);
-
-    const maxSize = 0.5 * PatternSquare.computeBiggestSideLengthPossible(center, items as PatternSquare[]);
-    if (maxSize >= 8) {
-        const size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
-        const color = Helper.randomHexColor();
-        items.push(new PatternSquare(center, size, color));
-    }
-}
-
-function addCircle(domainSize: ISize): void {
-    const center = randomPointInDomain(domainSize);
-
-    const maxSize = 0.5 * PatternCircle.computeBiggestDiameterPossible(center, items as PatternCircle[]);
-    if (maxSize >= 8) {
-        const size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
-        const color = Helper.randomHexColor();
-        items.push(new PatternCircle(center, size, color));
-    }
-}
-
 let needToRedraw = false;
-let needToAddItem = false;
+let needToAddItems = false;
 Parameters.addItemObserver(() => {
-    needToAddItem = true;
+    needToAddItems = true;
     needToRedraw = true;
 });
 
@@ -60,18 +27,23 @@ Parameters.addClearObserver(() => {
 });
 
 function update(): void {
-    if (needToAddItem) {
-        let addItemFunction: AddItemFunction;
-        if (Parameters.primitive === EPrimitive.SQUARE) {
-            addItemFunction = addSquare;
-        } else if (Parameters.primitive === EPrimitive.CIRCLE) {
-            addItemFunction = addCircle;
+    if (needToAddItems) {
+        for (let i = 0; i < 1000; i++) {
+            let newItem: PatternBase;
+            if (Parameters.primitive === EPrimitive.CIRCLE) {
+                newItem = new PatternCircle();
+            } else {
+                newItem = new PatternSquare();
+            }
+            items.push(newItem);
         }
+        needToAddItems = false;
+    }
 
-        for (let i = 0; i < 10000; i++) {
-            addItemFunction(canvasPlotter.size);
+    for (const item of items) {
+        if (item.needInitialization) {
+            item.reset(canvasPlotter.size, items);
         }
-        needToAddItem = false;
     }
 
     const zoomSpeed = Parameters.zoomSpeed;
