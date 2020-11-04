@@ -42,15 +42,14 @@ function update(): void {
 
     for (const item of items) {
         if (item.needInitialization) {
-            item.reset(canvasPlotter.size, items);
+            item.reset(canvasPlotter.size, items, Parameters.spacing);
         }
     }
 
-    const zoomSpeed = Parameters.zoomSpeed;
-    if (zoomSpeed > 0) {
-        const actualZoomSpeed = 1 + 0.01 * zoomSpeed;
+    if (Parameters.isZooming) {
+        const zoomSpeed = 1 + 0.01 * Parameters.zoomSpeed;
         for (const item of items) {
-            item.zoomIn(actualZoomSpeed);
+            item.zoomIn(zoomSpeed);
 
             if (!item.isInDomain(canvasPlotter.size)) { // recycle items that are out of view
                 item.needInitialization = true;

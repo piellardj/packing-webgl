@@ -51,6 +51,15 @@ const data = {
                     step: 0.01
                 },
                 {
+                    type: Demopage.supportedControls.Range,
+                    title: "Spacing",
+                    id: "spacing-range-id",
+                    min: 0.01,
+                    max: 0.99,
+                    value: 0.5,
+                    step: 0.01
+                },
+                {
                     type: Demopage.supportedControls.Button,
                     id: "new-item-button-id",
                     label: "New item",

@@ -4,6 +4,7 @@ const controlId = {
     LINES_PATTERN: "lines-pattern-style-tabs-id",
     PRIMITIVE: "primitive-tab-id",
     DENSITY: "density-range-id",
+    SPACING: "spacing-range-id",
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
     DOWNLOAD: "result-download-id",
@@ -35,6 +36,11 @@ function triggerClear(): void {
     }
 }
 Page.Tabs.addObserver(controlId.PRIMITIVE, triggerClear);
+Page.Range.addObserver(controlId.SPACING, () => {
+    if (!Parameters.isZooming) {
+        triggerClear();
+    }
+});
 
 enum EPrimitive {
     SQUARE = "square",
@@ -46,12 +52,19 @@ abstract class Parameters {
         return Page.Range.getValue(controlId.DENSITY);
     }
 
+    public static get spacing(): number {
+        return Page.Range.getValue(controlId.SPACING);
+    }
+
     public static get primitive(): EPrimitive {
         return Page.Tabs.getValues(controlId.PRIMITIVE)[0] as EPrimitive;
     }
 
     public static get zoomSpeed(): number {
         return Page.Range.getValue(controlId.ZOOM_SPEED);
+    }
+    public static get isZooming(): boolean {
+        return Math.abs(Parameters.zoomSpeed) > .001; // avoid float precision issues
     }
 
     public static addRedrawObserver(callback: RedrawObserver): void {
