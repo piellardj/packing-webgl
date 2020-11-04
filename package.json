@@ -1,0 +1,29 @@
+{
+  "name": "packing",
+  "homepage": "https://piellardj.github.io/packing",
+  "description": "Simple implementation of a packing algorithm, running on CPU.",
+  "main": "build/index.js",
+  "scripts": {
+    "pre-commit": "npm run rebuild && npm run lint",
+    "build-page": "ts-node-script src/generate-page.ts",
+    "build": "npm run build-page && npm run webpack",
+    "clean": "shx rm -rf docs/* **/*generated.*",
+    "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json",
+    "rebuild": "npm run clean && npm run build",
+    "webpack": "webpack --config src/config/webpack.config.js"
+  },
+  "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
+  "repository": "github:piellardj/packing",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.14.6",
+    "shx": "^0.3.3",
+    "ts-loader": "^8.0.8",
+    "ts-node": "^9.0.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.5",
+    "webpack": "^5.4.0",
+    "webpack-cli": "^4.1.0",
+    "webpage-templates": "github:piellardj/webpage-templates"
+  }
+}
