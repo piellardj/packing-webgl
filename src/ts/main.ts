@@ -9,25 +9,15 @@ import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternSquare } from "./patterns/pattern-square";
 
 import * as Helper from "./utils/helper";
-
-import "./page-interface-generated";
+import { ISize } from "./utils/i-size";
 import { NumberRange } from "./utils/number-range";
 
-const items: PatternBase[] = [];
+import "./page-interface-generated";
 
 let needToRedraw = false;
 let needToAddItems = false;
-Parameters.addItemObserver(() => {
-    needToAddItems = true;
-    needToRedraw = true;
-});
 
-Parameters.addClearObserver(() => {
-    items.length = 0;
-    needToRedraw = true;
-});
-
-function update(): void {
+function update(items: PatternBase[], domainSize: ISize): void {
     if (needToAddItems) {
         for (let i = 0; i < 100; i++) {
             let newItem: PatternBase;
@@ -44,7 +34,7 @@ function update(): void {
     const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
     for (const item of items) {
         if (item.needInitialization) {
-            item.reset(canvasPlotter.size, items, Parameters.spacing, acceptedSizesForNewItems);
+            item.reset(domainSize, items, Parameters.spacing, acceptedSizesForNewItems);
         }
     }
 
@@ -53,7 +43,7 @@ function update(): void {
         for (const item of items) {
             item.zoomIn(zoomSpeed);
 
-            if (!item.isInDomain(canvasPlotter.size)) { // recycle items that are out of view
+            if (!item.isInDomain(domainSize)) { // recycle items that are out of view
                 item.needInitialization = true;
             }
         }
@@ -61,7 +51,7 @@ function update(): void {
     }
 }
 
-function draw(plotter: PlotterBase): void {
+function draw(items: PatternBase[], plotter: PlotterBase): void {
     plotter.initialize();
 
     for (const item of items) {
@@ -71,14 +61,16 @@ function draw(plotter: PlotterBase): void {
     plotter.finalize();
 }
 
+const itemsList: PatternBase[] = [];
 const canvasPlotter = new PlotterCanvas2D();
-Parameters.addRedrawObserver(() => needToRedraw = true);
 
 function mainLoop(): void {
-    update();
+    const plotter = canvasPlotter;
+
+    update(itemsList, plotter.size);
 
     if (needToRedraw) {
-        draw(canvasPlotter);
+        draw(itemsList, plotter);
         needToRedraw = false;
     }
 
@@ -86,9 +78,21 @@ function mainLoop(): void {
 }
 requestAnimationFrame(mainLoop);
 
+Parameters.addRedrawObserver(() => needToRedraw = true);
+
+Parameters.addItemObserver(() => {
+    needToAddItems = true;
+    needToRedraw = true;
+});
+
+Parameters.addClearObserver(() => {
+    itemsList.length = 0;
+    needToRedraw = true;
+});
+
 Parameters.addDownloadObserver(() => {
     const svgPlotter = new PlotterSVG(canvasPlotter.size);
-    draw(svgPlotter);
+    draw(itemsList, svgPlotter);
 
     const fileName = "packing.svg";
     const svgString = svgPlotter.export();
