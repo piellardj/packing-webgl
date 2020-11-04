@@ -51,6 +51,10 @@ function update(): void {
         const actualZoomSpeed = 1 + 0.01 * zoomSpeed;
         for (const item of items) {
             item.zoomIn(actualZoomSpeed);
+
+            if (!item.isInDomain(canvasPlotter.size)) { // recycle items that are out of view
+                item.needInitialization = true;
+            }
         }
         needToRedraw = true;
     }

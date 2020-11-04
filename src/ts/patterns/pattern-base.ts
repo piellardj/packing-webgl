@@ -33,11 +33,6 @@ abstract class PatternBase {
         }
     }
 
-    public randomizePosition(domainSize: ISize): void {
-        this.center.x = Math.round(domainSize.width * (Math.random() - 0.5));
-        this.center.y = Math.round(domainSize.height * (Math.random() - 0.5));
-    }
-
     public reset(domainSize: ISize, existingItems: PatternBase[]): void {
         this.color = Helper.randomHexColor();
 
@@ -55,9 +50,22 @@ abstract class PatternBase {
         console.log(`Failed to reset item after ${MAX_RESET_TRIES} tries.`);
     }
 
+    public isInDomain(domainSize: ISize): boolean {
+        const absX = Math.abs(this.center.x);
+        const absY = Math.abs(this.center.y);
+
+        return absX - 0.5 * this.size < 0.5 * domainSize.width &&
+            absY - 0.5 * this.size < 0.5 * domainSize.height;
+    }
+
     public abstract computeBiggestSizePossible(itemsToAvoid: PatternBase[]): number;
 
     protected abstract drawInternal(plotter: PlotterBase): void;
+
+    private randomizePosition(domainSize: ISize): void {
+        this.center.x = Math.round(domainSize.width * (Math.random() - 0.5));
+        this.center.y = Math.round(domainSize.height * (Math.random() - 0.5));
+    }
 }
 
 export { PatternBase }
