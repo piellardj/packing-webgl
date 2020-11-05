@@ -41,7 +41,7 @@ function performRecycling(items: PatternBase[], domainSize: ISize): number {
     }
 
     iRecycling++;
-    if (iRecycling % 100 === 0) {
+    if (iRecycling % 100 === 0 && nbItemsRecycled > 0) {
         console.log(`Recycled "${nbItemsRecycled}" with an average nbTries of "${triesTotal / nbItemsRecycled}".`);
     }
     return nbItemsRecycled;
