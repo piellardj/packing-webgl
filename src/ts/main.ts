@@ -62,14 +62,15 @@ function generateItems(items: PatternBase[], amount: number): void {
 
 /** @returns true if changes were made that require redrawing */
 function update(items: PatternBase[], domainSize: ISize): boolean {
-    const nbChangedItems = performRecycling(items, domainSize);
-
-    let changedSometing = (nbChangedItems > 0);
+    let changedSometing = false;
 
     if (Parameters.isZooming) {
         performZooming(items, domainSize);
         changedSometing = true;
     }
+
+    const nbRecycledItems = performRecycling(items, domainSize);
+    changedSometing = changedSometing || (nbRecycledItems > 0);
 
     return changedSometing;
 }
