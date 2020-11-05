@@ -16,6 +16,7 @@ abstract class PatternBase {
     public size: number;
     public color: string;
     public needInitialization: boolean;
+    private lastTestId: number;
 
     protected constructor() {
         this.needInitialization = true;
@@ -23,6 +24,7 @@ abstract class PatternBase {
         this.center = { x: 0, y: 0 };
         this.size = 0;
         this.color = "green";
+        this.lastTestId = 0;
     }
 
     public zoomIn(zoomFactor: number): void {
@@ -74,6 +76,8 @@ abstract class PatternBase {
     protected abstract drawInternal(plotter: PlotterBase): void;
 
     private computeBiggestSizePossible(grid: Grid): number {
+        const currentTestId = PatternBase.generateTestId();
+
         const biggestSizeToAvoidCenter = this.computeBiggestSizePossibleToAvoidPoint(CANVAS_CENTER);
         let rawMaxSize = biggestSizeToAvoidCenter;
 
@@ -82,7 +86,7 @@ abstract class PatternBase {
 
         const exactCellId = grid.getCellId(this.center);
         const existingItemsFromExactCell = grid.getItemsFromCell(exactCellId.x, exactCellId.y);
-        const biggestSizeToAvoidClosestItems = this.computeBiggestSizePossibleToAvoidItems(existingItemsFromExactCell);
+        const biggestSizeToAvoidClosestItems = this.computeBiggestSizePossibleToAvoidItems(existingItemsFromExactCell, currentTestId);
         rawMaxSize = Math.min(rawMaxSize, biggestSizeToAvoidClosestItems);
 
         // the closest items were maybe not enough, test items that are a bit further
@@ -93,19 +97,23 @@ abstract class PatternBase {
             const maxCellId = grid.getCellId(bottomRightPoint);
 
             const additionalItemsToTest = grid.getItemsFromCellsGroup(minCellId.x, minCellId.y, maxCellId.x, maxCellId.y);
-            const biggestSizeToAvoidFurtherItems = this.computeBiggestSizePossibleToAvoidItems(additionalItemsToTest);
+            const biggestSizeToAvoidFurtherItems = this.computeBiggestSizePossibleToAvoidItems(additionalItemsToTest, currentTestId);
             rawMaxSize = Math.min(rawMaxSize, biggestSizeToAvoidFurtherItems);
         }
 
         return rawMaxSize;
     }
 
-    private computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[]): number {
+    private computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[], currentTestId: number): number {
         let maxSize = 100000;
 
         for (const item of itemsToAvoid) {
             if (!item.needInitialization) {
-                maxSize = Math.min(maxSize, this.computeBiggestSizePossibleToAvoidItem(item));
+                const testedAlready = (item.lastTestId === currentTestId);
+                if (!testedAlready) {
+                    maxSize = Math.min(maxSize, this.computeBiggestSizePossibleToAvoidItem(item));
+                    item.lastTestId = currentTestId;
+                }
             }
         }
 
@@ -115,6 +123,10 @@ abstract class PatternBase {
     private randomizePosition(domainSize: ISize): void {
         this.center.x = Math.round(domainSize.width * (Math.random() - 0.5));
         this.center.y = Math.round(domainSize.height * (Math.random() - 0.5));
+    }
+
+    private static generateTestId(): number {
+        return 1 + Math.round(Math.random() * 100000);
     }
 }
 
