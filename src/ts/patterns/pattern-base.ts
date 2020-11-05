@@ -45,10 +45,24 @@ abstract class PatternBase {
         while (iTry < MAX_RESET_TRIES) {
             this.randomizePosition(domainSize);
 
+            // first, test only the closest existing items
             const cellId = grid.getCellId(this.center);
-            const existingItems = grid.getItems(cellId.x, cellId.y);
+            const maxDistanceDetectable = grid.getDistanceToClosestBorder(this.center);
+            const existingItems = grid.getItemsFromCell(cellId.x, cellId.y);
 
-            const maxSize = sizeFactor * this.computeBiggestSizePossible(existingItems);
+            let rawMaxSize = this.computeBiggestSizePossible(existingItems);
+            if (rawMaxSize >= maxDistanceDetectable) {
+                // the closest items wer emaybe not enough, test items less close
+                const minPoint: IPoint = { x: this.center.x - 0.5 * rawMaxSize, y: this.center.y - 0.5 * rawMaxSize };
+                const maxPoint: IPoint = { x: this.center.x + 0.5 * rawMaxSize, y: this.center.y + 0.5 * rawMaxSize };
+                const minCellId = grid.getCellId(minPoint);
+                const maxCellId = grid.getCellId(maxPoint);
+
+                const additionalItemsToTest = grid.getItemsFromCellsGroup(minCellId.x, minCellId.y, maxCellId.x, maxCellId.y);
+                rawMaxSize = Math.min(rawMaxSize, this.computeBiggestSizePossible(additionalItemsToTest));
+            }
+
+            const maxSize = sizeFactor * rawMaxSize;
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.needInitialization = false;

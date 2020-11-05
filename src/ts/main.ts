@@ -142,7 +142,7 @@ function main(): void {
 
         if (needToRedraw) {
             if (Parameters.oneCellOnly) {
-                const localItems = grid.getItems(Parameters.cellX, Parameters.cellY);
+                const localItems = grid.getItemsFromCell(Parameters.cellX, Parameters.cellY);
                 draw(localItems, canvasPlotter);
             } else {
                 draw(itemsList, canvasPlotter);

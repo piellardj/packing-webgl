@@ -91,16 +91,52 @@ class Grid {
         };
     }
 
-    public getItems(cellX: number, cellY: number): PatternBase[] {
-        const cellId = this.computeCellId(cellX, cellY);
-        if (cellId >= 0 && cellId < this.gridCells.length) {
+    public getDistanceToClosestBorder(position: IPoint): number {
+        // position relative to the containing cell
+        const localX = (position.x - 0.5 * this.topLeftCorner.x) % this.cellSize;
+        const localY = (position.x - 0.5 * this.topLeftCorner.x) % this.cellSize;
+
+        const minDistanceX = Math.min(localX, this.cellSize - localX);
+        const minDistanceY = Math.min(localY, this.cellSize - localY);
+        return Math.min(minDistanceX, minDistanceY);
+    }
+
+
+    /** Provides the registered items that overlap a given cell.
+     * @param cellX (integer) horizontal position of the wanted cell
+     * @param cellY (integer) vertical position of the wanted cell
+     * @returns array of cells that overlap the wanted cell. If the wanted cell doesn't exist, returns empty array
+     */
+    public getItemsFromCell(cellX: number, cellY: number): PatternBase[] {
+        if (cellX >= 0 && cellX < this.gridSize.width && cellY >= 0 && cellY < this.gridSize.height) {
+            const cellId = this.computeCellId(cellX, cellY);
             return this.gridCells[cellId];
         }
         return [];
     }
 
+    /** Provides the registered items that overlap a certain group of cells.
+     * @param minCellX (integer) horizontal position of the lowest wanted cell
+     * @param minCellY (integer) vertical position of the lowest wanted cell
+     * @param maxCellX (integer) horizontal position of the highest wanted cell
+     * @param maxCellY (integer) vertical position of the highest wanted cell
+     * @returns array of cells that overlap the wanted group of cell. If no cell matches, returns empty array
+     */
+    public getItemsFromCellsGroup(minCellX: number, minCellY: number, maxCellX: number, maxCellY: number): PatternBase[] {
+        const result: PatternBase[] = [];
+
+        for (let iCellX = minCellX; iCellX <= maxCellX; iCellX++) {
+            for (let iCellY = minCellY; iCellY <= maxCellY; iCellY++) {
+                const cellItems = this.getItemsFromCell(iCellX, iCellY);
+                result.push.apply(result, cellItems);
+            }
+        }
+
+        return result;
+    }
+
     private resetDomain(domainSize: ISize, cellSize: number): void {
-        this.cellSize=  cellSize;
+        this.cellSize = cellSize;
         this.gridSize.width = Math.ceil(domainSize.width / cellSize);
         this.gridSize.height = Math.ceil(domainSize.height / cellSize);
 
@@ -112,6 +148,7 @@ class Grid {
         }
     }
 
+    /** No check that the parameters are in bounds. */
     private computeCellId(cellX: number, cellY: number): number {
         return cellX + cellY * this.gridSize.width;
     }
