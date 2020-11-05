@@ -93,8 +93,8 @@ class Grid {
 
     public getDistanceToClosestBorder(position: IPoint): number {
         // position relative to the containing cell
-        const localX = (position.x - 0.5 * this.topLeftCorner.x) % this.cellSize;
-        const localY = (position.x - 0.5 * this.topLeftCorner.x) % this.cellSize;
+        const localX = (position.x - this.topLeftCorner.x) % this.cellSize;
+        const localY = (position.y - this.topLeftCorner.y) % this.cellSize;
 
         const minDistanceX = Math.min(localX, this.cellSize - localX);
         const minDistanceY = Math.min(localY, this.cellSize - localY);
