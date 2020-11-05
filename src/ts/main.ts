@@ -14,9 +14,6 @@ import { NumberRange } from "./utils/number-range";
 
 import "./page-interface-generated";
 
-let needToRedraw = false;
-let needToAddItems = false;
-
 function performZooming(items: PatternBase[], domainSize: ISize): void {
     const zoomSpeed = 1 + 0.01 * Parameters.zoomSpeed;
     for (const item of items) {
@@ -29,7 +26,8 @@ function performZooming(items: PatternBase[], domainSize: ISize): void {
 }
 
 let iRecycling = 0;
-function performRecycling(items: PatternBase[], domainSize: ISize): void {
+/** @returns number of recycled items */
+function performRecycling(items: PatternBase[], domainSize: ISize): number {
     let nbItemsRecycled = 0;
     let triesTotal = 0;
 
@@ -45,6 +43,7 @@ function performRecycling(items: PatternBase[], domainSize: ISize): void {
     if (iRecycling % 100 === 0) {
         console.log(`Recycled "${nbItemsRecycled}" with an average nbTries of "${triesTotal / nbItemsRecycled}".`);
     }
+    return nbItemsRecycled;
 }
 
 function generateItems(items: PatternBase[], amount: number): void {
@@ -61,18 +60,18 @@ function generateItems(items: PatternBase[], amount: number): void {
     }
 }
 
-function update(items: PatternBase[], domainSize: ISize): void {
-    if (needToAddItems) {
-        generateItems(items, 100);
-        needToAddItems = false;
-    }
+/** @returns true if changes were made that require redrawing */
+function update(items: PatternBase[], domainSize: ISize): boolean {
+    const nbChangedItems = performRecycling(items, domainSize);
 
-    performRecycling(items, domainSize);
+    let changedSometing = (nbChangedItems > 0);
 
     if (Parameters.isZooming) {
         performZooming(items, domainSize);
-        needToRedraw = true;
+        changedSometing = true;
     }
+
+    return changedSometing;
 }
 
 function draw(items: PatternBase[], plotter: PlotterBase): void {
@@ -85,40 +84,53 @@ function draw(items: PatternBase[], plotter: PlotterBase): void {
     plotter.finalize();
 }
 
-const itemsList: PatternBase[] = [];
-const canvasPlotter = new PlotterCanvas2D();
+function main(): void {
+    const itemsList: PatternBase[] = [];
+    const canvasPlotter = new PlotterCanvas2D();
 
-function mainLoop(): void {
-    const plotter = canvasPlotter;
+    let needToAddItems = false;
+    let needToRedraw = true;
 
-    update(itemsList, plotter.size);
+    Parameters.addRedrawObserver(() => needToRedraw = true);
+    Parameters.addItemObserver(() => needToAddItems = true);
+    Parameters.addClearObserver(() => itemsList.length = 0);
 
-    if (needToRedraw) {
-        draw(itemsList, plotter);
-        needToRedraw = false;
+    Parameters.addDownloadObserver(() => {
+        const svgPlotter = new PlotterSVG(canvasPlotter.size);
+        draw(itemsList, svgPlotter);
+
+        const fileName = "packing.svg";
+        const svgString = svgPlotter.export();
+        Helper.downloadTextFile(fileName, svgString);
+    });
+
+    let nbItems = 0;
+
+    function mainLoop(): void {
+        const plotter = canvasPlotter;
+
+        if (needToAddItems) {
+            generateItems(itemsList, 100);
+            needToAddItems = false;
+        }
+
+        if (nbItems !== itemsList.length) {
+            needToRedraw = true;
+            nbItems = itemsList.length
+        }
+
+        if (update(itemsList, plotter.size)) {
+            needToRedraw = true;
+        }
+
+        if (needToRedraw) {
+            draw(itemsList, plotter);
+            needToRedraw = false;
+        }
+
+        requestAnimationFrame(mainLoop);
     }
-
     requestAnimationFrame(mainLoop);
 }
-requestAnimationFrame(mainLoop);
 
-Parameters.addRedrawObserver(() => needToRedraw = true);
-
-Parameters.addItemObserver(() => {
-    needToAddItems = true;
-    needToRedraw = true;
-});
-
-Parameters.addClearObserver(() => {
-    itemsList.length = 0;
-    needToRedraw = true;
-});
-
-Parameters.addDownloadObserver(() => {
-    const svgPlotter = new PlotterSVG(canvasPlotter.size);
-    draw(itemsList, svgPlotter);
-
-    const fileName = "packing.svg";
-    const svgString = svgPlotter.export();
-    Helper.downloadTextFile(fileName, svgString);
-});
+main();
