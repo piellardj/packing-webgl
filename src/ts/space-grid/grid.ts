@@ -43,24 +43,22 @@ class Grid {
 
         this.totalItems++;
 
-        const minX = item.center.x - 0.5 * item.size;
-        const minY = item.center.y - 0.5 * item.size;
-        const maxX = item.center.x + 0.5 * item.size;
-        const maxY = item.center.y + 0.5 * item.size;
+        const topLeft: IPoint = {
+            x: item.center.x - 0.5 * item.size,
+            y: item.center.y - 0.5 * item.size,
+        };
+        const bottomRight: IPoint = {
+            x: item.center.x + 0.5 * item.size,
+            y: item.center.y + 0.5 * item.size,
+        };
 
-        const minGridX = Math.floor((minX - this.topLeftCorner.x) / this.cellSize);
-        const minGridY = Math.floor((minY - this.topLeftCorner.y) / this.cellSize);
-        const maxGridX = Math.floor((maxX - this.topLeftCorner.x) / this.cellSize);
-        const maxGridY = Math.floor((maxY - this.topLeftCorner.y) / this.cellSize);
+        const minCellId = this.getCellId(topLeft);
+        const maxCellId = this.getCellId(bottomRight);
 
-        for (let iCellX = minGridX; iCellX <= maxGridX; iCellX++) {
-            if (iCellX >= 0 && iCellX < this.gridSize.width) {
-                for (let iCellY = minGridY; iCellY <= maxGridY; iCellY++) {
-                    if (iCellY >= 0 && iCellY < this.gridSize.height) {
-                        const cellId = this.computeCellId(iCellX, iCellY);
-                        this.gridCells[cellId].push(item);
-                    }
-                }
+        for (let iCellX = minCellId.x; iCellX <= maxCellId.x; iCellX++) {
+            for (let iCellY = minCellId.y; iCellY <= maxCellId.y; iCellY++) {
+                const cellId = this.computeCellId(iCellX, iCellY);
+                this.gridCells[cellId].push(item);
             }
         }
     }
@@ -85,10 +83,22 @@ class Grid {
     }
 
     public getCellId(position: IPoint): IPoint {
-        return {
-            x: Math.floor((position.x - this.topLeftCorner.x) / this.cellSize),
-            y: Math.floor((position.y - this.topLeftCorner.y) / this.cellSize),
-        };
+        let cellX = Math.floor((position.x - this.topLeftCorner.x) / this.cellSize);
+        let cellY = Math.floor((position.y - this.topLeftCorner.y) / this.cellSize);
+
+        if (cellX < 0) {
+            cellX = 0;
+        } else if (cellX >= this.gridSize.width) {
+            cellX = this.gridSize.width - 1;
+        }
+
+        if (cellY < 0) {
+            cellY = 0;
+        } else if (cellY >= this.gridSize.height) {
+            cellY = this.gridSize.height - 1;
+        }
+
+        return { x: cellX, y: cellY };
     }
 
     public getDistanceToClosestBorder(position: IPoint): number {
