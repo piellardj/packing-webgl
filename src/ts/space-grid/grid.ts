@@ -143,8 +143,10 @@ class Grid {
         this.topLeftCorner.x = -0.5 * domainSize.width;
         this.topLeftCorner.y = -0.5 * domainSize.height;
 
-        for (let i = 0; i < this.gridSize.width * this.gridSize.height; i++) {
-            this.gridCells[i] = [];
+        const nbCells = this.gridSize.width * this.gridSize.height;
+        this.gridCells.length = nbCells; // reduce size if needed
+        for (let i = 0; i < nbCells; i++) {
+            this.gridCells[i] = []; // empty/initialize all cells
         }
     }
 
