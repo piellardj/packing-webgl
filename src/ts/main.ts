@@ -11,11 +11,12 @@ import { PatternSquare } from "./patterns/pattern-square";
 import * as Helper from "./utils/helper";
 import { ISize } from "./utils/i-size";
 import { NumberRange } from "./utils/number-range";
+import { StopWatch } from "./utils/stop-watch";
 
 import "./page-interface-generated";
 
-function performZooming(items: PatternBase[], domainSize: ISize): void {
-    const zoomSpeed = 1 + 0.01 * Parameters.zoomSpeed;
+function performZooming(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize): void {
+    const zoomSpeed = 1 + deltaTimeInSeconds * Parameters.zoomSpeed;
     for (const item of items) {
         item.zoomIn(zoomSpeed);
 
@@ -61,11 +62,11 @@ function generateItems(items: PatternBase[], amount: number): void {
 }
 
 /** @returns true if changes were made that require redrawing */
-function update(items: PatternBase[], domainSize: ISize): boolean {
+function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize): boolean {
     let changedSometing = false;
 
     if (Parameters.isZooming) {
-        performZooming(items, domainSize);
+        performZooming(deltaTimeInSeconds, items, domainSize);
         changedSometing = true;
     }
 
@@ -106,9 +107,11 @@ function main(): void {
     });
 
     let nbItems = 0;
-
-    function mainLoop(): void {
-        const plotter = canvasPlotter;
+    const stopWatch = new StopWatch(0);
+    function mainLoop(time: number): void {
+        const timeInSeconds = time * 0.001;
+        const deltaTimeInSeconds = stopWatch.elapsedTime(timeInSeconds);
+        stopWatch.reset(timeInSeconds);
 
         if (needToAddItems) {
             generateItems(itemsList, 100);
@@ -120,12 +123,12 @@ function main(): void {
             nbItems = itemsList.length
         }
 
-        if (update(itemsList, plotter.size)) {
+        if (update(deltaTimeInSeconds, itemsList, canvasPlotter.size)) {
             needToRedraw = true;
         }
 
         if (needToRedraw) {
-            draw(itemsList, plotter);
+            draw(itemsList, canvasPlotter);
             needToRedraw = false;
         }
 

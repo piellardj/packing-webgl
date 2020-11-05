@@ -79,9 +79,9 @@ const data = {
                     title: "Zoom speed",
                     id: "zoom-speed-range-id",
                     min: 0,
-                    max: 1,
+                    max: 5,
                     value: 0,
-                    step: 0.01
+                    step: 0.05
                 },
             ]
         },
