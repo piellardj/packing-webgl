@@ -1,6 +1,8 @@
 import { PlotterBase } from "../plotter/plotter-base";
 import { PatternBase } from "./pattern-base";
 
+import { IPoint } from "../utils/i-point";
+
 class PatternSquare extends PatternBase {
     public constructor() {
         super();
@@ -10,10 +12,17 @@ class PatternSquare extends PatternBase {
         plotter.drawSquare(this.center, this.sideLength, this.color);
     }
 
-    public computeBiggestSizePossible(itemsToAvoid: PatternSquare[]): number {
-        const maxSizeX = Math.abs(this.center.x);
-        const maxSizeY = Math.abs(this.center.y);
-        let maxSize = Math.max(maxSizeX, maxSizeY); // avoid center of the canvas
+    protected computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number {
+        const toPointX = pointToAvoid.x - this.center.x;
+        const toPointY = pointToAvoid.y - this.center.y;
+
+        const maxSizeX = Math.abs(toPointX);
+        const maxSizeY = Math.abs(toPointY);
+        return Math.max(maxSizeX, maxSizeY);
+    }
+
+    public computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternSquare[]): number {
+        let maxSize = 10000;
 
         for (const item of itemsToAvoid) {
             if (!item.needInitialization) {

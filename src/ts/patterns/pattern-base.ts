@@ -9,6 +9,7 @@ import * as Helper from "../utils/helper";
 import { NumberRange } from "../utils/number-range";
 
 const MAX_RESET_TRIES = 100;
+const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
 abstract class PatternBase {
     public center: IPoint;
@@ -45,24 +46,7 @@ abstract class PatternBase {
         while (iTry < MAX_RESET_TRIES) {
             this.randomizePosition(domainSize);
 
-            // first, test only the closest existing items
-            const cellId = grid.getCellId(this.center);
-            const maxDistanceDetectable = grid.getDistanceToClosestBorder(this.center);
-            const existingItems = grid.getItemsFromCell(cellId.x, cellId.y);
-
-            let rawMaxSize = this.computeBiggestSizePossible(existingItems);
-            if (rawMaxSize >= maxDistanceDetectable) {
-                // the closest items wer emaybe not enough, test items less close
-                const minPoint: IPoint = { x: this.center.x - 0.5 * rawMaxSize, y: this.center.y - 0.5 * rawMaxSize };
-                const maxPoint: IPoint = { x: this.center.x + 0.5 * rawMaxSize, y: this.center.y + 0.5 * rawMaxSize };
-                const minCellId = grid.getCellId(minPoint);
-                const maxCellId = grid.getCellId(maxPoint);
-
-                const additionalItemsToTest = grid.getItemsFromCellsGroup(minCellId.x, minCellId.y, maxCellId.x, maxCellId.y);
-                rawMaxSize = Math.min(rawMaxSize, this.computeBiggestSizePossible(additionalItemsToTest));
-            }
-
-            const maxSize = sizeFactor * rawMaxSize;
+            const maxSize = sizeFactor * this.computeBiggestSizePossible(grid);
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.needInitialization = false;
@@ -83,9 +67,38 @@ abstract class PatternBase {
             absY - 0.5 * this.size < 0.5 * domainSize.height;
     }
 
-    public abstract computeBiggestSizePossible(itemsToAvoid: PatternBase[]): number;
+    protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;
+
+    protected abstract computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[]): number;
 
     protected abstract drawInternal(plotter: PlotterBase): void;
+
+    private computeBiggestSizePossible(grid: Grid): number {
+        const biggestSizeToAvoidCenter = this.computeBiggestSizePossibleToAvoidPoint(CANVAS_CENTER);
+        let rawMaxSize = biggestSizeToAvoidCenter;
+
+        // first, test only existing items that are in the exact same grid cell as us
+        const maxDistanceDetectableByExactCell = grid.getDistanceToClosestBorder(this.center);
+
+        const exactCellId = grid.getCellId(this.center);
+        const existingItemsFromExactCell = grid.getItemsFromCell(exactCellId.x, exactCellId.y);
+        const biggestSizeToAvoidClosestItems = this.computeBiggestSizePossibleToAvoidItems(existingItemsFromExactCell);
+        rawMaxSize = Math.min(rawMaxSize, biggestSizeToAvoidClosestItems);
+
+        // the closest items were maybe not enough, test items that are a bit further
+        if (rawMaxSize >= maxDistanceDetectableByExactCell) {
+            const topLeftPoint: IPoint = { x: this.center.x - 0.5 * rawMaxSize, y: this.center.y - 0.5 * rawMaxSize };
+            const bottomRightPoint: IPoint = { x: this.center.x + 0.5 * rawMaxSize, y: this.center.y + 0.5 * rawMaxSize };
+            const minCellId = grid.getCellId(topLeftPoint);
+            const maxCellId = grid.getCellId(bottomRightPoint);
+
+            const additionalItemsToTest = grid.getItemsFromCellsGroup(minCellId.x, minCellId.y, maxCellId.x, maxCellId.y);
+            const biggestSizeToAvoidFurtherItems = this.computeBiggestSizePossibleToAvoidItems(additionalItemsToTest);
+            rawMaxSize = Math.min(rawMaxSize, biggestSizeToAvoidFurtherItems);
+        }
+
+        return rawMaxSize;
+    }
 
     private randomizePosition(domainSize: ISize): void {
         this.center.x = Math.round(domainSize.width * (Math.random() - 0.5));
