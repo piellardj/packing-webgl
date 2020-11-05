@@ -4,7 +4,7 @@ const PROJECT_DIR = path.resolve(__dirname, "..", "..");
 
 module.exports = {
     devtool: "source-map",
-    mode: "production",
+    mode: "development",
     entry: path.join(PROJECT_DIR, "src", "ts", "main.ts"),
     output: {
         path: path.join(PROJECT_DIR, "docs", "script"),

@@ -3,6 +3,8 @@ import { ISize } from "../utils/i-size";
 
 import { PlotterBase } from "../plotter/plotter-base";
 
+import { Grid } from "../space-grid/grid";
+
 import * as Helper from "../utils/helper";
 import { NumberRange } from "../utils/number-range";
 
@@ -34,7 +36,7 @@ abstract class PatternBase {
         }
     }
 
-    public reset(domainSize: ISize, existingItems: PatternBase[], spacing: number, acceptedSizes: NumberRange): number {
+    public reset(domainSize: ISize, grid: Grid, spacing: number, acceptedSizes: NumberRange): number {
         this.color = Helper.randomHexColor();
 
         const sizeFactor = 1 - spacing;
@@ -42,6 +44,9 @@ abstract class PatternBase {
         let iTry = 0;
         while (iTry < MAX_RESET_TRIES) {
             this.randomizePosition(domainSize);
+
+            const cellId = grid.getCellId(this.center);
+            const existingItems = grid.getItems(cellId.x, cellId.y);
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(existingItems);
             if (acceptedSizes.isInRange(maxSize)) {

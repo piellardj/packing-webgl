@@ -13,6 +13,8 @@ abstract class PlotterBase {
     }
 
     public abstract drawCircle(center: IPoint, radius: number, color: string): void;
+
+    public abstract drawLine(from: IPoint, to: IPoint, thickness: number, color: string): void;
 }
 
 export { PlotterBase }

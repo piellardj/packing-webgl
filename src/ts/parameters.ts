@@ -8,6 +8,11 @@ const controlId = {
     MIN_SIZE: "min-size-range-id",
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
+    CELL_SIZE: "cell-size-range-id",
+    ONE_CELL_ONLY: "one-cell-only-checkbox-id",
+    SHOW_GRID: "show-grid-checkbox-id",
+    CELL_X: "cell-x-range-id",
+    CELL_Y: "cell-y-range-id",
     DOWNLOAD: "result-download-id",
 };
 
@@ -19,6 +24,10 @@ function triggerRedraw(): void {
     }
 }
 Page.Canvas.Observers.canvasResize.push(triggerRedraw);
+Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
+Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
+Page.Range.addObserver(controlId.CELL_X, triggerRedraw);
+Page.Range.addObserver(controlId.CELL_Y, triggerRedraw);
 
 type AddItemObserver = () => unknown;
 const addItemObservers: AddItemObserver[] = [];
@@ -75,6 +84,22 @@ abstract class Parameters {
     }
     public static get isZooming(): boolean {
         return Math.abs(Parameters.zoomSpeed) > .001; // avoid float precision issues
+    }
+
+    public static get cellSize(): number {
+        return Page.Range.getValue(controlId.CELL_SIZE);
+    }
+    public static get oneCellOnly(): boolean {
+        return Page.Checkbox.isChecked(controlId.ONE_CELL_ONLY);
+    }
+    public static get showGrid(): boolean {
+        return Page.Checkbox.isChecked(controlId.SHOW_GRID);
+    }
+    public static get cellX(): number {
+        return Page.Range.getValue(controlId.CELL_X);
+    }
+    public static get cellY(): number {
+        return Page.Range.getValue(controlId.CELL_Y);
     }
 
     public static addRedrawObserver(callback: RedrawObserver): void {

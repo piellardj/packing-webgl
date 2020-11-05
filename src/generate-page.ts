@@ -86,6 +86,50 @@ const data = {
             ]
         },
         {
+            title: "Debug",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Cell size",
+                    id: "cell-size-range-id",
+                    min: 10,
+                    max: 500,
+                    value: 100,
+                    step: 10
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "One cell only",
+                    id: "one-cell-only-checkbox-id",
+                    checked: false
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show grid",
+                    id: "show-grid-checkbox-id",
+                    checked: true
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Cell X",
+                    id: "cell-x-range-id",
+                    min: 0,
+                    max: 20,
+                    value: 0,
+                    step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Cell Y",
+                    id: "cell-y-range-id",
+                    min: 0,
+                    max: 20,
+                    value: 0,
+                    step: 1
+                },
+            ]
+        },
+        {
             title: "Output",
             controls: [
                 {

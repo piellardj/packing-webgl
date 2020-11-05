@@ -52,6 +52,20 @@ class PlotterCanvas2D extends PlotterBase {
         this.context.closePath();
     }
 
+    public drawLine(from: IPoint, to: IPoint, thickness: number, color: string): void {
+        this.context.fillStyle = "none";
+        this.context.strokeStyle = color;
+        this.context.lineWidth = thickness;
+
+        this.context.beginPath();
+        this.context.moveTo(from.x + 0.5 * this._size.width, from.y + 0.5 * this._size.height);
+        this.context.lineTo(to.x + 0.5 * this._size.width, to.y + 0.5 * this._size.height);
+        this.context.stroke();
+        this.context.closePath();
+
+        this.context.strokeStyle = "none";
+    }
+
     private resizeCanvas(): void {
         const actualWidth = Math.floor(this.cssPixel * this.canvas.clientWidth);
         const actualHeight = Math.floor(this.cssPixel * this.canvas.clientHeight);

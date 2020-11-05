@@ -47,6 +47,15 @@ class PlotterSVG extends PlotterBase {
         this.stringParts.push(`\t\t<circle fill="${color}" cx="${centerX}" cy="${centerY}" r="${radius}"/>\n`);
     }
 
+    public drawLine(from: IPoint, to: IPoint, thickness: number, color: string): void {
+        const x1 = from.x + 0.5 * this._size.width;
+        const y1 = from.y + 0.5 * this._size.height;
+        const x2 = to.x + 0.5 * this._size.width;
+        const y2 = to.y + 0.5 * this._size.height;
+
+        this.stringParts.push(`\t\t<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" fill="none" stroke-width="${thickness}" stroke="${color}"/>`);
+    }
+
     public export(): string {
         const start = Date.now();
         const result = this.stringParts.join("");
