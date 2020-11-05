@@ -67,15 +67,15 @@ function generateUninitializedItems(amount: number): PatternBase[] {
 
 /** @returns true if changes were made that require redrawing */
 function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize, grid: Grid): boolean {
-    let changedSometing = false;
+    grid.reset(domainSize, Parameters.cellSize, items);
+
+    const nbRecycledItems = performRecycling(items, domainSize, grid);
+    let changedSometing = (nbRecycledItems > 0);
 
     if (Parameters.isZooming) {
         performZooming(deltaTimeInSeconds, items, domainSize);
         changedSometing = true;
     }
-
-    const nbRecycledItems = performRecycling(items, domainSize, grid);
-    changedSometing = changedSometing || (nbRecycledItems > 0);
 
     return changedSometing;
 }
@@ -129,8 +129,6 @@ function main(): void {
             needToRedraw = true;
             nbItems = itemsList.length
         }
-
-        grid.reset(canvasPlotter.size, Parameters.cellSize, itemsList);
 
         if (update(deltaTimeInSeconds, itemsList, canvasPlotter.size, grid)) {
             needToRedraw = true;
