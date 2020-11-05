@@ -18,27 +18,16 @@ class PatternCircle extends PatternBase {
         return Math.sqrt(toPointX * toPointX + toPointY * toPointY);
     }
 
-    public computeBiggestSizePossibleToAvoidItems(existingItems: PatternCircle[]): number {
-        let maxSize = 10000;
-
-        for (const item of existingItems) {
-            if (!item.needInitialization) {
-                maxSize = Math.min(maxSize, this.computeDistanceToEdge(item));
-            }
-        }
-
-        return 2 * maxSize;
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternCircle): number {
+        const toCenterX = this.center.x - itemToAvoid.center.x;
+        const toCenterY = this.center.y - itemToAvoid.center.y;
+        const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+        const distanceToEdge = Math.abs(distance - itemToAvoid.radius);
+        return 2 * distanceToEdge;
     }
 
     private get radius(): number {
         return 0.5 * this.size;
-    }
-
-    private computeDistanceToEdge(obstacle: PatternCircle): number {
-        const toCenterX = this.center.x - obstacle.center.x;
-        const toCenterY = this.center.y - obstacle.center.y;
-        const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
-        return Math.abs(distance - obstacle.radius);
     }
 }
 

@@ -21,16 +21,8 @@ class PatternSquare extends PatternBase {
         return Math.max(maxSizeX, maxSizeY);
     }
 
-    public computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternSquare[]): number {
-        let maxSize = 10000;
-
-        for (const item of itemsToAvoid) {
-            if (!item.needInitialization) {
-                maxSize = Math.min(maxSize, this.computeDistanceToEdge(item));
-            }
-        }
-
-        return 2 * maxSize;
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare): number {
+        return 2 * this.computeDistanceToEdge(itemToAvoid);
     }
 
     private get sideLength(): number {

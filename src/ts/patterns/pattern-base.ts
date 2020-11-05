@@ -69,7 +69,7 @@ abstract class PatternBase {
 
     protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;
 
-    protected abstract computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[]): number;
+    protected abstract computeBiggestSizePossibleToAvoidItem(itemsToAvoid: PatternBase): number;
 
     protected abstract drawInternal(plotter: PlotterBase): void;
 
@@ -98,6 +98,18 @@ abstract class PatternBase {
         }
 
         return rawMaxSize;
+    }
+
+    private computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[]): number {
+        let maxSize = 100000;
+
+        for (const item of itemsToAvoid) {
+            if (!item.needInitialization) {
+                maxSize = Math.min(maxSize, this.computeBiggestSizePossibleToAvoidItem(item));
+            }
+        }
+
+        return maxSize;
     }
 
     private randomizePosition(domainSize: ISize): void {
