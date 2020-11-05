@@ -15,16 +15,12 @@ class Grid {
 
     constructor(domainSize: ISize, cellSize: number) {
         this.cellSize = cellSize;
-        this.gridSize = {
-            width: Math.ceil(domainSize.width / cellSize),
-            height: Math.ceil(domainSize.height / cellSize),
-        };
+        this.gridSize = { width: 0, height: 0 };
         this.gridCells = [];
-        this.topLeftCorner = {
-            x: -0.5 * domainSize.width,
-            y: -0.5 * domainSize.height,
-        };
+        this.topLeftCorner = { x: 0, y: 0 };
         this.totalItems = 0;
+
+        this.reset(domainSize, cellSize, []);
     }
 
     public reset(domainSize: ISize, cellSize: number, items: PatternBase[]): void {
