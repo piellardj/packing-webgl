@@ -101,7 +101,6 @@ class Grid {
         return Math.min(minDistanceX, minDistanceY);
     }
 
-
     /** Provides the registered items that overlap a given cell.
      * @param cellX (integer) horizontal position of the wanted cell
      * @param cellY (integer) vertical position of the wanted cell
@@ -115,7 +114,7 @@ class Grid {
         return [];
     }
 
-    /** Provides the registered items that overlap a certain group of cells.
+    /** Provides the registered items that overlap a certain group of cells. Contains duplicates.
      * @param minCellX (integer) horizontal position of the lowest wanted cell
      * @param minCellY (integer) vertical position of the lowest wanted cell
      * @param maxCellX (integer) horizontal position of the highest wanted cell
