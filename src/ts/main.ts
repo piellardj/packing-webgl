@@ -32,21 +32,30 @@ function performZooming(deltaTimeInSeconds: number, items: PatternBase[], domain
 /** @returns number of recycled items */
 function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): number {
     let nbItemsRecycled = 0;
-    let triesTotal = 0;
 
     const sizeFactor = 1 - Parameters.spacing;
     const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
+    const maxTries = Parameters.maxTriesPerFrame;
+    let triesLeft = maxTries;
 
     for (const item of items) {
         if (item.needInitialization) {
-            triesTotal += item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems);
-            grid.registerItem(item);
-            nbItemsRecycled++;
+            triesLeft -= item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems, triesLeft);
+            const succeeded = !item.needInitialization;
+            if (succeeded) {
+                grid.registerItem(item);
+                nbItemsRecycled++;
+            }
+
+            if (triesLeft <= 0) {
+                break;
+            }
         }
     }
 
     if (FrameCounter.isVerboseFrame() && nbItemsRecycled > 0) {
-        console.log(`Recycled "${nbItemsRecycled}" with an average nbTries of "${triesTotal / nbItemsRecycled}".`);
+        const nbTries = maxTries - triesLeft;
+        console.log(`Recycled "${nbItemsRecycled}" items with a total of "${nbTries}"\t/\t"${maxTries}" tries ("${nbTries/nbItemsRecycled}" per item).`);
     }
     return nbItemsRecycled;
 }

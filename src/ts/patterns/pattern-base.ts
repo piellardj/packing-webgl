@@ -8,7 +8,6 @@ import { Grid } from "../space-grid/grid";
 import * as Helper from "../utils/helper";
 import { NumberRange } from "../utils/number-range";
 
-const MAX_RESET_TRIES = 100;
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
 const MAX_TEST_ID = 999999999999; // lower (for extra safety) than Number.MAX_SAFE_INTEGER (which is not supported by IE11)
@@ -47,9 +46,10 @@ abstract class PatternBase {
         }
     }
 
-    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange): number {
+    /** @returns the number of tries (regardless of the success of the reset) */
+    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, maxTries: number): number {
         let iTry = 0;
-        while (iTry < MAX_RESET_TRIES) {
+        while (iTry < maxTries) {
             this.randomizePosition(domainSize);
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(grid);

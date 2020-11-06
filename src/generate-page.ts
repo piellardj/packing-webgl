@@ -90,6 +90,15 @@ const data = {
             controls: [
                 {
                     type: Demopage.supportedControls.Range,
+                    title: "Max tries per frame",
+                    id: "max-tries-per-frame-range-id",
+                    min: 100,
+                    max: 10000,
+                    value: 200,
+                    step: 100
+                },
+                {
+                    type: Demopage.supportedControls.Range,
                     title: "Cell size",
                     id: "cell-size-range-id",
                     min: 10,

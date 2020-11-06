@@ -8,6 +8,7 @@ const controlId = {
     MIN_SIZE: "min-size-range-id",
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
+    MAX_TRIES_PER_FRAME: "max-tries-per-frame-range-id",
     CELL_SIZE: "cell-size-range-id",
     ONE_CELL_ONLY: "one-cell-only-checkbox-id",
     SHOW_GRID: "show-grid-checkbox-id",
@@ -86,6 +87,11 @@ abstract class Parameters {
         return Math.abs(Parameters.zoomSpeed) > .001; // avoid float precision issues
     }
 
+    /* === DEBUG SECTION === */
+
+    public static get maxTriesPerFrame(): number {
+        return Page.Range.getValue(controlId.MAX_TRIES_PER_FRAME);
+    }
     public static get cellSize(): number {
         return Page.Range.getValue(controlId.CELL_SIZE);
     }
