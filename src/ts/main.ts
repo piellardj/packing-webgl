@@ -29,8 +29,13 @@ function performZooming(deltaTimeInSeconds: number, items: PatternBase[], domain
     }
 }
 
+interface IRecyclingResult {
+    nbItemsRecycled: number;
+    reorderedItemsList: PatternBase[];
+}
+
 /** @returns number of recycled items */
-function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): number {
+function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): IRecyclingResult {
     let nbItemsRecycled = 0;
 
     const sizeFactor = 1 - Parameters.spacing;
@@ -38,26 +43,32 @@ function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): 
     const maxTries = Parameters.maxTriesPerFrame;
     let triesLeft = maxTries;
 
+    const reorderedItemsList: PatternBase[] = [];
+    const previouslyUninitializedItems: PatternBase[] = [];
+
     for (const item of items) {
-        if (item.needInitialization) {
+        if (!item.needInitialization) {
+            reorderedItemsList.push(item);
+        } else {
+            previouslyUninitializedItems.push(item);
+
             triesLeft -= item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems, triesLeft);
             const succeeded = !item.needInitialization;
             if (succeeded) {
                 grid.registerItem(item);
                 nbItemsRecycled++;
             }
-
-            if (triesLeft <= 0) {
-                break;
-            }
         }
     }
 
     if (FrameCounter.isVerboseFrame() && nbItemsRecycled > 0) {
         const nbTries = maxTries - triesLeft;
-        console.log(`Recycled "${nbItemsRecycled}" items with a total of "${nbTries}"\t/\t"${maxTries}" tries ("${nbTries/nbItemsRecycled}" per item).`);
+        console.log(`Recycled "${nbItemsRecycled}" items with a total of "${nbTries}"\t/\t"${maxTries}" tries ("${nbTries / nbItemsRecycled}" per item).`);
     }
-    return nbItemsRecycled;
+
+    reorderedItemsList.push.apply(reorderedItemsList, previouslyUninitializedItems);
+
+    return { nbItemsRecycled, reorderedItemsList };
 }
 
 function generateUninitializedItems(amount: number): PatternBase[] {
@@ -76,21 +87,37 @@ function generateUninitializedItems(amount: number): PatternBase[] {
     return items;
 }
 
+interface IUpdateResult {
+    needRedraw: boolean;
+    reorderedItemsList: PatternBase[];
+}
 /** @returns true if changes were made that require redrawing */
-function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize, grid: Grid): boolean {
+function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize, grid: Grid, nbItemsToAdd: number): IUpdateResult {
     grid.reset(domainSize, Parameters.cellSize, items);
 
-    const nbRecycledItems = performRecycling(items, domainSize, grid);
-    let changedSometing = (nbRecycledItems > 0);
+    let changedSomething = false;
+
+    if (nbItemsToAdd > 0) {
+        const newItems = generateUninitializedItems(1000);
+        items.push.apply(items, newItems); // add new items to existing ones
+        changedSomething = true;
+    }
+
+    const recyclingResult = performRecycling(items, domainSize, grid);
+    changedSomething = changedSomething || (recyclingResult.nbItemsRecycled > 0);
 
     if (Parameters.isZooming) {
         performZooming(deltaTimeInSeconds, items, domainSize);
-        changedSometing = true;
+        changedSomething = true;
     }
 
-    return changedSometing;
+    return {
+        needRedraw: changedSomething,
+        reorderedItemsList: recyclingResult.reorderedItemsList,
+    };
 }
 
+/** Draws the provided items in their order. */
 function draw(items: PatternBase[], plotter: PlotterBase): void {
     plotter.initialize();
 
@@ -102,7 +129,7 @@ function draw(items: PatternBase[], plotter: PlotterBase): void {
 }
 
 function main(): void {
-    const itemsList: PatternBase[] = [];
+    let itemsList: PatternBase[] = [];
     const canvasPlotter = new PlotterCanvas2D();
     const grid = new Grid(canvasPlotter.size, Parameters.cellSize);
 
@@ -122,7 +149,6 @@ function main(): void {
         Helper.downloadTextFile(fileName, svgString);
     });
 
-    let nbItems = 0;
     const stopWatch = new StopWatch(0);
     function mainLoop(time: number): void {
         const timeInSeconds = time * 0.001;
@@ -130,20 +156,11 @@ function main(): void {
         stopWatch.reset(timeInSeconds);
         FrameCounter.incrementFrame();
 
-        if (needToAddItems) {
-            const newItems = generateUninitializedItems(1000);
-            itemsList.push.apply(itemsList, newItems); // add new items to existing ones
-            needToAddItems = false;
-        }
-
-        if (nbItems !== itemsList.length) {
-            needToRedraw = true;
-            nbItems = itemsList.length
-        }
-
-        if (update(deltaTimeInSeconds, itemsList, canvasPlotter.size, grid)) {
-            needToRedraw = true;
-        }
+        const nbItemsToAdd = needToAddItems ? 1000 : 0;
+        needToAddItems = false;
+        const updateResult = update(deltaTimeInSeconds, itemsList, canvasPlotter.size, grid, nbItemsToAdd);
+        itemsList = updateResult.reorderedItemsList;
+        needToRedraw = needToRedraw || updateResult.needRedraw;
 
         if (FrameCounter.isVerboseFrame()) {
             console.log(`${grid.totalItems}\t/\t${itemsList.length} initialized items.`);
