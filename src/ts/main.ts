@@ -63,7 +63,8 @@ function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): 
 
     if (FrameCounter.isVerboseFrame() && nbItemsRecycled > 0) {
         const nbTries = maxTries - triesLeft;
-        console.log(`Recycled "${nbItemsRecycled}" items with a total of "${nbTries}"\t/\t"${maxTries}" tries ("${nbTries / nbItemsRecycled}" per item).`);
+        const nbTriesPerItem = (nbTries / nbItemsRecycled).toFixed(1);
+        console.log(`${nbItemsRecycled} / ${previouslyUninitializedItems.length} items recycled with a total of ${nbTries} / ${maxTries} tries (${nbTriesPerItem} per item).`);
     }
 
     reorderedItemsList.push.apply(reorderedItemsList, previouslyUninitializedItems);
@@ -109,6 +110,10 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
     if (Parameters.isZooming) {
         performZooming(deltaTimeInSeconds, items, domainSize);
         changedSomething = true;
+    }
+
+    if (FrameCounter.isVerboseFrame()) {
+        console.log(`${items.length} items in total.`);
     }
 
     return {
@@ -161,10 +166,6 @@ function main(): void {
         const updateResult = update(deltaTimeInSeconds, itemsList, canvasPlotter.size, grid, nbItemsToAdd);
         itemsList = updateResult.reorderedItemsList;
         needToRedraw = needToRedraw || updateResult.needRedraw;
-
-        if (FrameCounter.isVerboseFrame()) {
-            console.log(`${grid.totalItems}\t/\t${itemsList.length} initialized items.`);
-        }
 
         if (needToRedraw) {
             if (Parameters.oneCellOnly) {
