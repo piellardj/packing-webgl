@@ -31,7 +31,7 @@ abstract class PatternBase {
 
         this.center = { x: 0, y: 0 };
         this.size = 0;
-        this.color = "green";
+        this.color = Helper.randomHexColor();
         this.lastTestId = 0;
     }
 
@@ -48,8 +48,6 @@ abstract class PatternBase {
     }
 
     public reset(domainSize: ISize, grid: Grid, spacing: number, acceptedSizes: NumberRange): number {
-        this.color = Helper.randomHexColor();
-
         const sizeFactor = 1 - spacing;
 
         let iTry = 0;
