@@ -20,9 +20,9 @@ abstract class PlotterCanvasBase extends PlotterBase {
         return this._size;
     }
 
-    public initialize(): void {
+    public initialize(backgroundColor: string): void {
         this.resizeCanvas();
-        this.clearCanvas("black");
+        this.clearCanvas(backgroundColor);
     }
 
     protected abstract clearCanvas(color: string): void;

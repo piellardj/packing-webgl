@@ -19,13 +19,13 @@ class PlotterSVG extends PlotterBase {
         return this._size;
     }
 
-    public initialize(): void {
+    public initialize(backgroundColor: string): void {
         this.stringParts = [];
 
         this.stringParts.push(`<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n`);
         this.stringParts.push(`<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ${this._size.width} ${this._size.height}">\n`);
 
-        this.stringParts.push(`\t<rect fill="black" stroke="none" x="0" y="0" width="${this._size.width}" height="${this._size.height}"/>\n`);
+        this.stringParts.push(`\t<rect fill="${backgroundColor}" stroke="none" x="0" y="0" width="${this._size.width}" height="${this._size.height}"/>\n`);
         this.stringParts.push(`\t<g stroke="none">\n`);
     }
 

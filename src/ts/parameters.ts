@@ -7,6 +7,7 @@ const controlId = {
     MIN_SIZE: "min-size-range-id",
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
+    BLACK_BACKGROUND: "black-background-checkbox-id",
     MAX_TRIES_PER_FRAME: "max-tries-per-frame-range-id",
     CELL_SIZE: "cell-size-range-id",
     ONE_CELL_ONLY: "one-cell-only-checkbox-id",
@@ -24,6 +25,7 @@ function triggerRedraw(): void {
     }
 }
 Page.Canvas.Observers.canvasResize.push(triggerRedraw);
+Page.Checkbox.addObserver(controlId.BLACK_BACKGROUND, triggerRedraw);
 Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
 Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
 Page.Range.addObserver(controlId.CELL_X, triggerRedraw);
@@ -80,6 +82,10 @@ abstract class Parameters {
     }
     public static get isZooming(): boolean {
         return Math.abs(Parameters.zoomSpeed) > .001; // avoid float precision issues
+    }
+
+    public static get blackBackground(): boolean {
+        return Page.Checkbox.isChecked(controlId.BLACK_BACKGROUND); // avoid float precision issues
     }
 
     /* === DEBUG SECTION === */

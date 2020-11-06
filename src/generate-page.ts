@@ -74,6 +74,12 @@ const data = {
                     value: 0,
                     step: 0.05
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Black background",
+                    id: "black-background-checkbox-id",
+                    checked: true
+                },
             ]
         },
         {

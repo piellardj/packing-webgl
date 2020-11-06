@@ -124,7 +124,8 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
 
 /** Draws the provided items in their order. */
 function draw(items: PatternBase[], plotter: PlotterBase): void {
-    plotter.initialize();
+    const backgroundColor = Parameters.blackBackground ? "black" : "white";
+    plotter.initialize(backgroundColor);
 
     for (const item of items) {
         item.draw(plotter);

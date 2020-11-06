@@ -4,7 +4,7 @@ import { ISize } from "../utils/i-size";
 abstract class PlotterBase {
     public abstract get size(): ISize;
 
-    public abstract initialize(): void;
+    public abstract initialize(backgroundColor: string): void;
     public abstract finalize(): void;
 
     public abstract drawRectangle(center: IPoint, size: ISize, color: string): void;
