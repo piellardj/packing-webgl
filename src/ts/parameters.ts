@@ -3,7 +3,6 @@ import "./page-interface-generated";
 const controlId = {
     LINES_PATTERN: "lines-pattern-style-tabs-id",
     PRIMITIVE: "primitive-tab-id",
-    DENSITY: "density-range-id",
     SPACING: "spacing-range-id",
     MIN_SIZE: "min-size-range-id",
     NEW_ITEM: "new-item-button-id",
@@ -64,10 +63,6 @@ enum EPrimitive {
 }
 
 abstract class Parameters {
-    public static get density(): number {
-        return Page.Range.getValue(controlId.DENSITY);
-    }
-
     public static get spacing(): number {
         return Page.Range.getValue(controlId.SPACING);
     }

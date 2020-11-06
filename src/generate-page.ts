@@ -43,15 +43,6 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Range,
-                    title: "Density",
-                    id: "density-range-id",
-                    min: 0,
-                    max: 1,
-                    value: 0.75,
-                    step: 0.01
-                },
-                {
-                    type: Demopage.supportedControls.Range,
                     title: "Spacing",
                     id: "spacing-range-id",
                     min: 0.01,
