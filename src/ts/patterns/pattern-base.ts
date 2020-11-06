@@ -11,6 +11,14 @@ import { NumberRange } from "../utils/number-range";
 const MAX_RESET_TRIES = 100;
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
+const MAX_TEST_ID = 999999999999; // lower (for extra safety) than Number.MAX_SAFE_INTEGER (which is not supported by IE11)
+let globalLastTestId = 1;
+
+function generateTestId(): number {
+    globalLastTestId = (globalLastTestId + 1) % MAX_TEST_ID;
+    return globalLastTestId;
+}
+
 abstract class PatternBase {
     public center: IPoint;
     public size: number;
@@ -76,7 +84,7 @@ abstract class PatternBase {
     protected abstract drawInternal(plotter: PlotterBase): void;
 
     private computeBiggestSizePossible(grid: Grid): number {
-        const currentTestId = PatternBase.generateTestId();
+        const currentTestId = generateTestId();
 
         const biggestSizeToAvoidCenter = this.computeBiggestSizePossibleToAvoidPoint(CANVAS_CENTER);
         let rawMaxSize = biggestSizeToAvoidCenter;
@@ -123,10 +131,6 @@ abstract class PatternBase {
     private randomizePosition(domainSize: ISize): void {
         this.center.x = Math.round(domainSize.width * (Math.random() - 0.5));
         this.center.y = Math.round(domainSize.height * (Math.random() - 0.5));
-    }
-
-    private static generateTestId(): number {
-        return 1 + Math.round(Math.random() * 100000);
     }
 }
 
