@@ -1,32 +1,18 @@
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
-import { PlotterBase } from "./plotter-base";
+import { PlotterCanvasBase } from "./plotter-canvas-base";
 
 import "../page-interface-generated";
 
-class PlotterCanvas2D extends PlotterBase {
-    private readonly canvas: HTMLCanvasElement;
+class PlotterCanvas2D extends PlotterCanvasBase {
     private readonly context: CanvasRenderingContext2D;
-    private readonly cssPixel: number;
-    private _size: ISize;
-
     public constructor() {
         super();
-
-        this.canvas = Page.Canvas.getCanvas();
         this.context = this.canvas.getContext("2d", { alpha: false });
-        this.cssPixel = window.devicePixelRatio ?? 1;
-        this.resizeCanvas();
     }
 
-    public get size(): ISize {
-        return this._size;
-    }
-
-    public initialize(): void {
-        this.resizeCanvas();
-
-        this.context.fillStyle = "black";
+    protected clearCanvas(color: string): void {
+        this.context.fillStyle = color;
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
@@ -64,21 +50,6 @@ class PlotterCanvas2D extends PlotterBase {
         this.context.closePath();
 
         this.context.strokeStyle = "none";
-    }
-
-    private resizeCanvas(): void {
-        const actualWidth = Math.floor(this.cssPixel * this.canvas.clientWidth);
-        const actualHeight = Math.floor(this.cssPixel * this.canvas.clientHeight);
-
-        if (this.canvas.width !== actualWidth || this.canvas.height !== actualHeight) {
-            this.canvas.width = actualWidth;
-            this.canvas.height = actualHeight;
-        }
-
-        this._size = {
-            width: this.canvas.width,
-            height: this.canvas.height,
-        }
     }
 }
 
