@@ -47,9 +47,7 @@ abstract class PatternBase {
         }
     }
 
-    public reset(domainSize: ISize, grid: Grid, spacing: number, acceptedSizes: NumberRange): number {
-        const sizeFactor = 1 - spacing;
-
+    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange): number {
         let iTry = 0;
         while (iTry < MAX_RESET_TRIES) {
             this.randomizePosition(domainSize);

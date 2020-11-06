@@ -34,10 +34,12 @@ function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): 
     let nbItemsRecycled = 0;
     let triesTotal = 0;
 
+    const sizeFactor = 1 - Parameters.spacing;
     const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
+
     for (const item of items) {
         if (item.needInitialization) {
-            triesTotal += item.reset(domainSize, grid, Parameters.spacing, acceptedSizesForNewItems);
+            triesTotal += item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems);
             grid.registerItem(item);
             nbItemsRecycled++;
         }
