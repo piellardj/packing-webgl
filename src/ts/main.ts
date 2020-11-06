@@ -143,7 +143,10 @@ function main(): void {
 
     Parameters.addRedrawObserver(() => needToRedraw = true);
     Parameters.addItemObserver(() => needToAddItems = true);
-    Parameters.addClearObserver(() => itemsList.length = 0);
+    Parameters.addClearObserver(() => {
+        itemsList.length = 0;
+        needToRedraw = true;
+    });
 
     Parameters.addDownloadObserver(() => {
         const svgPlotter = new PlotterSVG(canvasPlotter.size);
