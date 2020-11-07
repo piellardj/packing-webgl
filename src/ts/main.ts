@@ -10,7 +10,7 @@ import { PatternSquare } from "./patterns/pattern-square";
 import * as Helper from "./utils/helper";
 import { ISize } from "./utils/i-size";
 import { NumberRange } from "./utils/number-range";
-import * as FrameCounter from "./utils/frame-counter"
+import * as Statistics from "./statistics/statistics";
 
 import { Grid } from "./space-grid/grid";
 
@@ -60,7 +60,7 @@ function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): 
         }
     }
 
-    if (FrameCounter.isVerboseFrame() && nbItemsRecycled > 0) {
+    if (Statistics.isVerboseFrame() && nbItemsRecycled > 0) {
         const nbTries = maxTries - triesLeft;
         const nbTriesPerItem = (nbTries / nbItemsRecycled).toFixed(1);
         console.log(`${nbItemsRecycled} / ${previouslyUninitializedItems.length} items recycled with a total of ${nbTries} / ${maxTries} tries (${nbTriesPerItem} per item).`);
@@ -111,7 +111,7 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
         changedSomething = true;
     }
 
-    if (FrameCounter.isVerboseFrame()) {
+    if (Statistics.isVerboseFrame()) {
         console.log(`${items.length} items in total.`);
     }
 
@@ -166,11 +166,12 @@ function main(): void {
     });
 
     let lastRunTime = 0;
+    Statistics.initialize();
     function mainLoop(time: number): void {
         const deltaTimeInSeconds = 0.001 * (time - lastRunTime);
         lastRunTime = time;
 
-        FrameCounter.incrementFrame();
+        Statistics.registerFrame();
 
         const nbItemsToAdd = needToAddItems ? 1000 : 0;
         needToAddItems = false;
