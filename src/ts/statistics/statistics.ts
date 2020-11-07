@@ -1,5 +1,7 @@
 import { StopWatch } from "./stop-watch";
 
+import "../page-interface-generated";
+
 let totalFrames = 0;
 
 const timeSinceLastVerboseFrame = new StopWatch();
