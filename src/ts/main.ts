@@ -122,8 +122,10 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
     };
 }
 
-/** Draws the provided items in their order. */
-function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): void {
+/** Draws the provided items in their order.
+ * @returns Whether or not everything could be drawn
+ */
+function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
     const backgroundColor = Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     plotter.initialize(backgroundColor);
 
@@ -136,6 +138,8 @@ function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): void {
     }
 
     plotter.finalize();
+
+    return plotter.isReady;
 }
 
 function main(): void {
@@ -176,14 +180,16 @@ function main(): void {
         needToRedraw = needToRedraw || updateResult.needRedraw;
 
         if (needToRedraw) {
+            let successfulDraw = false;
+
             if (Parameters.oneCellOnly) {
                 const localItems = grid.getItemsFromCell(Parameters.cellX, Parameters.cellY);
-                draw(localItems, grid, canvasPlotter);
+                successfulDraw = draw(localItems, grid, canvasPlotter);
             } else {
-                draw(itemsList, grid, canvasPlotter);
+                successfulDraw = draw(itemsList, grid, canvasPlotter);
             }
 
-            needToRedraw = false;
+            needToRedraw = !successfulDraw;
         }
 
         requestAnimationFrame(mainLoop);

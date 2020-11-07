@@ -28,8 +28,12 @@ function downloadTextFile(fileName: string, content: string): void {
     }
 }
 
+const webgl = true;
+function chooseCanvasPlotter(): PlotterCanvasBase {
+    return webgl ? new PlotterCanvasWebGL() : new PlotterCanvas2D();
 }
 
 export {
+    chooseCanvasPlotter,
     downloadTextFile,
 }

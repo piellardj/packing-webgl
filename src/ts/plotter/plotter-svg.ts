@@ -1,6 +1,7 @@
 import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
+
 import { PlotterBase } from "./plotter-base";
 
 class PlotterSVG extends PlotterBase {
@@ -18,6 +19,10 @@ class PlotterSVG extends PlotterBase {
 
     public get size(): ISize {
         return this._size;
+    }
+
+    public get isReady(): boolean {
+        return true;
     }
 
     public initialize(backgroundColor: Color): void {

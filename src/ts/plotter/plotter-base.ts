@@ -5,6 +5,8 @@ import { ISize } from "../utils/i-size";
 abstract class PlotterBase {
     public abstract get size(): ISize;
 
+    public abstract get isReady(): boolean;
+
     public abstract initialize(backgroundColor: Color): void;
     public abstract finalize(): void;
 

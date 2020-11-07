@@ -13,6 +13,10 @@ class PlotterCanvas2D extends PlotterCanvasBase {
         this.context = this.canvas.getContext("2d", { alpha: false });
     }
 
+    public get isReady(): boolean {
+        return true;
+    }
+
     protected clearCanvas(color: Color): void {
         this.context.fillStyle = color.toString();
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);

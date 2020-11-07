@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as fse from "fs-extra";
 import * as path from "path";
 import { Demopage } from "webpage-templates";
 
@@ -162,3 +163,5 @@ buildResult.pageScriptDeclaration = "/* tslint:disable */\n" + buildResult.pageS
 
 const SCRIPT_DECLARATION_FILEPATH = path.join(SRC_DIR, "ts", "page-interface-generated.ts");
 fs.writeFileSync(SCRIPT_DECLARATION_FILEPATH, buildResult.pageScriptDeclaration);
+
+fse.copySync(path.join(SRC_DIR, "shaders"), path.join(DEST_DIR, "shaders"));

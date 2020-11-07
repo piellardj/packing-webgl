@@ -17,6 +17,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^14.14.6",
+    "fs-extra": "^9.0.1",
     "shx": "^0.3.3",
     "ts-loader": "^8.0.8",
     "ts-node": "^9.0.0",
