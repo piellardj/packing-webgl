@@ -1,10 +1,10 @@
 import "./page-interface-generated";
 
 const controlId = {
-    LINES_PATTERN: "lines-pattern-style-tabs-id",
     PRIMITIVE: "primitive-tab-id",
     SPACING: "spacing-range-id",
     MIN_SIZE: "min-size-range-id",
+    ALLOW_OVERLAPPING: "allow-overlapping-checkbox-id",
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
     BLACK_BACKGROUND: "black-background-checkbox-id",
@@ -25,6 +25,7 @@ function triggerRedraw(): void {
     }
 }
 Page.Canvas.Observers.canvasResize.push(triggerRedraw);
+Page.Checkbox.addObserver(controlId.ALLOW_OVERLAPPING, triggerRedraw);
 Page.Checkbox.addObserver(controlId.BLACK_BACKGROUND, triggerRedraw);
 Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
 Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
@@ -71,6 +72,10 @@ abstract class Parameters {
 
     public static get minSize(): number {
         return Page.Range.getValue(controlId.MIN_SIZE);
+    }
+
+    public static get allowOverlapping(): boolean {
+        return Page.Checkbox.isChecked(controlId.ALLOW_OVERLAPPING);
     }
 
     public static get primitive(): EPrimitive {

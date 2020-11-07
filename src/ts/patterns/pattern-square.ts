@@ -16,21 +16,24 @@ class PatternSquare extends PatternBase {
         return Math.max(maxSizeX, maxSizeY);
     }
 
-    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare): number {
-        return 2 * this.computeDistanceToEdge(itemToAvoid);
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare, allowOverlapping: boolean): number {
+        return 2 * this.computeDistanceToEdge(itemToAvoid, allowOverlapping);
     }
 
     private get sideLength(): number {
         return this.size;
     }
 
-    private computeDistanceToEdge(obstacle: PatternSquare): number {
+    private computeDistanceToEdge(obstacle: PatternSquare, allowOverlapping: boolean): number {
         const deltaX = Math.abs(this.center.x - obstacle.center.x);
         const deltaY = Math.abs(this.center.y - obstacle.center.y);
 
         if (deltaX < 0.5 * obstacle.sideLength) {
             if (deltaY < 0.5 * obstacle.sideLength) {
-                return Math.min(0.5 * obstacle.sideLength - deltaX, 0.5 * obstacle.sideLength - deltaY);
+                if (allowOverlapping) {
+                    return Math.min(0.5 * obstacle.sideLength - deltaX, 0.5 * obstacle.sideLength - deltaY);
+                }
+                return 0;
             } else {
                 return deltaY - 0.5 * obstacle.sideLength;
             }

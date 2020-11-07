@@ -37,6 +37,7 @@ interface IRecyclingResult {
 function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): IRecyclingResult {
     let nbItemsRecycled = 0;
 
+    const allowOverlapping = Parameters.allowOverlapping;
     const sizeFactor = 1 - Parameters.spacing;
     const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
     const maxTries = Parameters.maxTriesPerFrame;
@@ -51,7 +52,7 @@ function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): 
         } else {
             previouslyUninitializedItems.push(item);
 
-            triesLeft -= item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems, triesLeft);
+            triesLeft -= item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems, allowOverlapping, triesLeft);
             const succeeded = !item.needInitialization;
             if (succeeded) {
                 grid.registerItem(item);

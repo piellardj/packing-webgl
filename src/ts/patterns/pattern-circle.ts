@@ -13,12 +13,23 @@ class PatternCircle extends PatternBase {
         return Math.sqrt(toPointX * toPointX + toPointY * toPointY);
     }
 
-    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternCircle): number {
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternCircle, allowOverlapping: boolean): number {
+        return 2 * this.distanceToEdge(itemToAvoid, allowOverlapping);
+    }
+
+    private distanceToEdge(itemToAvoid: PatternCircle, allowOverlapping: boolean): number {
         const toCenterX = this.center.x - itemToAvoid.center.x;
         const toCenterY = this.center.y - itemToAvoid.center.y;
+
         const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
-        const distanceToEdge = Math.abs(distance - itemToAvoid.radius);
-        return 2 * distanceToEdge;
+
+        if (distance <= itemToAvoid.radius) {
+            if (allowOverlapping) {
+                return itemToAvoid.radius - distance;
+            }
+            return 0;
+        }
+        return distance - itemToAvoid.radius;
     }
 
     public get radius(): number {

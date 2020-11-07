@@ -93,6 +93,12 @@ const data = {
                     step: 1
                 },
                 {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Overlap",
+                    id: "allow-overlapping-checkbox-id",
+                    checked: true
+                },
+                {
                     type: Demopage.supportedControls.Button,
                     id: "new-item-button-id",
                     label: "New item",
