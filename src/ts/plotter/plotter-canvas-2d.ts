@@ -32,12 +32,14 @@ class PlotterCanvas2D extends PlotterCanvasBase {
         const halfHeight = 0.5 * this._size.height;
 
         for (const square of squares) {
-            const centerX = square.center.x + halfWidth;
-            const centerY = square.center.y + halfHeight;
-            const halfSize = 0.5 * square.size;
+            if (!square.needInitialization) {
+                const centerX = square.center.x + halfWidth;
+                const centerY = square.center.y + halfHeight;
+                const halfSize = 0.5 * square.size;
 
-            this.context.fillStyle = square.color.toString();
-            this.context.fillRect(centerX - halfSize, centerY - halfSize, square.size, square.size);
+                this.context.fillStyle = square.color.toString();
+                this.context.fillRect(centerX - halfSize, centerY - halfSize, square.size, square.size);
+            }
         }
     }
 

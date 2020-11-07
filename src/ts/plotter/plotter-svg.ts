@@ -48,11 +48,13 @@ class PlotterSVG extends PlotterBase {
 
         this.stringParts.push(`\t<g stroke="none">\n`);
         for (const square of squares) {
-            const centerX = square.center.x + halfWidth;
-            const centerY = square.center.y + halfHeight;
-            const halfSize = 0.5 * square.size;
+            if (!square.needInitialization) {
+                const centerX = square.center.x + halfWidth;
+                const centerY = square.center.y + halfHeight;
+                const halfSize = 0.5 * square.size;
 
-            this.stringParts.push(`\t\t<rect fill="${square.color}" x="${centerX - halfSize}" y="${centerY - halfSize}" width="${square.size}" height="${square.size}"/>\n`);
+                this.stringParts.push(`\t\t<rect fill="${square.color}" x="${centerX - halfSize}" y="${centerY - halfSize}" width="${square.size}" height="${square.size}"/>\n`);
+            }
         }
         this.stringParts.push(`\t</g>\n`);
     }
