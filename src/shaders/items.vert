@@ -4,7 +4,7 @@ attribute vec4 aColor; // in [0,1]^4, alpha == 0 to hide point
 
 uniform vec2 uScreenSize; // in pixels
 
-varying vec4 uColor;
+varying vec4 vColor;
 
 void main(void)
 {
@@ -17,5 +17,5 @@ void main(void)
     gl_Position = vec4(position, 0, 1);
     gl_PointSize = aSize;
 
-    uColor = aColor;
+    vColor = aColor;
 }

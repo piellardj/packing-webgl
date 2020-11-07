@@ -1,6 +1,6 @@
 precision lowp float;
 
-varying vec4 uColor;
+varying vec4 vColor;
 
 void main(void)
 {
@@ -11,5 +11,5 @@ void main(void)
         discard;
     }
 
-    gl_FragColor = uColor;
+    gl_FragColor = vColor;
 }
