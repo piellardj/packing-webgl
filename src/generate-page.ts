@@ -56,11 +56,10 @@ const data = {
     },
     controlsSections: [
         {
-            title: "Parameters",
+            title: "Packing",
             controls: [
                 {
                     type: Demopage.supportedControls.Tabs,
-                    title: "Primitive",
                     id: "primitive-tab-id",
                     unique: true,
                     options: [
@@ -99,6 +98,11 @@ const data = {
                     label: "New item",
                     flat: true
                 },
+            ]
+        },
+        {
+            title: "Display",
+            controls: [
                 {
                     type: Demopage.supportedControls.Range,
                     title: "Zoom speed",
