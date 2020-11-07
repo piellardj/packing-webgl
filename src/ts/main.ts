@@ -60,11 +60,9 @@ function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): 
         }
     }
 
-    if (Statistics.isVerboseFrame() && nbItemsRecycled > 0) {
-        const nbTries = maxTries - triesLeft;
-        const nbTriesPerItem = (nbTries / nbItemsRecycled).toFixed(1);
-        console.log(`${nbItemsRecycled} / ${previouslyUninitializedItems.length} items recycled with a total of ${nbTries} / ${maxTries} tries (${nbTriesPerItem} per item).`);
-    }
+    const nbPendingRecycling = previouslyUninitializedItems.length - nbItemsRecycled;
+    const nbTriesUsed = maxTries - triesLeft;
+    Statistics.registerRecyclingStats(items.length, nbItemsRecycled, nbPendingRecycling, nbTriesUsed);
 
     reorderedItemsList.push.apply(reorderedItemsList, previouslyUninitializedItems);
 
@@ -93,6 +91,8 @@ interface IUpdateResult {
 }
 /** @returns true if changes were made that require redrawing */
 function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize, grid: Grid, nbItemsToAdd: number): IUpdateResult {
+    Statistics.timeSpentInUpdate.start();
+
     grid.reset(domainSize, Parameters.cellSize, items);
 
     let changedSomething = false;
@@ -111,10 +111,7 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
         changedSomething = true;
     }
 
-    if (Statistics.isVerboseFrame()) {
-        console.log(`${items.length} items in total.`);
-    }
-
+    Statistics.timeSpentInUpdate.stop();
     return {
         needRedraw: changedSomething,
         reorderedItemsList: recyclingResult.reorderedItemsList,
@@ -125,6 +122,7 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
  * @returns Whether or not everything could be drawn
  */
 function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
+    Statistics.timeSpentInDraw.start();
     const backgroundColor = Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     plotter.initialize(backgroundColor);
 
@@ -138,6 +136,7 @@ function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
 
     plotter.finalize();
 
+    Statistics.timeSpentInDraw.stop();
     return plotter.isReady;
 }
 

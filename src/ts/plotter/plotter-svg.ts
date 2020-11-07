@@ -71,9 +71,7 @@ class PlotterSVG extends PlotterBase {
     }
 
     public export(): string {
-        const start = Date.now();
         const result = this.stringParts.join("");
-        console.log(`Concatenation took ${Date.now() - start} ms.`);
         return result;
     }
 }

@@ -15,7 +15,40 @@ const data = {
     scriptFiles: [
         "script/main.min.js"
     ],
-    indicators: [],
+    indicators: [
+        {
+            id: "fps",
+            label: "FPS"
+        },
+        {
+            id: "frame-time",
+            label: "Frame time"
+        },
+        {
+            id: "draw-time",
+            label: "Time spent in draw()"
+        },
+        {
+            id: "update-time",
+            label: "Time spent in update()"
+        },
+        {
+            id: "items-count",
+            label: "Total items"
+        },
+        {
+            id: "items-reclycled-count",
+            label: "Items recycled per second"
+        },
+        {
+            id: "items-pending-recycling-count",
+            label: "Items pending recycling"
+        },
+        {
+            id: "items-recycling-tries-count",
+            label: "Items recycling tries per frame"
+        },
+    ],
     canvas: {
         width: 512,
         height: 512,

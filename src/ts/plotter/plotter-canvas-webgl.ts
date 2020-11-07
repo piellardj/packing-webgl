@@ -38,7 +38,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         if (!initGL()) {
             throw new Error("Failed to initialize WebGL.");
         }
-        console.log(`Max supported point size: "${gl.ALIASED_POINT_SIZE_RANGE}" pixels.`);
+        console.log(`Max point size supported by WebGL: "${gl.ALIASED_POINT_SIZE_RANGE}" pixels.`);
 
         this.linesColor = new Color(0, 255, 0);
 
