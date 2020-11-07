@@ -1,4 +1,3 @@
-import { PlotterBase } from "../plotter/plotter-base";
 import { PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
@@ -6,10 +5,6 @@ import { IPoint } from "../utils/i-point";
 class PatternCircle extends PatternBase {
     public constructor() {
         super();
-    }
-
-    protected drawInternal(plotter: PlotterBase): void {
-        plotter.drawCircle(this.center, this.radius, this.color);
     }
 
     protected computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number {
@@ -26,7 +21,7 @@ class PatternCircle extends PatternBase {
         return 2 * distanceToEdge;
     }
 
-    private get radius(): number {
+    public get radius(): number {
         return 0.5 * this.size;
     }
 }

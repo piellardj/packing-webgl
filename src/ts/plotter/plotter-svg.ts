@@ -4,6 +4,9 @@ import { ISize } from "../utils/i-size";
 
 import { PlotterBase } from "./plotter-base";
 
+import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternSquare } from "../patterns/pattern-square";
+
 class PlotterSVG extends PlotterBase {
     private stringParts: string[];
     private readonly _size: ISize;
@@ -32,25 +35,42 @@ class PlotterSVG extends PlotterBase {
         this.stringParts.push(`<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ${this._size.width} ${this._size.height}">\n`);
 
         this.stringParts.push(`\t<rect fill="${backgroundColor}" stroke="none" x="0" y="0" width="${this._size.width}" height="${this._size.height}"/>\n`);
-        this.stringParts.push(`\t<g stroke="none">\n`);
     }
 
     // tslint:disable-next-line:no-empty
     public finalize(): void {
-        this.stringParts.push(`\t</g>\n`);
         this.stringParts.push(`</svg>\n`);
     }
 
-    public drawRectangle(center: IPoint, size: ISize, color: Color): void {
-        const centerX = center.x + 0.5 * this._size.width;
-        const centerY = center.y + 0.5 * this._size.height;
-        this.stringParts.push(`\t\t<rect fill="${color}" x="${centerX - 0.5 * size.width}" y="${centerY - 0.5 * size.height}" width="${size.width}" height="${size.height}"/>\n`);
+    public drawSquares(squares: PatternSquare[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        this.stringParts.push(`\t<g stroke="none">\n`);
+        for (const square of squares) {
+            const centerX = square.center.x + halfWidth;
+            const centerY = square.center.y + halfHeight;
+            const halfSize = 0.5 * square.size;
+
+            this.stringParts.push(`\t\t<rect fill="${square.color}" x="${centerX - halfSize}" y="${centerY - halfSize}" width="${square.size}" height="${square.size}"/>\n`);
+        }
+        this.stringParts.push(`\t</g>\n`);
     }
 
-    public drawCircle(center: IPoint, radius: number, color: Color): void {
-        const centerX = center.x + 0.5 * this._size.width;
-        const centerY = center.y + 0.5 * this._size.height;
-        this.stringParts.push(`\t\t<circle fill="${color}" cx="${centerX}" cy="${centerY}" r="${radius}"/>\n`);
+    public drawCircles(circles: PatternCircle[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        this.stringParts.push(`\t<g stroke="none">\n`);
+        for (const circle of circles) {
+            if (!circle.needInitialization) {
+                const centerX = circle.center.x + halfWidth;
+                const centerY = circle.center.y + halfHeight;
+
+                this.stringParts.push(`\t\t<circle fill="${circle.color}" cx="${centerX}" cy="${centerY}" r="${circle.radius}"/>\n`);
+            }
+        }
+        this.stringParts.push(`\t</g>\n`);
     }
 
     public initializeLinesDrawing(color: Color): void {

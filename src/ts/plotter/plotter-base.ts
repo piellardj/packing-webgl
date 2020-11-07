@@ -2,6 +2,9 @@ import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 
+import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternSquare } from "../patterns/pattern-square";
+
 abstract class PlotterBase {
     public abstract get size(): ISize;
 
@@ -10,12 +13,8 @@ abstract class PlotterBase {
     public abstract initialize(backgroundColor: Color): void;
     public abstract finalize(): void;
 
-    public abstract drawRectangle(center: IPoint, size: ISize, color: Color): void;
-    public drawSquare(center: IPoint, size: number, color: Color): void {
-        this.drawRectangle(center, {width: size, height: size}, color);
-    }
-
-    public abstract drawCircle(center: IPoint, radius: number, color: Color): void;
+    public abstract drawSquares(squares: PatternSquare[]): void;
+    public abstract drawCircles(circles: PatternCircle[]): void;
 
     /* Lines have  a 1 pixel thickness */
     public abstract initializeLinesDrawing(color: Color): void;

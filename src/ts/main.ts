@@ -126,8 +126,10 @@ function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
     const backgroundColor = Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     plotter.initialize(backgroundColor);
 
-    for (const item of items) {
-        item.draw(plotter);
+    if (Parameters.primitive === EPrimitive.CIRCLE) {
+        plotter.drawCircles(items as PatternCircle[]);
+    } else if (Parameters.primitive === EPrimitive.SQUARE) {
+        plotter.drawSquares(items as PatternSquare[]);
     }
 
     if (Parameters.showGrid) {

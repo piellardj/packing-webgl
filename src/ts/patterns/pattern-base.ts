@@ -2,8 +2,6 @@ import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 
-import { PlotterBase } from "../plotter/plotter-base";
-
 import { Grid } from "../space-grid/grid";
 
 import { NumberRange } from "../utils/number-range";
@@ -40,12 +38,6 @@ abstract class PatternBase {
         this.size *= zoomFactor;
     }
 
-    public draw(plotter: PlotterBase): void {
-        if (!this.needInitialization) {
-            this.drawInternal(plotter);
-        }
-    }
-
     /** @returns the number of tries (regardless of the success of the reset) */
     public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, maxTries: number): number {
         let iTry = 0;
@@ -76,8 +68,6 @@ abstract class PatternBase {
     protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;
 
     protected abstract computeBiggestSizePossibleToAvoidItem(itemsToAvoid: PatternBase): number;
-
-    protected abstract drawInternal(plotter: PlotterBase): void;
 
     private computeBiggestSizePossible(grid: Grid): number {
         const currentTestId = generateTestId();

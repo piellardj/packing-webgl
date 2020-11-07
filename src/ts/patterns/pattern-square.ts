@@ -1,4 +1,3 @@
-import { PlotterBase } from "../plotter/plotter-base";
 import { PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
@@ -6,10 +5,6 @@ import { IPoint } from "../utils/i-point";
 class PatternSquare extends PatternBase {
     public constructor() {
         super();
-    }
-
-    protected drawInternal(plotter: PlotterBase): void {
-        plotter.drawSquare(this.center, this.sideLength, this.color);
     }
 
     protected computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number {

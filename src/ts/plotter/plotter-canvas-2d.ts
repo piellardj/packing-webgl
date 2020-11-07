@@ -1,8 +1,10 @@
 import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
-import { ISize } from "../utils/i-size";
 
 import { PlotterCanvasBase } from "./plotter-canvas-base";
+
+import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternSquare } from "../patterns/pattern-square";
 
 import "../page-interface-generated";
 
@@ -25,23 +27,37 @@ class PlotterCanvas2D extends PlotterCanvasBase {
     // tslint:disable-next-line:no-empty
     public finalize(): void { }
 
-    public drawRectangle(center: IPoint, size: ISize, color: Color): void {
-        const centerX = center.x + 0.5 * this._size.width;
-        const centerY = center.y + 0.5 * this._size.height;
+    public drawSquares(squares: PatternSquare[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
 
-        this.context.fillStyle = color.toString();
-        this.context.fillRect(centerX - 0.5 * size.width, centerY - 0.5 * size.height, size.width, size.height);
+        for (const square of squares) {
+            const centerX = square.center.x + halfWidth;
+            const centerY = square.center.y + halfHeight;
+            const halfSize = 0.5 * square.size;
+
+            this.context.fillStyle = square.color.toString();
+            this.context.fillRect(centerX - halfSize, centerY - halfSize, square.size, square.size);
+        }
     }
 
-    public drawCircle(center: IPoint, radius: number, color: Color): void {
-        const centerX = center.x + 0.5 * this._size.width;
-        const centerY = center.y + 0.5 * this._size.height;
+    public drawCircles(circles: PatternCircle[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+        const TWO_PI = 2 * Math.PI;
 
-        this.context.fillStyle = color.toString();
-        this.context.beginPath();
-        this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        this.context.fill();
-        this.context.closePath();
+        for (const circle of circles) {
+            if (!circle.needInitialization) {
+                const centerX = circle.center.x + halfWidth;
+                const centerY = circle.center.y + halfHeight;
+
+                this.context.fillStyle = circle.color.toString();
+                this.context.beginPath();
+                this.context.arc(centerX, centerY, circle.radius, 0, TWO_PI);
+                this.context.fill();
+                this.context.closePath();
+            }
+        }
     }
 
     public initializeLinesDrawing(color: Color): void {
