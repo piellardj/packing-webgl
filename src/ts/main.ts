@@ -10,7 +10,6 @@ import { PatternSquare } from "./patterns/pattern-square";
 import * as Helper from "./utils/helper";
 import { ISize } from "./utils/i-size";
 import { NumberRange } from "./utils/number-range";
-import { StopWatch } from "./utils/stop-watch";
 import * as FrameCounter from "./utils/frame-counter"
 
 import { Grid } from "./space-grid/grid";
@@ -166,11 +165,11 @@ function main(): void {
         Helper.downloadTextFile(fileName, svgString);
     });
 
-    const stopWatch = new StopWatch(0);
+    let lastRunTime = 0;
     function mainLoop(time: number): void {
-        const timeInSeconds = time * 0.001;
-        const deltaTimeInSeconds = stopWatch.elapsedTime(timeInSeconds);
-        stopWatch.reset(timeInSeconds);
+        const deltaTimeInSeconds = 0.001 * (time - lastRunTime);
+        lastRunTime = time;
+
         FrameCounter.incrementFrame();
 
         const nbItemsToAdd = needToAddItems ? 1000 : 0;
