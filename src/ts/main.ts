@@ -6,16 +6,18 @@ import { PlotterSVG } from "./plotter/plotter-svg";
 import { PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternSquare } from "./patterns/pattern-square";
+import { PatternRectangle } from "./patterns/pattern-rectangle";
 
 import * as Helper from "./utils/helper";
 import { ISize } from "./utils/i-size";
 import { NumberRange } from "./utils/number-range";
+import { Color } from "./utils/color";
+
 import * as Statistics from "./statistics/statistics";
 
 import { Grid } from "./space-grid/grid";
 
 import "./page-interface-generated";
-import { Color } from "./utils/color";
 
 function performZooming(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize): void {
     const zoomSpeed = 1 + deltaTimeInSeconds * Parameters.zoomSpeed;
@@ -74,8 +76,10 @@ function generateUninitializedItems(amount: number): PatternBase[] {
     let instanciate: () => PatternBase;
     if (Parameters.primitive === EPrimitive.CIRCLE) {
         instanciate = () => new PatternCircle();
-    } else {
+    } else if (Parameters.primitive === EPrimitive.SQUARE) {
         instanciate = () => new PatternSquare();
+    }  else {
+        instanciate = () => new PatternRectangle();
     }
 
     const items: PatternBase[] = [];
@@ -131,6 +135,8 @@ function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
         plotter.drawCircles(items as PatternCircle[]);
     } else if (Parameters.primitive === EPrimitive.SQUARE) {
         plotter.drawSquares(items as PatternSquare[]);
+    } else if (Parameters.primitive === EPrimitive.RECTANGLE) {
+        plotter.drawRectangles(items as PatternRectangle[]);
     }
 
     if (Parameters.showGrid) {

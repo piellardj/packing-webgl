@@ -63,6 +63,7 @@ Page.Range.addObserver(controlId.MIN_SIZE, () => {
 enum EPrimitive {
     SQUARE = "square",
     CIRCLE = "circle",
+    RECTANGLE = "rectangle",
 }
 
 abstract class Parameters {

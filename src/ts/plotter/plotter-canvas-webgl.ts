@@ -6,6 +6,7 @@ import { PlotterCanvasBase } from "./plotter-canvas-base";
 import { PatternBase } from "../patterns/pattern-base";
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternSquare } from "../patterns/pattern-square";
+import { PatternRectangle } from "../patterns/pattern-rectangle";
 
 import { initGL, gl } from "../gl-utils/gl-canvas";
 import { Shader } from "../gl-utils/shader";
@@ -20,6 +21,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private linesShader: Shader | null;
     private squaresShader: Shader | null;
     private circlesShader: Shader | null;
+    private rectanglesShader: Shader | null;
 
     private readonly linesBuffer: number[];
     private readonly linesVBO: VBO;
@@ -29,6 +31,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
     private sizesBuffer: Float32Array;
     private readonly sizesVBO: VBO;
+
+    private aspectRatiosBuffer: Float32Array;
+    private readonly aspectRatiosVBO: VBO;
 
     private colorsBuffer: Float32Array;
     private readonly colorsVBO: VBO;
@@ -46,6 +51,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.linesShader = null;
         this.squaresShader = null;
         this.circlesShader = null;
+        this.rectanglesShader = null;
 
         this.linesBuffer = [];
         this.linesVBO = new VBO(gl, new Float32Array(this.linesBuffer), 2, gl.FLOAT, false);
@@ -55,6 +61,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
         this.sizesBuffer = new Float32Array([]);
         this.sizesVBO = new VBO(gl, this.sizesBuffer, 1, gl.FLOAT, false);
+
+        this.aspectRatiosBuffer = new Float32Array([]);
+        this.aspectRatiosVBO = new VBO(gl, this.aspectRatiosBuffer, 1, gl.FLOAT, false);
 
         this.colorsBuffer = new Float32Array([]);
         this.colorsVBO = new VBO(gl, this.colorsBuffer, 4, gl.FLOAT, false);
@@ -87,9 +96,20 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
             injected: {},
         }, (builtShader: Shader | null) => {
             if (builtShader === null) {
-                throw new Error("Failed to load or build the squares shader.");
+                throw new Error("Failed to load or build the circles shader.");
             }
             this.circlesShader = builtShader;
+        });
+
+        ShaderManager.buildShader({
+            vertexFilename: "rectangles.vert",
+            fragmentFilename: "rectangles.frag",
+            injected: {},
+        }, (builtShader: Shader | null) => {
+            if (builtShader === null) {
+                throw new Error("Failed to load or build the rectangles shader.");
+            }
+            this.rectanglesShader = builtShader;
         });
     }
 
@@ -116,6 +136,57 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
     public drawCircles(circles: PatternCircle[]): void {
         this.drawAsPoints(this.circlesShader, circles);
+    }
+
+    public drawRectangles(rectangles: PatternRectangle[]): void {
+        const nbRectangles = rectangles.length;
+        if (this.rectanglesShader !== null && nbRectangles > 0) {
+            const wantedPositionsBufferLength = 2 * nbRectangles;
+            if (this.positionsBuffer.length !== wantedPositionsBufferLength) {
+                this.positionsBuffer = new Float32Array(wantedPositionsBufferLength);
+            }
+
+            const wantedSizesBufferLength = nbRectangles;
+            if (this.sizesBuffer.length !== wantedSizesBufferLength) {
+                this.sizesBuffer = new Float32Array(wantedSizesBufferLength);
+            }
+
+            const wantedAspectRatiosBufferLength = nbRectangles;
+            if (this.aspectRatiosBuffer.length !== wantedAspectRatiosBufferLength) {
+                this.aspectRatiosBuffer = new Float32Array(wantedAspectRatiosBufferLength);
+            }
+
+            const wantedColorsBufferLength = 4 * nbRectangles;
+            if (this.colorsBuffer.length !== wantedColorsBufferLength) {
+                this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
+            }
+
+            for (let i = 0; i < nbRectangles; i++) {
+                this.positionsBuffer[2 * i + 0] = rectangles[i].center.x;
+                this.positionsBuffer[2 * i + 1] = rectangles[i].center.y;
+                this.sizesBuffer[i] = rectangles[i].size;
+                this.aspectRatiosBuffer[i] = rectangles[i].aspectRatio;
+                this.colorsBuffer[4 * i + 0] = rectangles[i].color.r / 255;
+                this.colorsBuffer[4 * i + 1] = rectangles[i].color.g / 255;
+                this.colorsBuffer[4 * i + 2] = rectangles[i].color.b / 255;
+                this.colorsBuffer[4 * i + 3] = rectangles[i].needInitialization ? 0 : 1;
+            }
+
+            this.positionsVBO.setData(this.positionsBuffer);
+            this.sizesVBO.setData(this.sizesBuffer);
+            this.aspectRatiosVBO.setData(this.aspectRatiosBuffer);
+            this.colorsVBO.setData(this.colorsBuffer);
+
+            this.rectanglesShader.a["aCoords"].VBO = this.positionsVBO;
+            this.rectanglesShader.a["aSize"].VBO = this.sizesVBO;
+            this.rectanglesShader.a["aAspectRatio"].VBO = this.aspectRatiosVBO;
+            this.rectanglesShader.a["aColor"].VBO = this.colorsVBO;
+            this.rectanglesShader.u["uScreenSize"].value = [this._size.width, this._size.height];
+
+            this.rectanglesShader.use();
+            this.rectanglesShader.bindUniformsAndAttributes();
+            gl.drawArrays(gl.POINTS, 0, nbRectangles);
+        }
     }
 
     private drawAsPoints(shader: Shader, items: PatternBase[]): void {

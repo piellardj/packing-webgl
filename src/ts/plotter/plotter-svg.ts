@@ -6,6 +6,7 @@ import { PlotterBase } from "./plotter-base";
 
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternSquare } from "../patterns/pattern-square";
+import { PatternRectangle } from "../patterns/pattern-rectangle";
 
 class PlotterSVG extends PlotterBase {
     private stringParts: string[];
@@ -71,6 +72,20 @@ class PlotterSVG extends PlotterBase {
 
                 this.stringParts.push(`\t\t<circle fill="${circle.color}" cx="${centerX}" cy="${centerY}" r="${circle.radius}"/>\n`);
             }
+        }
+        this.stringParts.push(`\t</g>\n`);
+    }
+
+    public drawRectangles(rectangles: PatternRectangle[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        this.stringParts.push(`\t<g stroke="none">\n`);
+        for (const rectangle of rectangles) {
+            const centerX = rectangle.center.x + halfWidth;
+            const centerY = rectangle.center.y + halfHeight;
+
+            this.stringParts.push(`\t\t<rect fill="${rectangle.color}" x="${centerX - 0.5 * rectangle.width}" y="${centerY - 0.5 * rectangle.height}" width="${rectangle.width}" height="${rectangle.height}"/>\n`);
         }
         this.stringParts.push(`\t</g>\n`);
     }

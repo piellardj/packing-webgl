@@ -71,7 +71,11 @@ const data = {
                         {
                             value: "circle",
                             label: "Circle"
-                        }
+                        },
+                        {
+                            value: "rectangle",
+                            label: "Rectangle"
+                        },
                     ]
                 },
                 {

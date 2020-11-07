@@ -5,6 +5,7 @@ import { PlotterCanvasBase } from "./plotter-canvas-base";
 
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternSquare } from "../patterns/pattern-square";
+import { PatternRectangle } from "../patterns/pattern-rectangle";
 
 import "../page-interface-generated";
 
@@ -58,6 +59,21 @@ class PlotterCanvas2D extends PlotterCanvasBase {
                 this.context.arc(centerX, centerY, circle.radius, 0, TWO_PI);
                 this.context.fill();
                 this.context.closePath();
+            }
+        }
+    }
+
+    public drawRectangles(rectangles: PatternRectangle[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        for (const rectangle of rectangles) {
+            if (!rectangle.needInitialization) {
+                const centerX = rectangle.center.x + halfWidth;
+                const centerY = rectangle.center.y + halfHeight;
+
+                this.context.fillStyle = rectangle.color.toString();
+                this.context.fillRect(centerX - 0.5 * rectangle.width, centerY - 0.5 * rectangle.height, rectangle.width, rectangle.height);
             }
         }
     }
