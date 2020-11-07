@@ -1,3 +1,4 @@
+import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 
@@ -5,7 +6,6 @@ import { PlotterBase } from "../plotter/plotter-base";
 
 import { Grid } from "../space-grid/grid";
 
-import * as Helper from "../utils/helper";
 import { NumberRange } from "../utils/number-range";
 
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
@@ -21,7 +21,7 @@ function generateTestId(): number {
 abstract class PatternBase {
     public center: IPoint;
     public size: number;
-    public color: string;
+    public readonly color: Color;
     public needInitialization: boolean;
     private lastTestId: number;
 
@@ -30,7 +30,7 @@ abstract class PatternBase {
 
         this.center = { x: 0, y: 0 };
         this.size = 0;
-        this.color = Helper.randomHexColor();
+        this.color = Color.random();
         this.lastTestId = 0;
     }
 

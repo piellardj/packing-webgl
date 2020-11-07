@@ -1,7 +1,6 @@
 import { EPrimitive, Parameters } from "./parameters";
 
 import { PlotterBase } from "./plotter/plotter-base";
-import { PlotterCanvas2D } from "./plotter/plotter-canvas-2d";
 import { PlotterSVG } from "./plotter/plotter-svg";
 
 import { PatternBase } from "./patterns/pattern-base";
@@ -17,6 +16,7 @@ import * as FrameCounter from "./utils/frame-counter"
 import { Grid } from "./space-grid/grid";
 
 import "./page-interface-generated";
+import { Color } from "./utils/color";
 
 function performZooming(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize): void {
     const zoomSpeed = 1 + deltaTimeInSeconds * Parameters.zoomSpeed;
@@ -123,12 +123,16 @@ function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: IS
 }
 
 /** Draws the provided items in their order. */
-function draw(items: PatternBase[], plotter: PlotterBase): void {
-    const backgroundColor = Parameters.blackBackground ? "black" : "white";
+function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): void {
+    const backgroundColor = Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     plotter.initialize(backgroundColor);
 
     for (const item of items) {
         item.draw(plotter);
+    }
+
+    if (Parameters.showGrid) {
+        grid.draw(plotter);
     }
 
     plotter.finalize();
@@ -136,7 +140,7 @@ function draw(items: PatternBase[], plotter: PlotterBase): void {
 
 function main(): void {
     let itemsList: PatternBase[] = [];
-    const canvasPlotter = new PlotterCanvas2D();
+    const canvasPlotter = Helper.chooseCanvasPlotter();
     const grid = new Grid(canvasPlotter.size, Parameters.cellSize);
 
     let needToAddItems = false;
@@ -151,7 +155,7 @@ function main(): void {
 
     Parameters.addDownloadObserver(() => {
         const svgPlotter = new PlotterSVG(canvasPlotter.size);
-        draw(itemsList, svgPlotter);
+        draw(itemsList, grid, svgPlotter);
 
         const fileName = "packing.svg";
         const svgString = svgPlotter.export();
@@ -174,14 +178,11 @@ function main(): void {
         if (needToRedraw) {
             if (Parameters.oneCellOnly) {
                 const localItems = grid.getItemsFromCell(Parameters.cellX, Parameters.cellY);
-                draw(localItems, canvasPlotter);
+                draw(localItems, grid, canvasPlotter);
             } else {
-                draw(itemsList, canvasPlotter);
+                draw(itemsList, grid, canvasPlotter);
             }
 
-            if (Parameters.showGrid) {
-                grid.draw(canvasPlotter);
-            }
             needToRedraw = false;
         }
 

@@ -1,3 +1,4 @@
+import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 import { PlotterBase } from "./plotter-base";
@@ -19,7 +20,7 @@ class PlotterSVG extends PlotterBase {
         return this._size;
     }
 
-    public initialize(backgroundColor: string): void {
+    public initialize(backgroundColor: Color): void {
         this.stringParts = [];
 
         this.stringParts.push(`<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n`);
@@ -35,25 +36,33 @@ class PlotterSVG extends PlotterBase {
         this.stringParts.push(`</svg>\n`);
     }
 
-    public drawRectangle(center: IPoint, size: ISize, color: string): void {
+    public drawRectangle(center: IPoint, size: ISize, color: Color): void {
         const centerX = center.x + 0.5 * this._size.width;
         const centerY = center.y + 0.5 * this._size.height;
         this.stringParts.push(`\t\t<rect fill="${color}" x="${centerX - 0.5 * size.width}" y="${centerY - 0.5 * size.height}" width="${size.width}" height="${size.height}"/>\n`);
     }
 
-    public drawCircle(center: IPoint, radius: number, color: string): void {
+    public drawCircle(center: IPoint, radius: number, color: Color): void {
         const centerX = center.x + 0.5 * this._size.width;
         const centerY = center.y + 0.5 * this._size.height;
         this.stringParts.push(`\t\t<circle fill="${color}" cx="${centerX}" cy="${centerY}" r="${radius}"/>\n`);
     }
 
-    public drawLine(from: IPoint, to: IPoint, thickness: number, color: string): void {
+    public initializeLinesDrawing(color: Color): void {
+        this.stringParts.push(`\t\t<g fill="none" stroke-width="1" stroke="${color}">\n`);
+    }
+
+    public drawLine(from: IPoint, to: IPoint): void {
         const x1 = from.x + 0.5 * this._size.width;
         const y1 = from.y + 0.5 * this._size.height;
         const x2 = to.x + 0.5 * this._size.width;
         const y2 = to.y + 0.5 * this._size.height;
 
-        this.stringParts.push(`\t\t<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" fill="none" stroke-width="${thickness}" stroke="${color}"/>`);
+        this.stringParts.push(`\t\t\t<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>\n`);
+    }
+
+    public finalizeLinesDrawing(): void {
+        this.stringParts.push(`\t\t</g>\n`);
     }
 
     public export(): string {

@@ -1,5 +1,6 @@
 import { PatternBase } from "../patterns/pattern-base";
 import { PlotterBase } from "../plotter/plotter-base";
+import { Color } from "../utils/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 
@@ -60,22 +61,25 @@ class Grid {
     }
 
     public draw(plotter: PlotterBase): void {
+        plotter.initializeLinesDrawing(Color.GREEN);
+
         const minX = this.topLeftCorner.x;
         const maxX = minX + this.gridSize.width * this.cellSize;
 
         const minY = this.topLeftCorner.y;
         const maxY = minY + this.gridSize.height * this.cellSize;
 
-        const green = "#00FF00";
         for (let iX = 0; iX < this.gridSize.width; iX++) {
             const x = minX + iX * this.cellSize;
-            plotter.drawLine({ x, y: minY }, { x, y: maxY }, 1, green);
+            plotter.drawLine({ x, y: minY }, { x, y: maxY });
         }
 
         for (let iY = 0; iY < this.gridSize.height; iY++) {
             const y = minY + iY * this.cellSize;
-            plotter.drawLine({ x: minX, y }, { x: maxX, y }, 1, green);
+            plotter.drawLine({ x: minX, y }, { x: maxX, y });
         }
+
+        plotter.finalizeLinesDrawing();
     }
 
     public getCellId(position: IPoint): IPoint {

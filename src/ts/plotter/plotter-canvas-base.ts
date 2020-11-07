@@ -1,4 +1,5 @@
 import { ISize } from "../utils/i-size";
+import { Color } from "../utils/color";
 import { PlotterBase } from "./plotter-base";
 
 import "../page-interface-generated";
@@ -20,12 +21,12 @@ abstract class PlotterCanvasBase extends PlotterBase {
         return this._size;
     }
 
-    public initialize(backgroundColor: string): void {
+    public initialize(backgroundColor: Color): void {
         this.resizeCanvas();
         this.clearCanvas(backgroundColor);
     }
 
-    protected abstract clearCanvas(color: string): void;
+    protected abstract clearCanvas(color: Color): void;
 
     private resizeCanvas(): void {
         const actualWidth = Math.floor(this.cssPixel * this.canvas.clientWidth);

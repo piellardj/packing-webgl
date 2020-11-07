@@ -1,3 +1,7 @@
+import { PlotterCanvas2D } from "../plotter/plotter-canvas-2d";
+import { PlotterCanvasBase } from "../plotter/plotter-canvas-base";
+import { PlotterCanvasWebGL } from "../plotter/plotter-canvas-webgl";
+
 function downloadTextFile(fileName: string, content: string): void {
     const fileType = "text/plain";
 
@@ -24,31 +28,8 @@ function downloadTextFile(fileName: string, content: string): void {
     }
 }
 
-function registerPadStartPolyfill(): void {
-    if (typeof String.prototype.padStart !== "function") {
-        String.prototype.padStart = function padStart(maxLength: number, fillString?: string): string {
-            if (this.length > maxLength) {
-                return String(this);
-            }
-
-            if (!fillString) {
-                fillString = " ";
-            }
-
-            const nbRepeats = Math.ceil((maxLength - this.length) / fillString.length);
-            let result = "";
-            for (let i = 0; i < nbRepeats; i++) {
-                result += fillString;
-            }
-            return result + this;
-        }
-    }
-}
-registerPadStartPolyfill(); // for IE11
-
-function randomHexColor(): string {
-    const randInt = Math.floor(256 * 256 * 256 * Math.random());
-    return "#" + randInt.toString(16).padStart(6, "0");
 }
 
-export { downloadTextFile, randomHexColor }
+export {
+    downloadTextFile,
+}
