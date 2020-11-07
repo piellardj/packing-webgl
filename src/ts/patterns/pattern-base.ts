@@ -21,7 +21,9 @@ abstract class PatternBase {
     public size: number;
     public readonly color: Color;
     public needInitialization: boolean;
+
     private lastTestId: number;
+    private initializationTime: number;
 
     protected constructor() {
         this.needInitialization = true;
@@ -48,6 +50,7 @@ abstract class PatternBase {
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.needInitialization = false;
+                this.initializationTime = performance.now();
                 break;
             }
 
@@ -63,6 +66,17 @@ abstract class PatternBase {
 
         return absX - 0.5 * this.size < 0.5 * domainSize.width &&
             absY - 0.5 * this.size < 0.5 * domainSize.height;
+    }
+
+    public computeOpacity(time: number, blendTime: number): number {
+        if (this.needInitialization) {
+            return -1;
+        }
+        const lifetime = time - this.initializationTime;
+        if (lifetime > blendTime) {
+            return 1;
+        }
+        return lifetime / blendTime;
     }
 
     protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;

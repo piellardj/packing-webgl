@@ -8,6 +8,7 @@ const controlId = {
     NEW_ITEM: "new-item-button-id",
     ZOOM_SPEED: "zoom-speed-range-id",
     BLACK_BACKGROUND: "black-background-checkbox-id",
+    BLENDING: "blending-checkbox-id",
     MAX_TRIES_PER_FRAME: "max-tries-per-frame-range-id",
     CELL_SIZE: "cell-size-range-id",
     ONE_CELL_ONLY: "one-cell-only-checkbox-id",
@@ -91,7 +92,11 @@ abstract class Parameters {
     }
 
     public static get blackBackground(): boolean {
-        return Page.Checkbox.isChecked(controlId.BLACK_BACKGROUND); // avoid float precision issues
+        return Page.Checkbox.isChecked(controlId.BLACK_BACKGROUND);
+    }
+
+    public static get blending(): boolean {
+        return Page.Checkbox.isChecked(controlId.BLENDING);
     }
 
     /* === DEBUG SECTION === */

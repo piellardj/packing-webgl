@@ -128,6 +128,12 @@ const data = {
                     id: "black-background-checkbox-id",
                     checked: true
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Blending",
+                    id: "blending-checkbox-id",
+                    checked: true
+                },
             ]
         },
         {

@@ -14,6 +14,7 @@ import * as ShaderManager from "../gl-utils/shader-manager";
 import { VBO } from "../gl-utils/vbo";
 
 import "../page-interface-generated";
+import { Parameters } from "../parameters";
 
 class PlotterCanvasWebGL extends PlotterCanvasBase {
     private linesColor: Color;
@@ -22,6 +23,8 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private squaresShader: Shader | null;
     private circlesShader: Shader | null;
     private rectanglesShader: Shader | null;
+
+    private blending: boolean;
 
     private readonly linesBuffer: number[];
     private readonly linesVBO: VBO;
@@ -52,6 +55,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.squaresShader = null;
         this.circlesShader = null;
         this.rectanglesShader = null;
+
+        this.blending = false;
+        this.enableBlending = true;
 
         this.linesBuffer = [];
         this.linesVBO = new VBO(gl, new Float32Array(this.linesBuffer), 2, gl.FLOAT, false);
@@ -161,6 +167,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
             }
 
+            this.enableBlending = Parameters.blending;
+            const time = performance.now();
+            const blendTime = this.computeBlendTime();
             for (let i = 0; i < nbRectangles; i++) {
                 this.positionsBuffer[2 * i + 0] = rectangles[i].center.x;
                 this.positionsBuffer[2 * i + 1] = rectangles[i].center.y;
@@ -169,7 +178,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 this.colorsBuffer[4 * i + 0] = rectangles[i].color.r / 255;
                 this.colorsBuffer[4 * i + 1] = rectangles[i].color.g / 255;
                 this.colorsBuffer[4 * i + 2] = rectangles[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = rectangles[i].needInitialization ? -1 : 1;
+                this.colorsBuffer[4 * i + 3] = rectangles[i].computeOpacity(time, blendTime);
             }
 
             this.positionsVBO.setData(this.positionsBuffer);
@@ -207,6 +216,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
             }
 
+            this.enableBlending = Parameters.blending;
+            const time = performance.now();
+            const blendTime = this.computeBlendTime();
             for (let i = 0; i < nbCircles; i++) {
                 this.positionsBuffer[2 * i + 0] = items[i].center.x;
                 this.positionsBuffer[2 * i + 1] = items[i].center.y;
@@ -214,7 +226,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
                 this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
                 this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = items[i].needInitialization ? 0 : 1;
+                this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
             }
 
             this.positionsVBO.setData(this.positionsBuffer);
@@ -256,6 +268,23 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
             this.linesShader.bindUniformsAndAttributes();
             gl.drawArrays(gl.LINES, 0, 2 * nbLines);
         }
+    }
+
+    private set enableBlending(value: boolean) {
+        if (value !== this.blending) {
+            this.blending = value;
+
+            if (value) {
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            } else {
+                gl.disable(gl.BLEND);
+            }
+        }
+    }
+
+    private computeBlendTime(): number {
+        return this.blending && Parameters.isZooming ? 500 / (1 + Parameters.zoomSpeed) : 0;
     }
 }
 
