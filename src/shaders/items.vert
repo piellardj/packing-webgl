@@ -10,7 +10,7 @@ void main(void)
 {
     const vec2 OUT_OF_SCREEN = vec2(1000000, 10000000);
 
-    float isPointHidden = step(aColor.a, 0.5);
+    float isPointHidden = step(aColor.a, 0.0);
 
     vec2 realPosition = 2.0 * aCoords / uScreenSize * vec2(1,-1);
     vec2 position = realPosition + isPointHidden * OUT_OF_SCREEN;
