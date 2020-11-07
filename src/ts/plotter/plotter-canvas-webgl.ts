@@ -143,7 +143,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
                 this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
                 this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = 1;
+                this.colorsBuffer[4 * i + 3] = items[i].needInitialization ? 0 : 1;
             }
 
             this.positionsVBO.setData(this.positionsBuffer);
