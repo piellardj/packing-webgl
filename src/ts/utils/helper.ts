@@ -1,7 +1,3 @@
-import { PlotterCanvas2D } from "../plotter/plotter-canvas-2d";
-import { PlotterCanvasBase } from "../plotter/plotter-canvas-base";
-import { PlotterCanvasWebGL } from "../plotter/plotter-canvas-webgl";
-
 function downloadTextFile(fileName: string, content: string): void {
     const fileType = "text/plain";
 
@@ -28,12 +24,6 @@ function downloadTextFile(fileName: string, content: string): void {
     }
 }
 
-const webgl = true;
-function chooseCanvasPlotter(): PlotterCanvasBase {
-    return webgl ? new PlotterCanvasWebGL() : new PlotterCanvas2D();
-}
-
 export {
-    chooseCanvasPlotter,
     downloadTextFile,
 }

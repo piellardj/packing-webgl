@@ -1,6 +1,8 @@
 import { EPrimitive, Parameters } from "./parameters";
 
 import { PlotterBase } from "./plotter/plotter-base";
+import { PlotterCanvas2D } from "./plotter/plotter-canvas-2d";
+import { PlotterCanvasWebGL } from "./plotter/plotter-canvas-webgl";
 import { PlotterSVG } from "./plotter/plotter-svg";
 
 import { PatternBase } from "./patterns/pattern-base";
@@ -151,7 +153,7 @@ function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
 
 function main(): void {
     let itemsList: PatternBase[] = [];
-    const canvasPlotter = Helper.chooseCanvasPlotter();
+    const canvasPlotter = Parameters.isWebGLVersion ? new PlotterCanvasWebGL() : new PlotterCanvas2D();
     const grid = new Grid(canvasPlotter.size, Parameters.cellSize);
 
     let needToAddItems = false;

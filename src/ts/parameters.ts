@@ -99,6 +99,10 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.BLENDING);
     }
 
+    public static get isWebGLVersion(): boolean {
+        return true;
+    }
+
     /* === DEBUG SECTION === */
 
     public static get maxTriesPerFrame(): number {
@@ -135,6 +139,11 @@ abstract class Parameters {
     public static addDownloadObserver(callback: () => unknown): void {
         Page.FileControl.addDownloadObserver(controlId.DOWNLOAD, callback);
     }
+}
+
+if (!Parameters.isWebGLVersion) {
+    Page.Checkbox.setChecked(controlId.BLENDING, false);
+    Page.Controls.setVisibility(controlId.BLENDING, false);
 }
 
 export { Parameters, EPrimitive }
