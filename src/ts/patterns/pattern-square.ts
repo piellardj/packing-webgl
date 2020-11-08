@@ -1,6 +1,7 @@
-import { PatternBase } from "./pattern-base";
+import { EVisibility, PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
+import { ISize } from "../utils/i-size";
 
 class PatternSquare extends PatternBase {
     public constructor() {
@@ -18,6 +19,24 @@ class PatternSquare extends PatternBase {
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare, allowOverlapping: boolean): number {
         return 2 * this.computeDistanceToEdge(itemToAvoid, allowOverlapping);
+    }
+
+    public computeVisibility(domainSize: ISize): EVisibility {
+        const halfDomainWidth = 0.5 * domainSize.width;
+        const halfDomainHeight = 0.5 * domainSize.height;
+
+        const absX = Math.abs(this.center.x);
+        const absY = Math.abs(this.center.y);
+
+        const halfSize = 0.5 * this.size;
+
+        if (absX + halfDomainWidth < halfSize && absY + halfDomainHeight < halfSize) {
+            return EVisibility.COVERS_VIEW;
+        }
+        if (absX - halfSize < halfDomainWidth || absY - halfSize < halfDomainHeight) {
+            return EVisibility.VISIBLE;
+        }
+        return EVisibility.OUT_OF_VIEW;
     }
 
     private get sideLength(): number {

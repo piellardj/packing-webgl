@@ -22,6 +22,12 @@ interface IPatternResetResult {
     nbTries: number;
 }
 
+enum EVisibility {
+    VISIBLE = 0,
+    OUT_OF_VIEW = 1,
+    COVERS_VIEW = 2,
+}
+
 abstract class PatternBase {
     public center: IPoint;
     public size: number;
@@ -66,14 +72,6 @@ abstract class PatternBase {
         return result;
     }
 
-    public isInDomain(domainSize: ISize): boolean {
-        const absX = Math.abs(this.center.x);
-        const absY = Math.abs(this.center.y);
-
-        return absX - 0.5 * this.size < 0.5 * domainSize.width &&
-            absY - 0.5 * this.size < 0.5 * domainSize.height;
-    }
-
     public computeOpacity(time: number, blendTime: number): number {
         const lifetime = time - this.initializationTime;
         if (lifetime > blendTime) {
@@ -92,6 +90,8 @@ abstract class PatternBase {
     protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;
 
     protected abstract computeBiggestSizePossibleToAvoidItem(itemsToAvoid: PatternBase, allowOverlapping: boolean): number;
+
+    public abstract computeVisibility(domainSize: ISize): EVisibility;
 
     private computeBiggestSizePossible(grid: Grid, allowOverlapping: boolean): number {
         const currentTestId = generateTestId();
@@ -144,4 +144,4 @@ abstract class PatternBase {
     }
 }
 
-export { PatternBase }
+export { PatternBase, EVisibility }

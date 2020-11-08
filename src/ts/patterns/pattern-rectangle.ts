@@ -1,6 +1,7 @@
-import { PatternBase } from "./pattern-base";
+import { EVisibility, PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
+import { ISize } from "../utils/i-size";
 
 const ASPECT_RATIO_VARIATION = 0.5; // must be in [0,1]
 
@@ -33,6 +34,25 @@ class PatternRectangle extends PatternBase {
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternRectangle, allowOverlapping: boolean): number {
         return 2 * this.computeDistanceToEdge(itemToAvoid, allowOverlapping);
+    }
+
+    public computeVisibility(domainSize: ISize): EVisibility {
+        const halfDomainWidth = 0.5 * domainSize.width;
+        const halfDomainHeight = 0.5 * domainSize.height;
+
+        const absX = Math.abs(this.center.x);
+        const absY = Math.abs(this.center.y);
+
+        const halfWidth = 0.5 * this.size * this.baseWidth;
+        const halfHeight = 0.5 * this.size * this.baseHeight;
+
+        if (absX + halfDomainWidth < halfWidth && absY + halfDomainHeight < halfHeight) {
+            return EVisibility.COVERS_VIEW;
+        }
+        if (absX - halfWidth < halfDomainWidth || absY - halfHeight < halfDomainHeight) {
+            return EVisibility.VISIBLE;
+        }
+        return EVisibility.OUT_OF_VIEW;
     }
 
     public get width(): number {

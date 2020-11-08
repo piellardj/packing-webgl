@@ -1,6 +1,6 @@
 import { EPrimitive, Parameters } from "./parameters";
 
-import { PatternBase } from "./patterns/pattern-base";
+import { EVisibility, PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternRectangle } from "./patterns/pattern-rectangle";
 import { PatternSquare } from "./patterns/pattern-square";
@@ -30,12 +30,15 @@ class Engine {
 
     private zoomCenter: IPoint;
 
+    private backgroundColorOverride: Color;
+
     public constructor() {
         this.initializedItemsList = [];
         this.uninitializedItemsList = [];
         this.lastRecyclingTime = 0;
 
         this.zoomCenter = { x: 0, y: 0 }; // canvas center
+        this.backgroundColorOverride = null;
     }
 
     public reset(): void {
@@ -54,6 +57,7 @@ class Engine {
         this.initializedItemsList = [];
         this.uninitializedItemsList = [];
         this.currentPrimitive = primitive;
+        this.backgroundColorOverride = null;
     }
 
     public addItems(count: number): void {
@@ -73,7 +77,8 @@ class Engine {
             }
         }
 
-        plotter.initialize(this.backgroundColor);
+        const backgroundColor = this.computeBackgroundColor();
+        plotter.initialize(backgroundColor);
 
         let itemsToDraw: PatternBase[];
         if (Parameters.oneCellOnly) {
@@ -190,17 +195,25 @@ class Engine {
         for (const item of this.initializedItemsList) {
             item.zoomIn(this.zoomCenter, zoomSpeed);
 
-            if (!item.isInDomain(domainSize)) { // recycle items that are out of view
-                this.uninitializedItemsList.push(item);
-            } else {
+            const visibility = item.computeVisibility(domainSize);
+            if (visibility === EVisibility.VISIBLE) {
                 newInitializedArray.push(item);
+            } else {
+                this.uninitializedItemsList.push(item); // recycle item
+
+                if (visibility === EVisibility.COVERS_VIEW) {
+                    this.backgroundColorOverride = item.color; // overrite current background to make the illusion that we are still in the item
+                }
             }
         }
 
         this.initializedItemsList = newInitializedArray;
     }
 
-    private get backgroundColor(): Color {
+    private computeBackgroundColor(): Color {
+        if (this.backgroundColorOverride !== null) {
+            return this.backgroundColorOverride;
+        }
         return Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     }
 
