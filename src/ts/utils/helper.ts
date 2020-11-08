@@ -24,6 +24,29 @@ function downloadTextFile(fileName: string, content: string): void {
     }
 }
 
+function getQueryStringValue(name: string): string | null {
+    const url = window.location.href;
+    const queryStringStart = url.indexOf("?");
+    if (queryStringStart >= 0) {
+        const queryString = url.substring(queryStringStart + 1);
+        if (queryString.length > 0) {
+            const parameters = queryString.split("&");
+            for (const parameter of parameters) {
+                const keyValue = parameter.split("=");
+                if (keyValue.length === 2) {
+                    const decodedKey = decodeURIComponent(keyValue[0]);
+                    if (decodedKey === name) {
+                        return decodeURIComponent(keyValue[1]);
+                    }
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
 export {
     downloadTextFile,
+    getQueryStringValue,
 }

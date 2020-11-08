@@ -1,3 +1,5 @@
+import * as Helpers from "./utils/helper";
+
 import "./page-interface-generated";
 
 const controlId = {
@@ -9,6 +11,7 @@ const controlId = {
     ZOOM_SPEED: "zoom-speed-range-id",
     BLACK_BACKGROUND: "black-background-checkbox-id",
     BLENDING: "blending-checkbox-id",
+    INDICATORS: "indicators-checkbox-id",
     MAX_TRIES_PER_FRAME: "max-tries-per-frame-range-id",
     CELL_SIZE: "cell-size-range-id",
     ONE_CELL_ONLY: "one-cell-only-checkbox-id",
@@ -67,6 +70,34 @@ enum EPrimitive {
     RECTANGLE = "rectangle",
 }
 
+const isInDebug = Helpers.getQueryStringValue("debug") === "1";
+Page.Sections.setVisibility("debug-section", isInDebug);
+Page.Canvas.setIndicatorVisibility("main-loop-time", isInDebug);
+Page.Canvas.setIndicatorVisibility("draw-time", isInDebug);
+Page.Canvas.setIndicatorVisibility("update-time", isInDebug);
+Page.Canvas.setIndicatorVisibility("items-reclycled-count", isInDebug);
+Page.Canvas.setIndicatorVisibility("items-pending-recycling-count", isInDebug);
+Page.Canvas.setIndicatorVisibility("items-recycling-tries-count", isInDebug);
+if (isInDebug) {
+    Page.Checkbox.setChecked(controlId.INDICATORS, true);
+} else {
+    Page.Checkbox.setChecked(controlId.ONE_CELL_ONLY, false);
+    Page.Checkbox.setChecked(controlId.SHOW_GRID, false);
+}
+
+const isWebGLVersion = Helpers.getQueryStringValue("webgl") !== "0";
+if (!isWebGLVersion) {
+    Page.Checkbox.setChecked(controlId.BLENDING, false);
+    Page.Controls.setVisibility(controlId.BLENDING, false);
+}
+
+function updateIndicatorsVisibility(): void {
+    const visible = Page.Checkbox.isChecked(controlId.INDICATORS);
+    Page.Canvas.setIndicatorsVisibility(visible);
+}
+Page.Checkbox.addObserver(controlId.INDICATORS, updateIndicatorsVisibility);
+updateIndicatorsVisibility();
+
 abstract class Parameters {
     public static get spacing(): number {
         return Page.Range.getValue(controlId.SPACING);
@@ -99,8 +130,11 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.BLENDING);
     }
 
+    public static get isInDebug(): boolean {
+        return isInDebug;
+    }
     public static get isWebGLVersion(): boolean {
-        return true;
+        return isWebGLVersion;
     }
 
     /* === DEBUG SECTION === */
@@ -139,11 +173,6 @@ abstract class Parameters {
     public static addDownloadObserver(callback: () => unknown): void {
         Page.FileControl.addDownloadObserver(controlId.DOWNLOAD, callback);
     }
-}
-
-if (!Parameters.isWebGLVersion) {
-    Page.Checkbox.setChecked(controlId.BLENDING, false);
-    Page.Controls.setVisibility(controlId.BLENDING, false);
 }
 
 export { Parameters, EPrimitive }

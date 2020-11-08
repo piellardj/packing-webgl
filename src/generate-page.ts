@@ -134,10 +134,17 @@ const data = {
                     id: "blending-checkbox-id",
                     checked: true
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Indicators",
+                    id: "indicators-checkbox-id",
+                    checked: false
+                },
             ]
         },
         {
             title: "Debug",
+            id: "debug-section",
             controls: [
                 {
                     type: Demopage.supportedControls.Range,
