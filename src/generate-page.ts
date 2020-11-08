@@ -21,16 +21,16 @@ const data = {
             label: "FPS"
         },
         {
-            id: "frame-time",
-            label: "Frame time"
+            id: "main-loop-time",
+            label: "Time spent in mainLoop()"
         },
         {
             id: "draw-time",
-            label: "Time spent in draw()"
+            label: "Time spent in mainLoop.draw()"
         },
         {
             id: "update-time",
-            label: "Time spent in update()"
+            label: "Time spent in mainLoop.update()"
         },
         {
             id: "items-count",

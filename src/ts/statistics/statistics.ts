@@ -6,6 +6,7 @@ let totalFrames = 0;
 
 const timeSinceLastVerboseFrame = new StopWatch();
 let frames = 0;
+const timeSpentInMainLoop = new StopWatch();
 const timeSpentInDraw = new StopWatch();
 const timeSpentInUpdate = new StopWatch();
 
@@ -41,14 +42,17 @@ function updateIndicators(): void {
     const fps = 1000 * frames / timeSinceLastVerboseFrame.totalTime;
     const averageFrameTime = timeSinceLastVerboseFrame.totalTime / frames;
 
+    const averageMainLoopTime = timeSpentInMainLoop.totalTime / frames;
+    const mainLoopTimeRelative = averageMainLoopTime / averageFrameTime;
+
     const averageDrawTime = timeSpentInDraw.totalTime / frames;
-    const drawTimeRelative = averageDrawTime / averageFrameTime;
+    const drawTimeRelative = averageDrawTime / averageMainLoopTime;
 
     const averageUpdateTime = timeSpentInUpdate.totalTime / frames;
-    const updateTimeRelative = averageUpdateTime / averageFrameTime;
+    const updateTimeRelative = averageUpdateTime / averageMainLoopTime;
 
-    Page.Canvas.setIndicatorText("fps", `${fps.toFixed(0)}`);
-    Page.Canvas.setIndicatorText("frame-time", `${averageFrameTime.toFixed(2)} ms`);
+    Page.Canvas.setIndicatorText("fps", `${fps.toFixed(0)} (${averageFrameTime.toFixed(2)} ms)`);
+    Page.Canvas.setIndicatorText("main-loop-time", `${averageMainLoopTime.toFixed(2)} ms (${(100 * mainLoopTimeRelative).toFixed(1)} %)`);
     Page.Canvas.setIndicatorText("draw-time", `${averageDrawTime.toFixed(2)} ms (${(100 * drawTimeRelative).toFixed(1)} %)`);
     Page.Canvas.setIndicatorText("update-time", `${averageUpdateTime.toFixed(2)} ms (${(100 * updateTimeRelative).toFixed(1)} %)`);
 
@@ -62,6 +66,7 @@ function resetAll(): void {
     timeSinceLastVerboseFrame.reset();
 
     frames = 0;
+    timeSpentInMainLoop.reset();
     timeSpentInDraw.reset();
     timeSpentInUpdate.reset();
 
@@ -83,6 +88,7 @@ export {
     registerFrame,
     isVerboseFrame,
     registerRecyclingStats,
+    timeSpentInMainLoop as timeSpanInMainLoop,
     timeSpentInDraw,
     timeSpentInUpdate,
 }
