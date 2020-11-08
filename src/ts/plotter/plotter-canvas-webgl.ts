@@ -16,6 +16,7 @@ import { VBO } from "../gl-utils/vbo";
 import "../page-interface-generated";
 import { Parameters } from "../parameters";
 
+type AffectShaderFunction = (shader: Shader) => unknown;
 type ExtraAttributeFunction = (item: PatternBase) => number;
 
 class PlotterCanvasWebGL extends PlotterCanvasBase {
@@ -64,49 +65,10 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.colorsBuffer = new Float32Array([]);
         this.colorsVBO = new VBO(gl, this.colorsBuffer, 4, gl.FLOAT, false);
 
-        ShaderManager.buildShader({
-            vertexFilename: "lines.vert",
-            fragmentFilename: "lines.frag",
-            injected: {},
-        }, (builtShader: Shader | null) => {
-            if (builtShader === null) {
-                throw new Error("Failed to load or build the lines shader.");
-            }
-            this.linesShader = builtShader;
-        });
-
-        ShaderManager.buildShader({
-            vertexFilename: "items.vert",
-            fragmentFilename: "squares.frag",
-            injected: {},
-        }, (builtShader: Shader | null) => {
-            if (builtShader === null) {
-                throw new Error("Failed to load or build the squares shader.");
-            }
-            this.squaresShader = builtShader;
-        });
-
-        ShaderManager.buildShader({
-            vertexFilename: "items.vert",
-            fragmentFilename: "circles.frag",
-            injected: {},
-        }, (builtShader: Shader | null) => {
-            if (builtShader === null) {
-                throw new Error("Failed to load or build the circles shader.");
-            }
-            this.circlesShader = builtShader;
-        });
-
-        ShaderManager.buildShader({
-            vertexFilename: "rectangles.vert",
-            fragmentFilename: "rectangles.frag",
-            injected: {},
-        }, (builtShader: Shader | null) => {
-            if (builtShader === null) {
-                throw new Error("Failed to load or build the rectangles shader.");
-            }
-            this.rectanglesShader = builtShader;
-        });
+        this.loadAndBuildShader("lines.vert", "lines.frag", "lines", (shader: Shader) => this.linesShader = shader);
+        this.loadAndBuildShader("items.vert", "squares.frag", "squares", (shader: Shader) => this.squaresShader = shader);
+        this.loadAndBuildShader("items.vert", "circles.frag", "circles", (shader: Shader) => this.circlesShader = shader);
+        this.loadAndBuildShader("rectangles.vert", "rectangles.frag", "rectangles", (shader: Shader) => this.rectanglesShader = shader);
     }
 
     public get isReady(): boolean {
@@ -241,6 +203,21 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 gl.disable(gl.BLEND);
             }
         }
+    }
+
+    private loadAndBuildShader(vertexFilename: string, fragmentFilename: string, shaderName: string, affectShader: AffectShaderFunction): void {
+        ShaderManager.buildShader({
+            vertexFilename,
+            fragmentFilename,
+            injected: {},
+        }, (builtShader: Shader | null) => {
+            if (builtShader === null) {
+                const errorMessage = `Failed to load or build the ${shaderName} shader.`;
+                Page.Demopage.setErrorMessage(`shader-${shaderName}`, errorMessage);
+                throw new Error(errorMessage);
+            }
+            affectShader(builtShader);
+        });
     }
 }
 
