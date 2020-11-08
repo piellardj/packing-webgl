@@ -16,8 +16,6 @@ import { NumberRange } from "./utils/number-range";
 import * as Statistics from "./statistics/statistics";
 
 class Engine {
-    public defaultBackgroundColor: Color; // background color of the "empty" space
-
     private initializedItemsList: PatternBase[]; // stored in the order they must be drawn.
     private uninitializedItemsList: PatternBase[]; // stored in no particular order
     private lastRecyclingTime: number;
@@ -28,8 +26,6 @@ class Engine {
     private grid: Grid; // used to index the items' positions for faster recycling
 
     public constructor() {
-        this.defaultBackgroundColor = Color.BLACK;
-
         this.initializedItemsList = [];
         this.uninitializedItemsList = [];
         this.lastRecyclingTime = 0;
@@ -70,7 +66,7 @@ class Engine {
             }
         }
 
-        plotter.initialize(this.defaultBackgroundColor);
+        plotter.initialize(this.backgroundColor);
 
         let itemsToDraw: PatternBase[];
         if (Parameters.oneCellOnly) {
@@ -193,6 +189,10 @@ class Engine {
         }
 
         this.initializedItemsList = newInitializedArray;
+    }
+
+    private get backgroundColor(): Color {
+        return Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     }
 }
 
