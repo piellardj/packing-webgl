@@ -1,5 +1,5 @@
 import { Color } from "../utils/color";
-import { IPoint } from "../utils/i-point";
+import { ILine } from "../utils/i-line";
 import { ISize } from "../utils/i-size";
 
 import { PatternCircle } from "../patterns/pattern-circle";
@@ -19,9 +19,7 @@ abstract class PlotterBase {
     public abstract drawRectangles(rectangles: PatternRectangle[]): void;
 
     /* Lines have  a 1 pixel thickness */
-    public abstract initializeLinesDrawing(color: Color): void;
-    public abstract drawLine(from: IPoint, to: IPoint): void;
-    public abstract finalizeLinesDrawing(): void;
+    public abstract drawLines(lines: ILine[], color: Color): void;
 }
 
 export { PlotterBase };

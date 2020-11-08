@@ -1,5 +1,5 @@
 import { Color } from "../utils/color";
-import { IPoint } from "../utils/i-point";
+import { ILine } from "../utils/i-line";
 import { ISize } from "../utils/i-size";
 
 import { PlotterBase } from "./plotter-base";
@@ -86,21 +86,21 @@ class PlotterSVG extends PlotterBase {
         this.stringParts.push(`\t</g>\n`);
     }
 
-    public initializeLinesDrawing(color: Color): void {
-        this.stringParts.push(`\t\t<g fill="none" stroke-width="1" stroke="${color}">\n`);
-    }
+    public drawLines(lines: ILine[], color: Color): void {
+        const path: string[] = [];
 
-    public drawLine(from: IPoint, to: IPoint): void {
-        const x1 = from.x + 0.5 * this._size.width;
-        const y1 = from.y + 0.5 * this._size.height;
-        const x2 = to.x + 0.5 * this._size.width;
-        const y2 = to.y + 0.5 * this._size.height;
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+        for (const line of lines) {
+            const x1 = line.from.x + halfWidth;
+            const y1 = line.from.y + halfHeight;
+            const x2 = line.to.x + halfWidth;
+            const y2 = line.to.y + halfHeight;
 
-        this.stringParts.push(`\t\t\t<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>\n`);
-    }
+            path.push(`M${x1},${y1}L${x2},${y2}`);
+        }
 
-    public finalizeLinesDrawing(): void {
-        this.stringParts.push(`\t\t</g>\n`);
+        this.stringParts.push(`\t\t\t<path fill="none" stroke-width="1" stroke="${color}" d="${path.join()}"/>\n`);
     }
 
     public export(): string {

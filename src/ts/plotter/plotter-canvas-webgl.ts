@@ -1,4 +1,4 @@
-import { IPoint } from "../utils/i-point";
+import { ILine } from "../utils/i-line";
 import { Color } from "../utils/color";
 
 import { PlotterCanvasBase } from "./plotter-canvas-base";
@@ -26,7 +26,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
     private blending: boolean;
 
-    private readonly linesBuffer: number[];
+    private linesBuffer: Float32Array;
     private readonly linesVBO: VBO;
 
     private positionsBuffer: Float32Array;
@@ -59,7 +59,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.blending = false;
         this.enableBlending = true;
 
-        this.linesBuffer = [];
+        this.linesBuffer = new Float32Array([]);
         this.linesVBO = new VBO(gl, new Float32Array(this.linesBuffer), 2, gl.FLOAT, false);
 
         this.positionsBuffer = new Float32Array([]);
@@ -248,20 +248,22 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
     }
 
-    public initializeLinesDrawing(color: Color): void {
-        this.linesBuffer.length = 0;
-        this.linesColor = color;
-    }
-
-    public drawLine(from: IPoint, to: IPoint): void {
-        this.linesBuffer.push(from.x, from.y);
-        this.linesBuffer.push(to.x, to.y);
-    }
-
-    public finalizeLinesDrawing(): void {
-        const nbLines = Math.floor(this.linesBuffer.length / 4);
+    public drawLines(lines: ILine[], color: Color): void {
+        const nbLines = lines.length;
 
         if (this.linesShader !== null && nbLines >= 1) {
+            const wantedLinesBufferLength = 4 * nbLines;
+            if (this.linesBuffer.length !== wantedLinesBufferLength) {
+                this.linesBuffer = new Float32Array(wantedLinesBufferLength)
+            }
+
+            for (let i = 0; i < nbLines; i++) {
+                this.linesBuffer[4 * i + 0] = lines[i].from.x;
+                this.linesBuffer[4 * i + 1] = lines[i].from.y;
+                this.linesBuffer[4 * i + 2] = lines[i].to.x;
+                this.linesBuffer[4 * i + 3] = lines[i].to.y;
+            }
+
             this.linesVBO.setData(new Float32Array(this.linesBuffer));
 
             this.linesShader.a["aCoords"].VBO = this.linesVBO;

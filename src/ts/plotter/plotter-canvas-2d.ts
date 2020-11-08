@@ -1,5 +1,5 @@
 import { Color } from "../utils/color";
-import { IPoint } from "../utils/i-point";
+import { ILine } from "../utils/i-line";
 
 import { PlotterCanvasBase } from "./plotter-canvas-base";
 
@@ -72,19 +72,19 @@ class PlotterCanvas2D extends PlotterCanvasBase {
         }
     }
 
-    public initializeLinesDrawing(color: Color): void {
+    public drawLines(lines: ILine[], color: Color): void {
         this.context.fillStyle = "none";
         this.context.strokeStyle = color.toString();
         this.context.lineWidth = 1;
         this.context.beginPath();
-    }
 
-    public drawLine(from: IPoint, to: IPoint): void {
-        this.context.moveTo(from.x + 0.5 * this._size.width, from.y + 0.5 * this._size.height);
-        this.context.lineTo(to.x + 0.5 * this._size.width, to.y + 0.5 * this._size.height);
-    }
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+        for (const line of lines) {
+            this.context.moveTo(line.from.x + halfWidth, line.from.y + halfHeight);
+            this.context.lineTo(line.to.x + halfWidth, line.to.y + halfHeight);
+        }
 
-    public finalizeLinesDrawing(): void {
         this.context.stroke();
         this.context.closePath();
         this.context.strokeStyle = "none";
