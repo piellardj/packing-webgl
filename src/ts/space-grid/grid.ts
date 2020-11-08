@@ -51,8 +51,8 @@ class Grid {
         const minCellId = this.getCellId(topLeft);
         const maxCellId = this.getCellId(bottomRight);
 
-        for (let iCellX = minCellId.x; iCellX <= maxCellId.x; iCellX++) {
-            for (let iCellY = minCellId.y; iCellY <= maxCellId.y; iCellY++) {
+        for (let iCellY = minCellId.y; iCellY <= maxCellId.y; iCellY++) {
+            for (let iCellX = minCellId.x; iCellX <= maxCellId.x; iCellX++) {
                 const cellId = this.computeCellId(iCellX, iCellY);
                 this.gridCells[cellId].push(item);
             }
@@ -133,8 +133,8 @@ class Grid {
     public getItemsFromCellsGroup(minCellX: number, minCellY: number, maxCellX: number, maxCellY: number): PatternBase[] {
         const result: PatternBase[] = [];
 
-        for (let iCellX = minCellX; iCellX <= maxCellX; iCellX++) {
-            for (let iCellY = minCellY; iCellY <= maxCellY; iCellY++) {
+        for (let iCellY = minCellY; iCellY <= maxCellY; iCellY++) {
+            for (let iCellX = minCellX; iCellX <= maxCellX; iCellX++) {
                 const cellItems = this.getItemsFromCell(iCellX, iCellY);
                 result.push.apply(result, cellItems);
             }
@@ -146,7 +146,7 @@ class Grid {
     /** @returns true if the cells disposition changed */
     private resetDomain(domainSize: ISize, cellSize: number): boolean {
         const wantedGridSizeX = Math.ceil(domainSize.width / cellSize);
-        const wantedGridSizeY=  Math.ceil(domainSize.height / cellSize);
+        const wantedGridSizeY = Math.ceil(domainSize.height / cellSize);
 
         const hasChanged = (this.cellSize !== cellSize) ||
             (this.gridSize.width !== wantedGridSizeX) || (this.gridSize.height !== wantedGridSizeY);
