@@ -16,6 +16,8 @@ import { VBO } from "../gl-utils/vbo";
 import "../page-interface-generated";
 import { Parameters } from "../parameters";
 
+type ExtraAttributeFunction = (item: PatternBase) => number;
+
 class PlotterCanvasWebGL extends PlotterCanvasBase {
     private linesColor: Color;
 
@@ -29,14 +31,8 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private linesBuffer: Float32Array;
     private readonly linesVBO: VBO;
 
-    private positionsBuffer: Float32Array;
-    private readonly positionsVBO: VBO;
-
-    private sizesBuffer: Float32Array;
-    private readonly sizesVBO: VBO;
-
-    private aspectRatiosBuffer: Float32Array;
-    private readonly aspectRatiosVBO: VBO;
+    private statesBuffer: Float32Array;
+    private readonly statesVBO: VBO;
 
     private colorsBuffer: Float32Array;
     private readonly colorsVBO: VBO;
@@ -62,14 +58,8 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.linesBuffer = new Float32Array([]);
         this.linesVBO = new VBO(gl, new Float32Array(this.linesBuffer), 2, gl.FLOAT, false);
 
-        this.positionsBuffer = new Float32Array([]);
-        this.positionsVBO = new VBO(gl, this.positionsBuffer, 2, gl.FLOAT, false);
-
-        this.sizesBuffer = new Float32Array([]);
-        this.sizesVBO = new VBO(gl, this.sizesBuffer, 1, gl.FLOAT, false);
-
-        this.aspectRatiosBuffer = new Float32Array([]);
-        this.aspectRatiosVBO = new VBO(gl, this.aspectRatiosBuffer, 1, gl.FLOAT, false);
+        this.statesBuffer = new Float32Array([]);
+        this.statesVBO = new VBO(gl, this.statesBuffer, 4, gl.FLOAT, false);
 
         this.colorsBuffer = new Float32Array([]);
         this.colorsVBO = new VBO(gl, this.colorsBuffer, 4, gl.FLOAT, false);
@@ -145,107 +135,8 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     }
 
     public drawRectangles(rectangles: PatternRectangle[]): void {
-        const nbRectangles = rectangles.length;
-        if (this.rectanglesShader !== null && nbRectangles > 0) {
-            // try not to resize the buffers too often to avoid GC
-            const roundNbRectangles = 1024 * Math.ceil(nbRectangles / 1024);
-            const wantedPositionsBufferLength = 2 * roundNbRectangles;
-            if (this.positionsBuffer.length !== wantedPositionsBufferLength) {
-                this.positionsBuffer = new Float32Array(wantedPositionsBufferLength);
-            }
-
-            const wantedSizesBufferLength = roundNbRectangles;
-            if (this.sizesBuffer.length !== wantedSizesBufferLength) {
-                this.sizesBuffer = new Float32Array(wantedSizesBufferLength);
-            }
-
-            const wantedAspectRatiosBufferLength = roundNbRectangles;
-            if (this.aspectRatiosBuffer.length !== wantedAspectRatiosBufferLength) {
-                this.aspectRatiosBuffer = new Float32Array(wantedAspectRatiosBufferLength);
-            }
-
-            const wantedColorsBufferLength = 4 * roundNbRectangles;
-            if (this.colorsBuffer.length !== wantedColorsBufferLength) {
-                this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
-            }
-
-            this.enableBlending = Parameters.blending;
-            const time = performance.now();
-            const blendTime = PatternBase.maxBlendingTime;
-            for (let i = 0; i < nbRectangles; i++) {
-                this.positionsBuffer[2 * i + 0] = rectangles[i].center.x;
-                this.positionsBuffer[2 * i + 1] = rectangles[i].center.y;
-                this.sizesBuffer[i] = rectangles[i].size;
-                this.aspectRatiosBuffer[i] = rectangles[i].aspectRatio;
-                this.colorsBuffer[4 * i + 0] = rectangles[i].color.r / 255;
-                this.colorsBuffer[4 * i + 1] = rectangles[i].color.g / 255;
-                this.colorsBuffer[4 * i + 2] = rectangles[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = rectangles[i].computeOpacity(time, blendTime);
-            }
-
-            this.positionsVBO.setData(this.positionsBuffer);
-            this.sizesVBO.setData(this.sizesBuffer);
-            this.aspectRatiosVBO.setData(this.aspectRatiosBuffer);
-            this.colorsVBO.setData(this.colorsBuffer);
-
-            this.rectanglesShader.a["aCoords"].VBO = this.positionsVBO;
-            this.rectanglesShader.a["aSize"].VBO = this.sizesVBO;
-            this.rectanglesShader.a["aAspectRatio"].VBO = this.aspectRatiosVBO;
-            this.rectanglesShader.a["aColor"].VBO = this.colorsVBO;
-            this.rectanglesShader.u["uScreenSize"].value = [this._size.width, this._size.height];
-
-            this.rectanglesShader.use();
-            this.rectanglesShader.bindUniformsAndAttributes();
-            gl.drawArrays(gl.POINTS, 0, nbRectangles);
-        }
-    }
-
-    private drawAsPoints(shader: Shader, items: PatternBase[]): void {
-        const nbCircles = items.length;
-        if (shader !== null && nbCircles > 0) {
-            // try not to resize the buffers too often to avoid GC
-            const roundNbCircles = 1024 * Math.ceil(nbCircles / 1024);
-            const wantedPositionsBufferLength = 2 * roundNbCircles;
-            if (this.positionsBuffer.length !== wantedPositionsBufferLength) {
-                this.positionsBuffer = new Float32Array(wantedPositionsBufferLength);
-            }
-
-            const wantedSizesBufferLength = roundNbCircles;
-            if (this.sizesBuffer.length !== wantedSizesBufferLength) {
-                this.sizesBuffer = new Float32Array(wantedSizesBufferLength);
-            }
-
-            const wantedColorsBufferLength = 4 * roundNbCircles;
-            if (this.colorsBuffer.length !== wantedColorsBufferLength) {
-                this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
-            }
-
-            this.enableBlending = Parameters.blending;
-            const time = performance.now();
-            const blendTime = PatternBase.maxBlendingTime;
-            for (let i = 0; i < nbCircles; i++) {
-                this.positionsBuffer[2 * i + 0] = items[i].center.x;
-                this.positionsBuffer[2 * i + 1] = items[i].center.y;
-                this.sizesBuffer[i] = items[i].size;
-                this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
-                this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
-                this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
-            }
-
-            this.positionsVBO.setData(this.positionsBuffer);
-            this.sizesVBO.setData(this.sizesBuffer);
-            this.colorsVBO.setData(this.colorsBuffer);
-
-            shader.a["aCoords"].VBO = this.positionsVBO;
-            shader.a["aSize"].VBO = this.sizesVBO;
-            shader.a["aColor"].VBO = this.colorsVBO;
-            shader.u["uScreenSize"].value = [this._size.width, this._size.height];
-
-            shader.use();
-            shader.bindUniformsAndAttributes();
-            gl.drawArrays(gl.POINTS, 0, nbCircles);
-        }
+        const extraAttributeFunction = (item: PatternBase) => (item as PatternRectangle).aspectRatio;
+        this.drawAsPoints(this.rectanglesShader, rectangles, extraAttributeFunction);
     }
 
     public drawLines(lines: ILine[], color: Color): void {
@@ -274,6 +165,69 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
             this.linesShader.bindUniformsAndAttributes();
             gl.drawArrays(gl.LINES, 0, 2 * nbLines);
         }
+    }
+
+    private drawAsPoints(shader: Shader, items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
+        const nbItems = items.length;
+        if (shader !== null && nbItems > 0) {
+            this.updateStateAndColorVBOs(items, extraAttribute);
+
+            shader.a["aState"].VBO = this.statesVBO;
+            shader.a["aColor"].VBO = this.colorsVBO;
+            shader.u["uScreenSize"].value = [this._size.width, this._size.height];
+
+            shader.use();
+            shader.bindUniformsAndAttributes();
+            gl.drawArrays(gl.POINTS, 0, nbItems);
+        }
+    }
+
+    private updateStateAndColorVBOs(items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
+        const nbItems = items.length;
+
+        // try not to resize the buffers too often to avoid GC
+        const nbItemsRounded = 1024 * Math.ceil(nbItems / 1024);
+
+        const wantedStatesBufferLength = 4 * nbItemsRounded;
+        if (this.statesBuffer.length !== wantedStatesBufferLength) {
+            this.statesBuffer = new Float32Array(wantedStatesBufferLength);
+        }
+
+        const wantedColorsBufferLength = 4 * nbItemsRounded;
+        if (this.colorsBuffer.length !== wantedColorsBufferLength) {
+            this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
+        }
+
+        this.enableBlending = Parameters.blending;
+        const time = performance.now();
+        const blendTime = PatternBase.maxBlendingTime;
+
+        if (typeof extraAttribute === "function") {
+            for (let i = 0; i < nbItems; i++) {
+                this.statesBuffer[4 * i + 0] = items[i].center.x;
+                this.statesBuffer[4 * i + 1] = items[i].center.y;
+                this.statesBuffer[4 * i + 2] = items[i].size;
+                this.statesBuffer[4 * i + 3] = extraAttribute(items[i]);
+                this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
+                this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
+                this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
+                this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
+            }
+        } else {
+            for (let i = 0; i < nbItems; i++) {
+                this.statesBuffer[4 * i + 0] = items[i].center.x;
+                this.statesBuffer[4 * i + 1] = items[i].center.y;
+                this.statesBuffer[4 * i + 2] = items[i].size;
+                // unused this.statesBuffer[4 * i + 3]
+                this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
+                this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
+                this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
+                this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
+            }
+        }
+
+        this.statesVBO.setData(this.statesBuffer);
+        this.colorsVBO.setData(this.colorsBuffer);
     }
 
     private set enableBlending(value: boolean) {
