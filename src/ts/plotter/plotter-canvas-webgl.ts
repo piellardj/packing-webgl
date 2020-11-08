@@ -169,7 +169,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
             this.enableBlending = Parameters.blending;
             const time = performance.now();
-            const blendTime = this.computeBlendTime();
+            const blendTime = PatternBase.maxBlendingTime;
             for (let i = 0; i < nbRectangles; i++) {
                 this.positionsBuffer[2 * i + 0] = rectangles[i].center.x;
                 this.positionsBuffer[2 * i + 1] = rectangles[i].center.y;
@@ -218,7 +218,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
             this.enableBlending = Parameters.blending;
             const time = performance.now();
-            const blendTime = this.computeBlendTime();
+            const blendTime = PatternBase.maxBlendingTime;
             for (let i = 0; i < nbCircles; i++) {
                 this.positionsBuffer[2 * i + 0] = items[i].center.x;
                 this.positionsBuffer[2 * i + 1] = items[i].center.y;
@@ -281,10 +281,6 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
                 gl.disable(gl.BLEND);
             }
         }
-    }
-
-    private computeBlendTime(): number {
-        return this.blending && Parameters.isZooming ? 500 / (1 + Parameters.zoomSpeed) : 0;
     }
 }
 

@@ -20,6 +20,7 @@ class Engine {
 
     private initializedItemsList: PatternBase[]; // stored in the order they must be drawn.
     private uninitializedItemsList: PatternBase[]; // stored in no particular order
+    private lastRecyclingTime: number;
 
     private currentPrimitive: EPrimitive;
     private createItem: () => PatternBase;
@@ -31,6 +32,7 @@ class Engine {
 
         this.initializedItemsList = [];
         this.uninitializedItemsList = [];
+        this.lastRecyclingTime = 0;
     }
 
     public reset(): void {
@@ -59,7 +61,14 @@ class Engine {
     }
 
     public draw(plotter: PlotterBase): boolean {
-        const everythingDrawn = plotter.isReady;
+        let everythingDrawn = plotter.isReady;
+        if (!Parameters.isZooming) {
+            const timeSinceLastRecycling = performance.now() - this.lastRecyclingTime;
+            const blendingOver = timeSinceLastRecycling > PatternBase.maxBlendingTime;
+            if (!blendingOver) {
+                everythingDrawn = false;
+            }
+        }
 
         plotter.initialize(this.defaultBackgroundColor);
 
@@ -104,6 +113,9 @@ class Engine {
 
         const itemsRecycled = this.performRecycling(domainSize);
         requiresRedraw = requiresRedraw || itemsRecycled;
+        if (itemsRecycled) {
+            this.lastRecyclingTime = performance.now();
+        }
 
         if (Parameters.isZooming) {
             const itemsMoved = (this.initializedItemsList.length > 0);

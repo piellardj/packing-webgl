@@ -5,6 +5,7 @@ import { ISize } from "../utils/i-size";
 import { Grid } from "../space-grid/grid";
 
 import { NumberRange } from "../utils/number-range";
+import { Parameters } from "../parameters";
 
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
@@ -79,6 +80,13 @@ abstract class PatternBase {
             return 1;
         }
         return lifetime / blendTime;
+    }
+
+    public static get maxBlendingTime(): number {
+        if (Parameters.blending) {
+            return 500 / (1 + Parameters.zoomSpeed);
+        }
+        return 0;
     }
 
     protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;
