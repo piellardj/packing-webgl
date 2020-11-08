@@ -88,7 +88,7 @@ export {
     registerFrame,
     isVerboseFrame,
     registerRecyclingStats,
-    timeSpentInMainLoop as timeSpanInMainLoop,
+    timeSpentInMainLoop,
     timeSpentInDraw,
     timeSpentInUpdate,
 }

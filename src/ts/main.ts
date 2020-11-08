@@ -182,7 +182,7 @@ function main(): void {
         lastRunTime = time;
 
         Statistics.registerFrame();
-        Statistics.timeSpanInMainLoop.start();
+        Statistics.timeSpentInMainLoop.start();
 
         const nbItemsToAdd = needToAddItems ? 1000 : 0;
         needToAddItems = false;
@@ -203,7 +203,7 @@ function main(): void {
             needToRedraw = !successfulDraw;
         }
 
-        Statistics.timeSpanInMainLoop.stop();
+        Statistics.timeSpentInMainLoop.stop();
         requestAnimationFrame(mainLoop);
     }
     requestAnimationFrame(mainLoop);
