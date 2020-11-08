@@ -33,7 +33,7 @@ class PatternSquare extends PatternBase {
         if (absX + halfDomainWidth < halfSize && absY + halfDomainHeight < halfSize) {
             return EVisibility.COVERS_VIEW;
         }
-        if (absX - halfSize < halfDomainWidth || absY - halfSize < halfDomainHeight) {
+        if (absX - halfSize < halfDomainWidth && absY - halfSize < halfDomainHeight) {
             return EVisibility.VISIBLE;
         }
         return EVisibility.OUT_OF_VIEW;

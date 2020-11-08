@@ -49,7 +49,7 @@ class PatternRectangle extends PatternBase {
         if (absX + halfDomainWidth < halfWidth && absY + halfDomainHeight < halfHeight) {
             return EVisibility.COVERS_VIEW;
         }
-        if (absX - halfWidth < halfDomainWidth || absY - halfHeight < halfDomainHeight) {
+        if (absX - halfWidth < halfDomainWidth && absY - halfHeight < halfDomainHeight) {
             return EVisibility.VISIBLE;
         }
         return EVisibility.OUT_OF_VIEW;
