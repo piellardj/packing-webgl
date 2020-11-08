@@ -37,9 +37,9 @@ abstract class PatternBase {
         this.lastTestId = 0;
     }
 
-    public zoomIn(zoomFactor: number): void {
-        this.center.x *= zoomFactor;
-        this.center.y *= zoomFactor;
+    public zoomIn(zoomCenter: IPoint, zoomFactor: number): void {
+        this.center.x = (this.center.x - zoomCenter.x) * zoomFactor + zoomCenter.x;
+        this.center.y = (this.center.y - zoomCenter.y) * zoomFactor + zoomCenter.y;
         this.size *= zoomFactor;
     }
 

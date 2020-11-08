@@ -11,9 +11,12 @@ import { Grid } from "./space-grid/grid";
 
 import { Color } from "./utils/color";
 import { ISize } from "./utils/i-size";
+import { IPoint } from "./utils/i-point";
 import { NumberRange } from "./utils/number-range";
 
 import * as Statistics from "./statistics/statistics";
+
+import "./page-interface-generated";
 
 class Engine {
     private initializedItemsList: PatternBase[]; // stored in the order they must be drawn.
@@ -25,10 +28,14 @@ class Engine {
 
     private grid: Grid; // used to index the items' positions for faster recycling
 
+    private zoomCenter: IPoint;
+
     public constructor() {
         this.initializedItemsList = [];
         this.uninitializedItemsList = [];
         this.lastRecyclingTime = 0;
+
+        this.zoomCenter = { x: 0, y: 0 }; // canvas center
     }
 
     public reset(): void {
@@ -175,11 +182,13 @@ class Engine {
      * @returns true if something changed and requires a redraw
      */
     private performZoom(deltaTimeInSeconds: number, domainSize: ISize): void {
+        this.updateZoomCenter(domainSize);
+
         const newInitializedArray: PatternBase[] = [];
 
         const zoomSpeed = 1 + deltaTimeInSeconds * Parameters.zoomSpeed;
         for (const item of this.initializedItemsList) {
-            item.zoomIn(zoomSpeed);
+            item.zoomIn(this.zoomCenter, zoomSpeed);
 
             if (!item.isInDomain(domainSize)) { // recycle items that are out of view
                 this.uninitializedItemsList.push(item);
@@ -193,6 +202,29 @@ class Engine {
 
     private get backgroundColor(): Color {
         return Parameters.blackBackground ? Color.BLACK : Color.WHITE;
+    }
+
+    private updateZoomCenter(domainSize: ISize): void {
+        if (Page.Canvas.isMouseDown()) {
+            const mousePosition = Page.Canvas.getMousePosition(); // in [0,1]^2
+            this.zoomCenter.x = domainSize.width * (mousePosition[0] - 0.5);
+            this.zoomCenter.y = domainSize.height * (mousePosition[1] - 0.5);
+        }
+
+        const halfWidth = 0.5 * domainSize.width;
+        const halfHeight = 0.5 * domainSize.height;
+
+        if (this.zoomCenter.x < -halfWidth) {
+            this.zoomCenter.x = -halfWidth
+        } else if (this.zoomCenter.x > halfWidth) {
+            this.zoomCenter.x = halfWidth;
+        }
+
+        if (this.zoomCenter.y < -halfHeight) {
+            this.zoomCenter.y = -halfHeight
+        } else if (this.zoomCenter.y > halfHeight) {
+            this.zoomCenter.y = halfHeight;
+        }
     }
 }
 
