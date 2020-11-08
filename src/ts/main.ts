@@ -181,7 +181,6 @@ function main(): void {
         const deltaTimeInSeconds = 0.001 * (time - lastRunTime);
         lastRunTime = time;
 
-        Statistics.registerFrame();
         Statistics.timeSpentInMainLoop.start();
 
         const nbItemsToAdd = needToAddItems ? 1000 : 0;
@@ -204,6 +203,7 @@ function main(): void {
         }
 
         Statistics.timeSpentInMainLoop.stop();
+        Statistics.registerFrame();
         requestAnimationFrame(mainLoop);
     }
     requestAnimationFrame(mainLoop);

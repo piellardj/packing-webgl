@@ -2,9 +2,10 @@ import { StopWatch } from "./stop-watch";
 
 import "../page-interface-generated";
 
-let totalFrames = 0;
+const VERBOSE_INTERVAL = 1000;
 
 const timeSinceLastVerboseFrame = new StopWatch();
+
 let frames = 0;
 const timeSpentInMainLoop = new StopWatch();
 const timeSpentInDraw = new StopWatch();
@@ -16,16 +17,12 @@ let itemsPendingRecyclingCount = 0;
 let itemsRecyclingTries = 0;
 
 function initialize(): void {
-    totalFrames = 0;
-
     timeSinceLastVerboseFrame.reset();
     timeSinceLastVerboseFrame.start();
     frames = 0;
 }
 
 function registerFrame(): void {
-    totalFrames++;
-
     frames++;
 
     if (isVerboseFrame()) {
@@ -35,7 +32,7 @@ function registerFrame(): void {
 }
 
 function isVerboseFrame(): boolean {
-    return (totalFrames % 100) === 0;
+    return timeSinceLastVerboseFrame.totalTime > VERBOSE_INTERVAL;
 }
 
 function updateIndicators(): void {
