@@ -86,7 +86,6 @@ function registerRecyclingStats(total: number, recycled: number, pendingRecyclin
 export {
     initialize,
     registerFrame,
-    isVerboseFrame,
     registerRecyclingStats,
     timeSpentInMainLoop,
     timeSpentInDraw,
