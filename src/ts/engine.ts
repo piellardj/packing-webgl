@@ -167,7 +167,6 @@ class Engine {
             item.zoomIn(zoomSpeed);
 
             if (!item.isInDomain(domainSize)) { // recycle items that are out of view
-                item.needInitialization = true;
                 this.uninitializedItemsList.push(item);
             } else {
                 newInitializedArray.push(item);

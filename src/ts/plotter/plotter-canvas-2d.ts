@@ -33,14 +33,12 @@ class PlotterCanvas2D extends PlotterCanvasBase {
         const halfHeight = 0.5 * this._size.height;
 
         for (const square of squares) {
-            if (!square.needInitialization) {
-                const centerX = square.center.x + halfWidth;
-                const centerY = square.center.y + halfHeight;
-                const halfSize = 0.5 * square.size;
+            const centerX = square.center.x + halfWidth;
+            const centerY = square.center.y + halfHeight;
+            const halfSize = 0.5 * square.size;
 
-                this.context.fillStyle = square.color.toString();
-                this.context.fillRect(centerX - halfSize, centerY - halfSize, square.size, square.size);
-            }
+            this.context.fillStyle = square.color.toString();
+            this.context.fillRect(centerX - halfSize, centerY - halfSize, square.size, square.size);
         }
     }
 
@@ -50,16 +48,14 @@ class PlotterCanvas2D extends PlotterCanvasBase {
         const TWO_PI = 2 * Math.PI;
 
         for (const circle of circles) {
-            if (!circle.needInitialization) {
-                const centerX = circle.center.x + halfWidth;
-                const centerY = circle.center.y + halfHeight;
+            const centerX = circle.center.x + halfWidth;
+            const centerY = circle.center.y + halfHeight;
 
-                this.context.fillStyle = circle.color.toString();
-                this.context.beginPath();
-                this.context.arc(centerX, centerY, circle.radius, 0, TWO_PI);
-                this.context.fill();
-                this.context.closePath();
-            }
+            this.context.fillStyle = circle.color.toString();
+            this.context.beginPath();
+            this.context.arc(centerX, centerY, circle.radius, 0, TWO_PI);
+            this.context.fill();
+            this.context.closePath();
         }
     }
 
@@ -68,13 +64,11 @@ class PlotterCanvas2D extends PlotterCanvasBase {
         const halfHeight = 0.5 * this._size.height;
 
         for (const rectangle of rectangles) {
-            if (!rectangle.needInitialization) {
-                const centerX = rectangle.center.x + halfWidth;
-                const centerY = rectangle.center.y + halfHeight;
+            const centerX = rectangle.center.x + halfWidth;
+            const centerY = rectangle.center.y + halfHeight;
 
-                this.context.fillStyle = rectangle.color.toString();
-                this.context.fillRect(centerX - 0.5 * rectangle.width, centerY - 0.5 * rectangle.height, rectangle.width, rectangle.height);
-            }
+            this.context.fillStyle = rectangle.color.toString();
+            this.context.fillRect(centerX - 0.5 * rectangle.width, centerY - 0.5 * rectangle.height, rectangle.width, rectangle.height);
         }
     }
 

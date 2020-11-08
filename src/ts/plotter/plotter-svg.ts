@@ -49,13 +49,11 @@ class PlotterSVG extends PlotterBase {
 
         this.stringParts.push(`\t<g stroke="none">\n`);
         for (const square of squares) {
-            if (!square.needInitialization) {
-                const centerX = square.center.x + halfWidth;
-                const centerY = square.center.y + halfHeight;
-                const halfSize = 0.5 * square.size;
+            const centerX = square.center.x + halfWidth;
+            const centerY = square.center.y + halfHeight;
+            const halfSize = 0.5 * square.size;
 
-                this.stringParts.push(`\t\t<rect fill="${square.color}" x="${centerX - halfSize}" y="${centerY - halfSize}" width="${square.size}" height="${square.size}"/>\n`);
-            }
+            this.stringParts.push(`\t\t<rect fill="${square.color}" x="${centerX - halfSize}" y="${centerY - halfSize}" width="${square.size}" height="${square.size}"/>\n`);
         }
         this.stringParts.push(`\t</g>\n`);
     }
@@ -66,12 +64,10 @@ class PlotterSVG extends PlotterBase {
 
         this.stringParts.push(`\t<g stroke="none">\n`);
         for (const circle of circles) {
-            if (!circle.needInitialization) {
-                const centerX = circle.center.x + halfWidth;
-                const centerY = circle.center.y + halfHeight;
+            const centerX = circle.center.x + halfWidth;
+            const centerY = circle.center.y + halfHeight;
 
-                this.stringParts.push(`\t\t<circle fill="${circle.color}" cx="${centerX}" cy="${centerY}" r="${circle.radius}"/>\n`);
-            }
+            this.stringParts.push(`\t\t<circle fill="${circle.color}" cx="${centerX}" cy="${centerY}" r="${circle.radius}"/>\n`);
         }
         this.stringParts.push(`\t</g>\n`);
     }

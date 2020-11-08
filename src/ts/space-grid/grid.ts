@@ -37,10 +37,6 @@ class Grid {
     }
 
     public registerItem(item: PatternBase): void {
-        if (item.needInitialization) {
-            return;
-        }
-
         this.totalItems++;
 
         const topLeft: IPoint = {

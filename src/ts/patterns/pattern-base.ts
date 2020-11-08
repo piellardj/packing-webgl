@@ -25,14 +25,11 @@ abstract class PatternBase {
     public center: IPoint;
     public size: number;
     public readonly color: Color;
-    public needInitialization: boolean;
 
     private lastTestId: number;
     private initializationTime: number;
 
     protected constructor() {
-        this.needInitialization = true;
-
         this.center = { x: 0, y: 0 };
         this.size = 0;
         this.color = Color.random();
@@ -58,7 +55,6 @@ abstract class PatternBase {
             const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, allowOverlapping);
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
-                this.needInitialization = false;
                 this.initializationTime = performance.now();
                 result.success = true;
             }
@@ -78,9 +74,6 @@ abstract class PatternBase {
     }
 
     public computeOpacity(time: number, blendTime: number): number {
-        if (this.needInitialization) {
-            return -1;
-        }
         const lifetime = time - this.initializationTime;
         if (lifetime > blendTime) {
             return 1;
@@ -125,7 +118,7 @@ abstract class PatternBase {
         let maxSize = 100000;
 
         for (const item of itemsToAvoid) {
-            if (!item.needInitialization) {
+            if (item !== this) {
                 const testedAlready = (item.lastTestId === currentTestId);
                 if (!testedAlready) {
                     maxSize = Math.min(maxSize, this.computeBiggestSizePossibleToAvoidItem(item, allowOverlapping));
