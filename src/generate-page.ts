@@ -194,6 +194,12 @@ const data = {
                     value: 0,
                     step: 1
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Instancing",
+                    id: "instancing-checkbox-id",
+                    checked: true
+                },
             ]
         },
         {

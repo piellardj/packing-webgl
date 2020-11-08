@@ -18,6 +18,7 @@ const controlId = {
     SHOW_GRID: "show-grid-checkbox-id",
     CELL_X: "cell-x-range-id",
     CELL_Y: "cell-y-range-id",
+    INSTANCING: "instancing-checkbox-id",
     DOWNLOAD: "result-download-id",
 };
 
@@ -33,6 +34,7 @@ Page.Checkbox.addObserver(controlId.ALLOW_OVERLAPPING, triggerRedraw);
 Page.Checkbox.addObserver(controlId.BLACK_BACKGROUND, triggerRedraw);
 Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
 Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
+Page.Checkbox.addObserver(controlId.INSTANCING, triggerRedraw);
 Page.Range.addObserver(controlId.CELL_X, triggerRedraw);
 Page.Range.addObserver(controlId.CELL_Y, triggerRedraw);
 
@@ -156,6 +158,14 @@ abstract class Parameters {
     }
     public static get cellY(): number {
         return Page.Range.getValue(controlId.CELL_Y);
+    }
+
+    public static get useInstancing(): boolean {
+        return Page.Checkbox.isChecked(controlId.INSTANCING);
+    }
+    public static disallowInstancing(): void {
+        Page.Checkbox.setChecked(controlId.INSTANCING, false);
+        Page.Controls.setVisibility(controlId.INSTANCING, false);
     }
 
     public static addRedrawObserver(callback: RedrawObserver): void {
