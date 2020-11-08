@@ -16,6 +16,11 @@ function generateTestId(): number {
     return globalLastTestId;
 }
 
+interface IPatternResetResult {
+    success: boolean;
+    nbTries: number;
+}
+
 abstract class PatternBase {
     public center: IPoint;
     public size: number;
@@ -41,9 +46,13 @@ abstract class PatternBase {
     }
 
     /** @returns the number of tries (regardless of the success of the reset) */
-    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, allowOverlapping: boolean, maxTries: number): number {
-        let iTry = 0;
-        while (iTry < maxTries) {
+    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, allowOverlapping: boolean, maxTries: number): IPatternResetResult {
+        const result: IPatternResetResult = {
+            nbTries: 0,
+            success: false,
+        };
+
+        while (result.nbTries < maxTries && !result.success) {
             this.randomizePosition(domainSize);
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, allowOverlapping);
@@ -51,13 +60,13 @@ abstract class PatternBase {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.needInitialization = false;
                 this.initializationTime = performance.now();
-                break;
+                result.success = true;
             }
 
-            iTry++;
+            result.nbTries++;
         }
 
-        return iTry;
+        return result;
     }
 
     public isInDomain(domainSize: ISize): boolean {

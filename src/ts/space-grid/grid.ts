@@ -24,13 +24,16 @@ class Grid {
         this.reset(domainSize, cellSize, []);
     }
 
-    public reset(domainSize: ISize, cellSize: number, items: PatternBase[]): void {
-        this.resetDomain(domainSize, cellSize);
+    /** @returns true if the grid needs to be redrawn */
+    public reset(domainSize: ISize, cellSize: number, items: PatternBase[]): boolean {
+        const gridHasChanged = this.resetDomain(domainSize, cellSize);
 
         this.totalItems = 0;
         for (const item of items) {
             this.registerItem(item);
         }
+
+        return gridHasChanged;
     }
 
     public registerItem(item: PatternBase): void {
@@ -144,10 +147,17 @@ class Grid {
         return result;
     }
 
-    private resetDomain(domainSize: ISize, cellSize: number): void {
+    /** @returns true if the cells disposition changed */
+    private resetDomain(domainSize: ISize, cellSize: number): boolean {
+        const wantedGridSizeX = Math.ceil(domainSize.width / cellSize);
+        const wantedGridSizeY=  Math.ceil(domainSize.height / cellSize);
+
+        const hasChanged = (this.cellSize !== cellSize) ||
+            (this.gridSize.width !== wantedGridSizeX) || (this.gridSize.height !== wantedGridSizeY);
+
         this.cellSize = cellSize;
-        this.gridSize.width = Math.ceil(domainSize.width / cellSize);
-        this.gridSize.height = Math.ceil(domainSize.height / cellSize);
+        this.gridSize.width = wantedGridSizeX;
+        this.gridSize.height = wantedGridSizeY;
 
         this.topLeftCorner.x = -0.5 * domainSize.width;
         this.topLeftCorner.y = -0.5 * domainSize.height;
@@ -157,6 +167,8 @@ class Grid {
         for (let i = 0; i < nbCells; i++) {
             this.gridCells[i] = []; // empty/initialize all cells
         }
+
+        return hasChanged;
     }
 
     /** No check that the parameters are in bounds. */

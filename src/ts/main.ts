@@ -1,160 +1,21 @@
-import { EPrimitive, Parameters } from "./parameters";
+import { Engine } from "./engine";
 
-import { PlotterBase } from "./plotter/plotter-base";
+import { Parameters } from "./parameters";
+
 import { PlotterCanvas2D } from "./plotter/plotter-canvas-2d";
 import { PlotterCanvasWebGL } from "./plotter/plotter-canvas-webgl";
 import { PlotterSVG } from "./plotter/plotter-svg";
 
-import { PatternBase } from "./patterns/pattern-base";
-import { PatternCircle } from "./patterns/pattern-circle";
-import { PatternSquare } from "./patterns/pattern-square";
-import { PatternRectangle } from "./patterns/pattern-rectangle";
-
-import * as Helper from "./utils/helper";
-import { ISize } from "./utils/i-size";
-import { NumberRange } from "./utils/number-range";
-import { Color } from "./utils/color";
-
 import * as Statistics from "./statistics/statistics";
 
-import { Grid } from "./space-grid/grid";
+import * as Helper from "./utils/helper";
 
 import "./page-interface-generated";
 
-function performZooming(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize): void {
-    const zoomSpeed = 1 + deltaTimeInSeconds * Parameters.zoomSpeed;
-    for (const item of items) {
-        item.zoomIn(zoomSpeed);
-
-        if (!item.isInDomain(domainSize)) { // recycle items that are out of view
-            item.needInitialization = true;
-        }
-    }
-}
-
-interface IRecyclingResult {
-    nbItemsRecycled: number;
-    reorderedItemsList: PatternBase[];
-}
-
-/** @returns number of recycled items */
-function performRecycling(items: PatternBase[], domainSize: ISize, grid: Grid): IRecyclingResult {
-    let nbItemsRecycled = 0;
-
-    const allowOverlapping = Parameters.allowOverlapping;
-    const sizeFactor = 1 - Parameters.spacing;
-    const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
-    const maxTries = Parameters.maxTriesPerFrame;
-    let triesLeft = maxTries;
-
-    const reorderedItemsList: PatternBase[] = [];
-    const previouslyUninitializedItems: PatternBase[] = [];
-
-    for (const item of items) {
-        if (!item.needInitialization) {
-            reorderedItemsList.push(item);
-        } else {
-            previouslyUninitializedItems.push(item);
-
-            triesLeft -= item.reset(domainSize, grid, sizeFactor, acceptedSizesForNewItems, allowOverlapping, triesLeft);
-            const succeeded = !item.needInitialization;
-            if (succeeded) {
-                grid.registerItem(item);
-                nbItemsRecycled++;
-            }
-        }
-    }
-
-    const nbPendingRecycling = previouslyUninitializedItems.length - nbItemsRecycled;
-    const nbTriesUsed = maxTries - triesLeft;
-    Statistics.registerRecyclingStats(items.length, nbItemsRecycled, nbPendingRecycling, nbTriesUsed);
-
-    reorderedItemsList.push.apply(reorderedItemsList, previouslyUninitializedItems);
-
-    return { nbItemsRecycled, reorderedItemsList };
-}
-
-function generateUninitializedItems(amount: number): PatternBase[] {
-    let instanciate: () => PatternBase;
-    if (Parameters.primitive === EPrimitive.CIRCLE) {
-        instanciate = () => new PatternCircle();
-    } else if (Parameters.primitive === EPrimitive.SQUARE) {
-        instanciate = () => new PatternSquare();
-    }  else {
-        instanciate = () => new PatternRectangle();
-    }
-
-    const items: PatternBase[] = [];
-    for (let i = 0; i < amount; i++) {
-        const newItem = instanciate();
-        items.push(newItem);
-    }
-    return items;
-}
-
-interface IUpdateResult {
-    needRedraw: boolean;
-    reorderedItemsList: PatternBase[];
-}
-/** @returns true if changes were made that require redrawing */
-function update(deltaTimeInSeconds: number, items: PatternBase[], domainSize: ISize, grid: Grid, nbItemsToAdd: number): IUpdateResult {
-    Statistics.timeSpentInUpdate.start();
-
-    grid.reset(domainSize, Parameters.cellSize, items);
-
-    let changedSomething = false;
-
-    if (nbItemsToAdd > 0) {
-        const newItems = generateUninitializedItems(1000);
-        items.push.apply(items, newItems); // add new items to existing ones
-        changedSomething = true;
-    }
-
-    const recyclingResult = performRecycling(items, domainSize, grid);
-    changedSomething = changedSomething || (recyclingResult.nbItemsRecycled > 0);
-
-    if (Parameters.isZooming) {
-        performZooming(deltaTimeInSeconds, items, domainSize);
-        changedSomething = true;
-    }
-
-    Statistics.timeSpentInUpdate.stop();
-    return {
-        needRedraw: changedSomething,
-        reorderedItemsList: recyclingResult.reorderedItemsList,
-    };
-}
-
-/** Draws the provided items in their order.
- * @returns Whether or not everything could be drawn
- */
-function draw(items: PatternBase[], grid: Grid, plotter: PlotterBase): boolean {
-    Statistics.timeSpentInDraw.start();
-    const backgroundColor = Parameters.blackBackground ? Color.BLACK : Color.WHITE;
-    plotter.initialize(backgroundColor);
-
-    if (Parameters.primitive === EPrimitive.CIRCLE) {
-        plotter.drawCircles(items as PatternCircle[]);
-    } else if (Parameters.primitive === EPrimitive.SQUARE) {
-        plotter.drawSquares(items as PatternSquare[]);
-    } else if (Parameters.primitive === EPrimitive.RECTANGLE) {
-        plotter.drawRectangles(items as PatternRectangle[]);
-    }
-
-    if (Parameters.showGrid) {
-        grid.draw(plotter);
-    }
-
-    plotter.finalize();
-
-    Statistics.timeSpentInDraw.stop();
-    return plotter.isReady;
-}
-
 function main(): void {
-    let itemsList: PatternBase[] = [];
     const canvasPlotter = Parameters.isWebGLVersion ? new PlotterCanvasWebGL() : new PlotterCanvas2D();
-    const grid = new Grid(canvasPlotter.size, Parameters.cellSize);
+
+    const engine = new Engine();
 
     let needToAddItems = false;
     let needToRedraw = true;
@@ -162,13 +23,13 @@ function main(): void {
     Parameters.addRedrawObserver(() => needToRedraw = true);
     Parameters.addItemObserver(() => needToAddItems = true);
     Parameters.addClearObserver(() => {
-        itemsList.length = 0;
+        engine.reset();
         needToRedraw = true;
     });
 
     Parameters.addDownloadObserver(() => {
         const svgPlotter = new PlotterSVG(canvasPlotter.size);
-        draw(itemsList, grid, svgPlotter);
+        engine.draw(svgPlotter);
 
         const fileName = "packing.svg";
         const svgString = svgPlotter.export();
@@ -177,27 +38,27 @@ function main(): void {
 
     let lastRunTime = 0;
     Statistics.initialize();
+    engine.reset();
     function mainLoop(time: number): void {
+        Statistics.timeSpentInMainLoop.start();
+
         const deltaTimeInSeconds = 0.001 * (time - lastRunTime);
         lastRunTime = time;
 
-        Statistics.timeSpentInMainLoop.start();
+        if (needToAddItems) {
+            engine.addItems(1000);
+            needToAddItems = false;
+        }
 
-        const nbItemsToAdd = needToAddItems ? 1000 : 0;
-        needToAddItems = false;
-        const updateResult = update(deltaTimeInSeconds, itemsList, canvasPlotter.size, grid, nbItemsToAdd);
-        itemsList = updateResult.reorderedItemsList;
-        needToRedraw = needToRedraw || updateResult.needRedraw;
+        Statistics.timeSpentInUpdate.start();
+        const updateChangedSomething = engine.udpate(deltaTimeInSeconds, canvasPlotter.size);
+        needToRedraw = needToRedraw || updateChangedSomething;
+        Statistics.timeSpentInUpdate.stop();
 
         if (needToRedraw) {
-            let successfulDraw = false;
-
-            if (Parameters.oneCellOnly) {
-                const localItems = grid.getItemsFromCell(Parameters.cellX, Parameters.cellY);
-                successfulDraw = draw(localItems, grid, canvasPlotter);
-            } else {
-                successfulDraw = draw(itemsList, grid, canvasPlotter);
-            }
+            Statistics.timeSpentInDraw.start();
+            const successfulDraw = engine.draw(canvasPlotter);
+            Statistics.timeSpentInDraw.stop();
 
             needToRedraw = !successfulDraw;
         }
