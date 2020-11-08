@@ -147,22 +147,24 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     public drawRectangles(rectangles: PatternRectangle[]): void {
         const nbRectangles = rectangles.length;
         if (this.rectanglesShader !== null && nbRectangles > 0) {
-            const wantedPositionsBufferLength = 2 * nbRectangles;
+            // try not to resize the buffers too often to avoid GC
+            const roundNbRectangles = 1024 * Math.ceil(nbRectangles / 1024);
+            const wantedPositionsBufferLength = 2 * roundNbRectangles;
             if (this.positionsBuffer.length !== wantedPositionsBufferLength) {
                 this.positionsBuffer = new Float32Array(wantedPositionsBufferLength);
             }
 
-            const wantedSizesBufferLength = nbRectangles;
+            const wantedSizesBufferLength = roundNbRectangles;
             if (this.sizesBuffer.length !== wantedSizesBufferLength) {
                 this.sizesBuffer = new Float32Array(wantedSizesBufferLength);
             }
 
-            const wantedAspectRatiosBufferLength = nbRectangles;
+            const wantedAspectRatiosBufferLength = roundNbRectangles;
             if (this.aspectRatiosBuffer.length !== wantedAspectRatiosBufferLength) {
                 this.aspectRatiosBuffer = new Float32Array(wantedAspectRatiosBufferLength);
             }
 
-            const wantedColorsBufferLength = 4 * nbRectangles;
+            const wantedColorsBufferLength = 4 * roundNbRectangles;
             if (this.colorsBuffer.length !== wantedColorsBufferLength) {
                 this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
             }
@@ -201,17 +203,19 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private drawAsPoints(shader: Shader, items: PatternBase[]): void {
         const nbCircles = items.length;
         if (shader !== null && nbCircles > 0) {
-            const wantedPositionsBufferLength = 2 * nbCircles;
+            // try not to resize the buffers too often to avoid GC
+            const roundNbCircles = 1024 * Math.ceil(nbCircles / 1024);
+            const wantedPositionsBufferLength = 2 * roundNbCircles;
             if (this.positionsBuffer.length !== wantedPositionsBufferLength) {
                 this.positionsBuffer = new Float32Array(wantedPositionsBufferLength);
             }
 
-            const wantedSizesBufferLength = nbCircles;
+            const wantedSizesBufferLength = roundNbCircles;
             if (this.sizesBuffer.length !== wantedSizesBufferLength) {
                 this.sizesBuffer = new Float32Array(wantedSizesBufferLength);
             }
 
-            const wantedColorsBufferLength = 4 * nbCircles;
+            const wantedColorsBufferLength = 4 * roundNbCircles;
             if (this.colorsBuffer.length !== wantedColorsBufferLength) {
                 this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
             }
