@@ -63,12 +63,19 @@ class Engine {
 
         plotter.initialize(this.defaultBackgroundColor);
 
+        let itemsToDraw: PatternBase[];
+        if (Parameters.oneCellOnly) {
+            itemsToDraw = this.grid.getItemsFromCell(Parameters.cellX, Parameters.cellY);
+        } else {
+            itemsToDraw = this.initializedItemsList;
+        }
+
         if (this.currentPrimitive === EPrimitive.SQUARE) {
-            plotter.drawSquares(this.initializedItemsList as PatternSquare[]);
+            plotter.drawSquares(itemsToDraw as PatternSquare[]);
         } else if (this.currentPrimitive === EPrimitive.CIRCLE) {
-            plotter.drawCircles(this.initializedItemsList as PatternCircle[]);
+            plotter.drawCircles(itemsToDraw as PatternCircle[]);
         } else if (this.currentPrimitive === EPrimitive.RECTANGLE) {
-            plotter.drawRectangles(this.initializedItemsList as PatternRectangle[]);
+            plotter.drawRectangles(itemsToDraw as PatternRectangle[]);
         }
 
         if (Parameters.showGrid) {
