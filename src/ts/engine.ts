@@ -58,6 +58,8 @@ class Engine {
         this.uninitializedItemsList = [];
         this.currentPrimitive = primitive;
         this.backgroundColorOverride = null;
+        this.zoomCenter.x = 0;
+        this.zoomCenter.y = 0;
     }
 
     public addItems(count: number): void {
