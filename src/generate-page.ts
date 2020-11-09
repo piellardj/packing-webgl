@@ -21,6 +21,14 @@ const data = {
             label: "FPS"
         },
         {
+            id: "items-count",
+            label: "Items count"
+        },
+        {
+            id: "items-visible-count",
+            label: "Visible items count"
+        },
+        {
             id: "main-loop-time",
             label: "Time spent in mainLoop()"
         },
@@ -33,12 +41,16 @@ const data = {
             label: "Time spent in mainLoop.update()"
         },
         {
-            id: "items-count",
-            label: "Items count"
+            id: "update-reindex-time",
+            label: "Time spent in mainLoop.update.reindex()"
         },
         {
-            id: "items-visible-count",
-            label: "Visible items count"
+            id: "update-recycle-time",
+            label: "Time spent in mainLoop.update.recycle()"
+        },
+        {
+            id: "update-zoom-time",
+            label: "Time spent in mainLoop.update.zoom()"
         },
         {
             id: "items-reclycled-count",

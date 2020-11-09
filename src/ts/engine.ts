@@ -118,20 +118,26 @@ class Engine {
 
         let requiresRedraw = false;
 
+        Statistics.timeSpentInReindex.start();
         const gridChanged = this.reindexItems(domainSize);
         requiresRedraw = requiresRedraw || gridChanged;
+        Statistics.timeSpentInReindex.stop();
 
+        Statistics.timeSpentInRecycle.start();
         const itemsRecycled = this.performRecycling(domainSize);
         requiresRedraw = requiresRedraw || itemsRecycled;
         if (itemsRecycled) {
             this.lastRecyclingTime = performance.now();
         }
+        Statistics.timeSpentInRecycle.stop();
 
+        Statistics.timeSpentInZoom.start();
         if (Parameters.isZooming) {
             const itemsMoved = (this.initializedItemsList.length > 0);
             this.performZoom(deltaTimeInSeconds, domainSize);
             requiresRedraw = requiresRedraw || itemsMoved;
         }
+        Statistics.timeSpentInZoom.stop();
 
         return requiresRedraw;
     }

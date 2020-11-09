@@ -12,6 +12,9 @@ let frames = 0;
 const timeSpentInMainLoop = new StopWatch();
 const timeSpentInDraw = new StopWatch();
 const timeSpentInUpdate = new StopWatch();
+const timeSpentInReindex = new StopWatch();
+const timeSpentInRecycle = new StopWatch();
+const timeSpentInZoom = new StopWatch();
 
 let itemsCount = 0;
 let itemsRecycledCount = 0;
@@ -56,11 +59,23 @@ function updateIndicators(): void {
     const averageUpdateTime = timeSpentInUpdate.totalTime / frames;
     const updateTimeRelative = averageUpdateTime / averageMainLoopTime;
 
+    const averageUpdateReindexTime = timeSpentInReindex.totalTime / frames;
+    const updateReindexTimeRelative = averageUpdateReindexTime / averageUpdateTime;
+
+    const averageUpdateRecycleTime = timeSpentInRecycle.totalTime / frames;
+    const updateRecycleTimeRelative = averageUpdateRecycleTime / averageUpdateTime;
+
+    const averageUpdateZoomTime = timeSpentInZoom.totalTime / frames;
+    const updateZoomTimeRelative = averageUpdateZoomTime / averageUpdateTime;
+
     if (Parameters.isInDebug) {
         Page.Canvas.setIndicatorText("fps", `${fps.toFixed(0)} (${averageFrameTime.toFixed(2)} ms)`);
         Page.Canvas.setIndicatorText("main-loop-time", `${averageMainLoopTime.toFixed(2)} ms (${(100 * mainLoopTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("draw-time", `${averageDrawTime.toFixed(2)} ms (${(100 * drawTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-time", `${averageUpdateTime.toFixed(2)} ms (${(100 * updateTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("update-reindex-time", `${averageUpdateReindexTime.toFixed(2)} ms (${(100 * updateReindexTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("update-recycle-time", `${averageUpdateRecycleTime.toFixed(2)} ms (${(100 * updateRecycleTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("update-zoom-time", `${averageUpdateZoomTime.toFixed(2)} ms (${(100 * updateZoomTimeRelative).toFixed(1)} %)`);
 
         Page.Canvas.setIndicatorText("items-reclycled-count", `${(itemsRecycledCount / frames * fps).toFixed(1)}`);
         Page.Canvas.setIndicatorText("items-pending-recycling-count", `${(itemsPendingRecyclingCount / frames).toFixed(1)}`);
@@ -90,6 +105,9 @@ function resetAll(): void {
     timeSpentInMainLoop.reset();
     timeSpentInDraw.reset();
     timeSpentInUpdate.reset();
+    timeSpentInReindex.reset();
+    timeSpentInRecycle.reset();
+    timeSpentInZoom.reset();
 
     itemsRecycledCount = 0;
     itemsPendingRecyclingCount = 0;
@@ -128,4 +146,7 @@ export {
     timeSpentInMainLoop,
     timeSpentInDraw,
     timeSpentInUpdate,
+    timeSpentInReindex,
+    timeSpentInRecycle,
+    timeSpentInZoom,
 }
