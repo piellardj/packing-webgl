@@ -104,6 +104,10 @@ const data = {
                             value: "rectangle",
                             label: "Rectangle"
                         },
+                        {
+                            value: "triangle",
+                            label: "Triangle"
+                        },
                     ]
                 },
                 {

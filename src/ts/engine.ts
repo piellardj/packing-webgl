@@ -4,6 +4,7 @@ import { EVisibility, PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternRectangle } from "./patterns/pattern-rectangle";
 import { PatternSquare } from "./patterns/pattern-square";
+import { PatternTriangle } from "./patterns/pattern-triangle";
 
 import { PlotterBase } from "./plotter/plotter-base";
 
@@ -50,6 +51,8 @@ class Engine {
             this.createItem = () => new PatternCircle();
         } else if (primitive === EPrimitive.RECTANGLE) {
             this.createItem = () => new PatternRectangle();
+        } else if (primitive === EPrimitive.TRIANGLE) {
+            this.createItem = () => new PatternTriangle();
         } else {
             throw new Error(`Invalid primitive "${primitive}.`);
         }
@@ -95,6 +98,8 @@ class Engine {
             plotter.drawCircles(itemsToDraw as PatternCircle[]);
         } else if (this.currentPrimitive === EPrimitive.RECTANGLE) {
             plotter.drawRectangles(itemsToDraw as PatternRectangle[]);
+        } else if (this.currentPrimitive === EPrimitive.TRIANGLE) {
+            plotter.drawTriangles(itemsToDraw as PatternTriangle[]);
         }
 
         if (Parameters.showGrid) {

@@ -7,6 +7,7 @@ import { PlotterBase } from "./plotter-base";
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
+import { PatternTriangle } from "../patterns/pattern-triangle";
 
 class PlotterSVG extends PlotterBase {
     private stringParts: string[];
@@ -82,6 +83,20 @@ class PlotterSVG extends PlotterBase {
             const centerY = rectangle.center.y + halfHeight;
 
             this.stringParts.push(`\t\t<rect fill="${rectangle.color}" x="${centerX - 0.5 * rectangle.width}" y="${centerY - 0.5 * rectangle.height}" width="${rectangle.width}" height="${rectangle.height}"/>\n`);
+        }
+        this.stringParts.push(`\t</g>\n`);
+    }
+
+    public drawTriangles(triangles: PatternTriangle[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        this.stringParts.push(`\t<g stroke="none">\n`);
+        for (const triangle of triangles) {
+            const centerX = triangle.center.x + halfWidth;
+            const centerY = triangle.center.y + halfHeight;
+
+            this.stringParts.push(`\t\t<polygon fill="${triangle.color}" points="${centerX + triangle.P1.x * triangle.size},${centerY + triangle.P1.y * triangle.size} ${centerX + triangle.P2.x * triangle.size},${centerY + triangle.P2.y * triangle.size} ${centerX + triangle.P3.x * triangle.size},${centerY + triangle.P3.y * triangle.size}"/>\n`);
         }
         this.stringParts.push(`\t</g>\n`);
     }

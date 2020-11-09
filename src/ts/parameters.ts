@@ -75,6 +75,7 @@ enum EPrimitive {
     SQUARE = "square",
     CIRCLE = "circle",
     RECTANGLE = "rectangle",
+    TRIANGLE = "triangle",
 }
 
 const isInDebug = Helpers.getQueryStringValue("debug") === "1";

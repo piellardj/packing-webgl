@@ -6,6 +6,7 @@ import { PlotterCanvasBase } from "./plotter-canvas-base";
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
+import { PatternTriangle } from "../patterns/pattern-triangle";
 
 import "../page-interface-generated";
 
@@ -69,6 +70,24 @@ class PlotterCanvas2D extends PlotterCanvasBase {
 
             this.context.fillStyle = rectangle.color.toString();
             this.context.fillRect(centerX - 0.5 * rectangle.width, centerY - 0.5 * rectangle.height, rectangle.width, rectangle.height);
+        }
+    }
+
+    public drawTriangles(triangles: PatternTriangle[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        for (const triangle of triangles) {
+            const centerX = triangle.center.x + halfWidth;
+            const centerY = triangle.center.y + halfHeight;
+
+            this.context.fillStyle = triangle.color.toString();
+            this.context.beginPath();
+            this.context.moveTo(centerX + triangle.P1.x * triangle.size, centerY + triangle.P1.y * triangle.size);
+            this.context.lineTo(centerX + triangle.P2.x * triangle.size, centerY + triangle.P2.y * triangle.size);
+            this.context.lineTo(centerX + triangle.P3.x * triangle.size, centerY + triangle.P3.y * triangle.size);
+            this.context.fill();
+            this.context.closePath();
         }
     }
 

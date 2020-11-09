@@ -7,6 +7,7 @@ import { PatternBase } from "../patterns/pattern-base";
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
+import { PatternTriangle } from "../patterns/pattern-triangle";
 
 import { initGL, gl } from "../gl-utils/gl-canvas";
 import { Shader } from "../gl-utils/shader";
@@ -14,23 +15,33 @@ import * as ShaderManager from "../gl-utils/shader-manager";
 import { VBO } from "../gl-utils/vbo";
 
 import "../page-interface-generated";
-import { Parameters } from "../parameters";
+import { EPrimitive, Parameters } from "../parameters";
 
 type AffectShaderFunction = (shader: Shader) => unknown;
 type ExtraAttributeFunction = (item: PatternBase) => number;
+
+const SQUARE_GEOMETRY = [-.5, .5, -.5, -.5, .5, .5, .5, -.5];
+const TRIANGLE_GEOMETRY = [
+    PatternTriangle.baseP1.x, PatternTriangle.baseP1.y,
+    PatternTriangle.baseP2.x, PatternTriangle.baseP2.y,
+    PatternTriangle.baseP3.x, PatternTriangle.baseP3.y,
+];
 
 class PlotterCanvasWebGL extends PlotterCanvasBase {
     private instancingExt: ANGLE_instanced_arrays;
     private needToResetInstancingDivision: boolean;
 
     private linesShader: Shader | null;
+
     private squaresShader: Shader | null;
     private circlesShader: Shader | null;
     private rectanglesShader: Shader | null;
+    private trianglesShader: Shader | null;
 
     private squaresInstancedShader: Shader | null;
     private circlesInstancedShader: Shader | null;
     private rectanglesInstancedShader: Shader | null;
+    private trianglesInstancedShader: Shader | null;
 
     private blending: boolean;
 
@@ -77,30 +88,36 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.colorsBuffer = new Float32Array([]);
         this.colorsVBO = new VBO(gl, this.colorsBuffer, 4, gl.FLOAT, false);
 
-        const squareGeometryBuffer = [-.5, .5, -.5, -.5, .5, .5, .5, -.5];
-        this.geometryVBO = new VBO(gl, new Float32Array(squareGeometryBuffer), 2, gl.FLOAT, true);
+        const geometryBuffer = SQUARE_GEOMETRY.concat(TRIANGLE_GEOMETRY);
+        this.geometryVBO = new VBO(gl, new Float32Array(geometryBuffer), 2, gl.FLOAT, true);
 
         this.linesShader = null;
         this.squaresShader = null;
         this.circlesShader = null;
         this.rectanglesShader = null;
+        this.trianglesShader = null;
         this.loadAndBuildShader("lines.vert", "lines.frag", "lines", (shader: Shader) => this.linesShader = shader);
         this.loadAndBuildShader("items.vert", "squares.frag", "squares", (shader: Shader) => this.squaresShader = shader);
         this.loadAndBuildShader("items.vert", "circles.frag", "circles", (shader: Shader) => this.circlesShader = shader);
         this.loadAndBuildShader("rectangles.vert", "rectangles.frag", "rectangles", (shader: Shader) => this.rectanglesShader = shader);
+        this.loadAndBuildShader("triangles.vert", "triangles.frag", "triangles", (shader: Shader) => this.trianglesShader = shader);
 
         this.squaresInstancedShader = null;
         this.circlesInstancedShader = null;
         this.rectanglesInstancedShader = null;
+        this.trianglesInstancedShader = null;
         if (this.supportsInstancing) {
             this.loadAndBuildShader("instanced/simpleGeometry.vert", "instanced/fillColor.frag", "instanced squares", (shader: Shader) => this.squaresInstancedShader = shader);
             this.loadAndBuildShader("instanced/circles.vert", "instanced/circles.frag", "instanced squares", (shader: Shader) => this.circlesInstancedShader = shader);
             this.loadAndBuildShader("instanced/rectangles.vert", "instanced/fillColor.frag", "instanced circles", (shader: Shader) => this.rectanglesInstancedShader = shader);
+            this.loadAndBuildShader("instanced/triangles.vert", "instanced/fillColor.frag", "instanced triangles", (shader: Shader) => this.trianglesInstancedShader = shader);
         }
     }
 
     public get isReady(): boolean {
-        return this.linesShader !== null && this.squaresShader !== null && this.circlesShader !== null;
+        return this.linesShader !== null &&
+            this.squaresShader !== null && this.circlesShader !== null && this.rectanglesShader !== null && this.trianglesShader !== null &&
+            this.squaresInstancedShader !== null && this.circlesInstancedShader !== null && this.rectanglesInstancedShader !== null && this.trianglesInstancedShader !== null;
     }
 
     protected clearCanvas(color: Color): void {
@@ -118,7 +135,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
     public drawSquares(squares: PatternSquare[]): void {
         if (this.useInstancing && this.squaresInstancedShader !== null) {
-            this.drawInstanced(this.squaresInstancedShader, squares);
+            this.drawInstanced(this.squaresInstancedShader, squares, EPrimitive.SQUARE);
         } else {
             this.drawAsPoints(this.squaresShader, squares);
         }
@@ -126,7 +143,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
     public drawCircles(circles: PatternCircle[]): void {
         if (this.useInstancing && this.circlesInstancedShader !== null) {
-            this.drawInstanced(this.circlesInstancedShader, circles);
+            this.drawInstanced(this.circlesInstancedShader, circles, EPrimitive.CIRCLE);
         } else {
             this.drawAsPoints(this.circlesShader, circles);
         }
@@ -136,9 +153,19 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         const extraAttributeFunction = (item: PatternBase) => (item as PatternRectangle).aspectRatio;
 
         if (this.useInstancing && this.rectanglesInstancedShader !== null) {
-            this.drawInstanced(this.rectanglesInstancedShader, rectangles, extraAttributeFunction);
+            this.drawInstanced(this.rectanglesInstancedShader, rectangles, EPrimitive.RECTANGLE, extraAttributeFunction);
         } else {
             this.drawAsPoints(this.rectanglesShader, rectangles, extraAttributeFunction);
+        }
+    }
+
+    public drawTriangles(triangles: PatternTriangle[]): void {
+        const extraAttributeFunction = (item: PatternBase) => (item as PatternTriangle).angle;
+
+        if (this.useInstancing && this.trianglesInstancedShader !== null) {
+            this.drawInstanced(this.trianglesInstancedShader, triangles, EPrimitive.TRIANGLE, extraAttributeFunction);
+        } else {
+            this.drawAsPoints(this.trianglesShader, triangles, extraAttributeFunction);
         }
     }
 
@@ -170,7 +197,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
     }
 
-    private drawInstanced(shader: Shader, items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
+    private drawInstanced(shader: Shader, items: PatternBase[], primitive: EPrimitive, extraAttribute?: ExtraAttributeFunction): void {
         const nbItems = items.length;
         if (this.supportsInstancing && shader !== null && nbItems > 0) {
             this.updateStateAndColorVBOs(items, extraAttribute);
@@ -185,7 +212,11 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
             this.colorsVBO.bindInstanced(shader.a["aColor"].loc, this.instancingExt, 1);
             this.needToResetInstancingDivision = true;
 
-            this.instancingExt.drawArraysInstancedANGLE(gl.TRIANGLE_STRIP, 0, 4, nbItems);
+            if (primitive === EPrimitive.TRIANGLE) {
+                this.instancingExt.drawArraysInstancedANGLE(gl.TRIANGLES, 4, 3, nbItems);
+            } else {
+                this.instancingExt.drawArraysInstancedANGLE(gl.TRIANGLE_STRIP, 0, 4, nbItems);
+            }
         }
     }
 
