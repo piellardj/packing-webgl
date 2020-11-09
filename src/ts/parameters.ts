@@ -80,6 +80,10 @@ Page.Canvas.setIndicatorVisibility("update-time", isInDebug);
 Page.Canvas.setIndicatorVisibility("items-reclycled-count", isInDebug);
 Page.Canvas.setIndicatorVisibility("items-pending-recycling-count", isInDebug);
 Page.Canvas.setIndicatorVisibility("items-recycling-tries-count", isInDebug);
+Page.Canvas.setIndicatorVisibility("grid-size",isInDebug);
+Page.Canvas.setIndicatorVisibility("grid-cell-size",isInDebug);
+Page.Canvas.setIndicatorVisibility("grid-items-per-cell", isInDebug);
+
 if (isInDebug) {
     Page.Checkbox.setChecked(controlId.INDICATORS, true);
 } else {

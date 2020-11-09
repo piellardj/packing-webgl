@@ -177,6 +177,8 @@ class Engine {
         const nbPendingRecycling = this.uninitializedItemsList.length;
         const nbTriesUsed = maxTries - triesLeft;
         Statistics.registerRecyclingStats(totalItemsCount, nbItemsRecycled, nbPendingRecycling, nbTriesUsed);
+        this.grid.computeStatistics();
+
         return nbItemsRecycled > 0;
     }
 

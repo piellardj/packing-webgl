@@ -52,6 +52,18 @@ const data = {
             id: "items-recycling-tries-count",
             label: "Items recycling tries per frame"
         },
+        {
+            id: "grid-size",
+            label: "Grid size"
+        },
+        {
+            id: "grid-cell-size",
+            label: "Grid cell size"
+        },
+        {
+            id: "grid-items-per-cell",
+            label: "Grid items per cell"
+        },
     ],
     canvas: {
         width: 512,

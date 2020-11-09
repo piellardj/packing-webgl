@@ -5,6 +5,8 @@ import { ILine } from "../utils/i-line";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 
+import * as Statistics from "..//statistics/statistics";
+
 type GridCell = PatternBase[];
 
 class Grid {
@@ -13,17 +15,21 @@ class Grid {
     private readonly topLeftCorner: IPoint;
     private cellSize: number;
 
+    private registeredItemsCount: number; // including duplicates
+
     constructor(domainSize: ISize, cellSize: number) {
         this.cellSize = cellSize;
         this.gridSize = { width: 0, height: 0 };
         this.gridCells = [];
         this.topLeftCorner = { x: 0, y: 0 };
+        this.registeredItemsCount = 0;
 
         this.reset(domainSize, cellSize, []);
     }
 
     /** @returns true if the grid needs to be redrawn */
     public reset(domainSize: ISize, cellSize: number, items: PatternBase[]): boolean {
+        this.registeredItemsCount = 0;
         const gridHasChanged = this.resetDomain(domainSize, cellSize);
 
         for (const item of items) {
@@ -50,6 +56,7 @@ class Grid {
             for (let iCellX = minCellId.x; iCellX <= maxCellId.x; iCellX++) {
                 const cellId = this.computeCellId(iCellX, iCellY);
                 this.gridCells[cellId].push(item);
+                this.registeredItemsCount++;
             }
         }
     }
@@ -144,6 +151,10 @@ class Grid {
         }
 
         return result;
+    }
+
+    public computeStatistics(): void {
+        Statistics.registerGridStats(this.gridSize, this.cellSize, this.registeredItemsCount);
     }
 
     /** @returns true if the cells disposition changed */

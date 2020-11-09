@@ -2,6 +2,7 @@ import { StopWatch } from "./stop-watch";
 
 import "../page-interface-generated";
 import { Parameters } from "../parameters";
+import { ISize } from "../utils/i-size";
 
 const VERBOSE_INTERVAL = 1000;
 
@@ -16,6 +17,12 @@ let itemsCount = 0;
 let itemsRecycledCount = 0;
 let itemsPendingRecyclingCount = 0;
 let itemsRecyclingTries = 0;
+
+let nbGridStats = 0;
+let gridWidth = 0;
+let gridHeight = 0;
+let gridCellSize = 0;
+let gridRegisteredItems = 0;
 
 function initialize(): void {
     timeSinceLastVerboseFrame.reset();
@@ -58,6 +65,15 @@ function updateIndicators(): void {
         Page.Canvas.setIndicatorText("items-reclycled-count", `${(itemsRecycledCount / frames * fps).toFixed(1)}`);
         Page.Canvas.setIndicatorText("items-pending-recycling-count", `${(itemsPendingRecyclingCount / frames).toFixed(1)}`);
         Page.Canvas.setIndicatorText("items-recycling-tries-count", `${(itemsRecyclingTries / frames).toFixed(1)}`);
+
+        if (nbGridStats > 0) {
+            const averageGridWidth = Math.round(gridWidth / nbGridStats);
+            const averageGridHeight = Math.round(gridHeight / nbGridStats);
+            const averageGridCellCount = averageGridWidth * averageGridHeight;
+            Page.Canvas.setIndicatorText("grid-size", `${averageGridWidth}x${averageGridHeight} (${averageGridCellCount})`);
+            Page.Canvas.setIndicatorText("grid-cell-size", `${(gridCellSize / nbGridStats).toFixed(1)}`);
+            Page.Canvas.setIndicatorText("grid-items-per-cell", `${(gridRegisteredItems / nbGridStats / averageGridCellCount).toFixed(1)}`);
+        }
     } else {
         Page.Canvas.setIndicatorText("fps", fps.toFixed(0));
     }
@@ -78,6 +94,8 @@ function resetAll(): void {
     itemsRecycledCount = 0;
     itemsPendingRecyclingCount = 0;
     itemsRecyclingTries = 0;
+
+    nbGridStats = 0;
 }
 
 function registerRecyclingStats(total: number, recycled: number, pendingRecycling: number, nbTriesCount: number): void {
@@ -87,8 +105,24 @@ function registerRecyclingStats(total: number, recycled: number, pendingRecyclin
     itemsRecyclingTries += nbTriesCount;
 }
 
+function registerGridStats(gridSize: ISize, cellSize: number, registeredItems: number): void {
+    if (nbGridStats === 0) {
+        gridWidth = 0;
+        gridHeight = 0;
+        gridCellSize = 0;
+        gridRegisteredItems = 0;
+    }
+
+    nbGridStats++;
+    gridWidth += gridSize.width;
+    gridHeight += gridSize.height;
+    gridCellSize += cellSize;
+    gridRegisteredItems += registeredItems;
+}
+
 export {
     initialize,
+    registerGridStats,
     registerFrame,
     registerRecyclingStats,
     timeSpentInMainLoop,
