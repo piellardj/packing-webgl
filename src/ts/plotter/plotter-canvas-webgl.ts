@@ -96,11 +96,11 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.circlesShader = null;
         this.rectanglesShader = null;
         this.trianglesShader = null;
-        this.loadAndBuildShader("lines.vert", "lines.frag", "lines", (shader: Shader) => this.linesShader = shader);
-        this.loadAndBuildShader("items.vert", "squares.frag", "squares", (shader: Shader) => this.squaresShader = shader);
-        this.loadAndBuildShader("items.vert", "circles.frag", "circles", (shader: Shader) => this.circlesShader = shader);
-        this.loadAndBuildShader("rectangles.vert", "rectangles.frag", "rectangles", (shader: Shader) => this.rectanglesShader = shader);
-        this.loadAndBuildShader("triangles.vert", "triangles.frag", "triangles", (shader: Shader) => this.trianglesShader = shader);
+        this.loadAndBuildShader("point/lines.vert", "point/lines.frag", "lines", (shader: Shader) => this.linesShader = shader);
+        this.loadAndBuildShader("point/items.vert", "point/squares.frag", "squares", (shader: Shader) => this.squaresShader = shader);
+        this.loadAndBuildShader("point/items.vert", "point/circles.frag", "circles", (shader: Shader) => this.circlesShader = shader);
+        this.loadAndBuildShader("point/rectangles.vert", "point/rectangles.frag", "rectangles", (shader: Shader) => this.rectanglesShader = shader);
+        this.loadAndBuildShader("point/triangles.vert", "point/triangles.frag", "triangles", (shader: Shader) => this.trianglesShader = shader);
 
         this.squaresInstancedShader = null;
         this.circlesInstancedShader = null;
