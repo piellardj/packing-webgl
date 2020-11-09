@@ -134,39 +134,21 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     public finalize(): void { }
 
     public drawSquares(squares: PatternSquare[]): void {
-        if (this.useInstancing && this.squaresInstancedShader !== null) {
-            this.drawInstanced(this.squaresInstancedShader, squares, EPrimitive.SQUARE);
-        } else {
-            this.drawAsPoints(this.squaresShader, squares);
-        }
+        this.drawPrimitives(this.squaresShader, this.squaresInstancedShader, squares, EPrimitive.SQUARE);
     }
 
     public drawCircles(circles: PatternCircle[]): void {
-        if (this.useInstancing && this.circlesInstancedShader !== null) {
-            this.drawInstanced(this.circlesInstancedShader, circles, EPrimitive.CIRCLE);
-        } else {
-            this.drawAsPoints(this.circlesShader, circles);
-        }
+        this.drawPrimitives(this.circlesShader, this.circlesInstancedShader, circles, EPrimitive.CIRCLE);
     }
 
     public drawRectangles(rectangles: PatternRectangle[]): void {
         const extraAttributeFunction = (item: PatternBase) => (item as PatternRectangle).aspectRatio;
-
-        if (this.useInstancing && this.rectanglesInstancedShader !== null) {
-            this.drawInstanced(this.rectanglesInstancedShader, rectangles, EPrimitive.RECTANGLE, extraAttributeFunction);
-        } else {
-            this.drawAsPoints(this.rectanglesShader, rectangles, extraAttributeFunction);
-        }
+        this.drawPrimitives(this.rectanglesShader, this.rectanglesInstancedShader, rectangles, EPrimitive.RECTANGLE, extraAttributeFunction);
     }
 
     public drawTriangles(triangles: PatternTriangle[]): void {
         const extraAttributeFunction = (item: PatternBase) => (item as PatternTriangle).angle;
-
-        if (this.useInstancing && this.trianglesInstancedShader !== null) {
-            this.drawInstanced(this.trianglesInstancedShader, triangles, EPrimitive.TRIANGLE, extraAttributeFunction);
-        } else {
-            this.drawAsPoints(this.trianglesShader, triangles, extraAttributeFunction);
-        }
+        this.drawPrimitives(this.trianglesShader, this.trianglesInstancedShader, triangles, EPrimitive.TRIANGLE, extraAttributeFunction);
     }
 
     public drawLines(lines: ILine[], color: Color): void {
@@ -197,11 +179,19 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
     }
 
-    private drawInstanced(shader: Shader, items: PatternBase[], primitive: EPrimitive, extraAttribute?: ExtraAttributeFunction): void {
+    private drawPrimitives(pointsShader: Shader, instancedShader: Shader, items: PatternBase[], primitive: EPrimitive, extraAttributeFunction?: ExtraAttributeFunction): void {
+        this.updateStateAndColorVBOs(items, extraAttributeFunction);
+
+        if (this.useInstancing && instancedShader !== null) {
+            this.drawInstanced(instancedShader, items, primitive);
+        } else {
+            this.drawAsPoints(pointsShader, items);
+        }
+    }
+
+    private drawInstanced(shader: Shader, items: PatternBase[], primitive: EPrimitive): void {
         const nbItems = items.length;
         if (this.supportsInstancing && shader !== null && nbItems > 0) {
-            this.updateStateAndColorVBOs(items, extraAttribute);
-
             shader.u["uScreenSize"].value = [this._size.width, this._size.height];
 
             shader.use();
@@ -220,11 +210,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
     }
 
-    private drawAsPoints(shader: Shader, items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
+    private drawAsPoints(shader: Shader, items: PatternBase[]): void {
         const nbItems = items.length;
         if (shader !== null && nbItems > 0) {
-            this.updateStateAndColorVBOs(items, extraAttribute);
-
             shader.a["aState"].VBO = this.statesVBO;
             shader.a["aColor"].VBO = this.colorsVBO;
             shader.u["uScreenSize"].value = [this._size.width, this._size.height];
