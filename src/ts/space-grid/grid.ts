@@ -13,14 +13,11 @@ class Grid {
     private readonly topLeftCorner: IPoint;
     private cellSize: number;
 
-    public totalItems: number;
-
     constructor(domainSize: ISize, cellSize: number) {
         this.cellSize = cellSize;
         this.gridSize = { width: 0, height: 0 };
         this.gridCells = [];
         this.topLeftCorner = { x: 0, y: 0 };
-        this.totalItems = 0;
 
         this.reset(domainSize, cellSize, []);
     }
@@ -29,7 +26,6 @@ class Grid {
     public reset(domainSize: ISize, cellSize: number, items: PatternBase[]): boolean {
         const gridHasChanged = this.resetDomain(domainSize, cellSize);
 
-        this.totalItems = 0;
         for (const item of items) {
             this.registerItem(item);
         }
@@ -38,8 +34,6 @@ class Grid {
     }
 
     public registerItem(item: PatternBase): void {
-        this.totalItems++;
-
         const topLeft: IPoint = {
             x: item.center.x - 0.5 * item.size,
             y: item.center.y - 0.5 * item.size,
