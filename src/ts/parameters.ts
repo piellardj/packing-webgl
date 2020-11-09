@@ -103,6 +103,7 @@ const isWebGLVersion = Helpers.getQueryStringValue("webgl") !== "0";
 if (!isWebGLVersion) {
     Page.Checkbox.setChecked(controlId.BLENDING, false);
     Page.Controls.setVisibility(controlId.BLENDING, false);
+    Page.Controls.setVisibility(controlId.INSTANCING, false);
 }
 
 function updateIndicatorsVisibility(): void {
