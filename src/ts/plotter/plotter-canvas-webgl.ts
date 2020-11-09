@@ -23,8 +23,6 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private instancingExt: ANGLE_instanced_arrays;
     private needToResetInstancingDivision: boolean;
 
-    private linesColor: Color;
-
     private linesShader: Shader | null;
     private squaresShader: Shader | null;
     private circlesShader: Shader | null;
@@ -66,8 +64,6 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         } else {
             console.log(`Using the "${instancingExtensionName}" WebGL extension.`);
         }
-
-        this.linesColor = new Color(0, 255, 0);
 
         this.blending = false;
         this.enableBlending = true;
@@ -166,7 +162,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
 
             this.linesShader.a["aCoords"].VBO = this.linesVBO;
             this.linesShader.u["uScreenSize"].value = [this._size.width, this._size.height];
-            this.linesShader.u["uColor"].value = [this.linesColor.r / 255, this.linesColor.g / 255, this.linesColor.b / 255, 1];
+            this.linesShader.u["uColor"].value = [color.r / 255, color.g / 255, color.b / 255, 1];
 
             this.linesShader.use();
             this.linesShader.bindUniformsAndAttributes();
