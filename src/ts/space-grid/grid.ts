@@ -9,22 +9,23 @@ import * as Statistics from "..//statistics/statistics";
 
 type GridCell = PatternBase[];
 
+const MIN_CELL_SIZE = 10;
+const MAX_CELL_SIZE = 500;
+
 class Grid {
     private readonly gridSize: ISize;
     private readonly gridCells: GridCell[];
     private readonly topLeftCorner: IPoint;
-    private cellSize: number;
+    private _cellSize: number;
 
     private registeredItemsCount: number; // including duplicates
 
-    constructor(domainSize: ISize, cellSize: number) {
-        this.cellSize = cellSize;
+    constructor() {
         this.gridSize = { width: 0, height: 0 };
         this.gridCells = [];
         this.topLeftCorner = { x: 0, y: 0 };
-        this.registeredItemsCount = 0;
 
-        this.reset(domainSize, cellSize, []);
+        this.reset({ width: 1, height: 1 }, 100, []);
     }
 
     /** @returns true if the grid needs to be redrawn */
@@ -65,13 +66,13 @@ class Grid {
         const lines: ILine[] = [];
 
         const minX = this.topLeftCorner.x;
-        const maxX = minX + this.gridSize.width * this.cellSize;
+        const maxX = minX + this.gridSize.width * this._cellSize;
 
         const minY = this.topLeftCorner.y;
-        const maxY = minY + this.gridSize.height * this.cellSize;
+        const maxY = minY + this.gridSize.height * this._cellSize;
 
         for (let iX = 0; iX < this.gridSize.width; iX++) {
-            const x = minX + iX * this.cellSize;
+            const x = minX + iX * this._cellSize;
             const line: ILine = {
                 from: { x, y: minY },
                 to: { x, y: maxY },
@@ -80,7 +81,7 @@ class Grid {
         }
 
         for (let iY = 0; iY < this.gridSize.height; iY++) {
-            const y = minY + iY * this.cellSize;
+            const y = minY + iY * this._cellSize;
             const line: ILine = {
                 from: { x: minX, y },
                 to: { x: maxX, y },
@@ -92,8 +93,8 @@ class Grid {
     }
 
     public getCellId(position: IPoint): IPoint {
-        let cellX = Math.floor((position.x - this.topLeftCorner.x) / this.cellSize);
-        let cellY = Math.floor((position.y - this.topLeftCorner.y) / this.cellSize);
+        let cellX = Math.floor((position.x - this.topLeftCorner.x) / this._cellSize);
+        let cellY = Math.floor((position.y - this.topLeftCorner.y) / this._cellSize);
 
         if (cellX < 0) {
             cellX = 0;
@@ -112,11 +113,11 @@ class Grid {
 
     public getDistanceToClosestBorder(position: IPoint): number {
         // position relative to the containing cell
-        const localX = (position.x - this.topLeftCorner.x) % this.cellSize;
-        const localY = (position.y - this.topLeftCorner.y) % this.cellSize;
+        const localX = (position.x - this.topLeftCorner.x) % this._cellSize;
+        const localY = (position.y - this.topLeftCorner.y) % this._cellSize;
 
-        const minDistanceX = Math.min(localX, this.cellSize - localX);
-        const minDistanceY = Math.min(localY, this.cellSize - localY);
+        const minDistanceX = Math.min(localX, this._cellSize - localX);
+        const minDistanceY = Math.min(localY, this._cellSize - localY);
         return Math.min(minDistanceX, minDistanceY);
     }
 
@@ -154,7 +155,18 @@ class Grid {
     }
 
     public computeStatistics(): void {
-        Statistics.registerGridStats(this.gridSize, this.cellSize, this.registeredItemsCount);
+        Statistics.registerGridStats(this.gridSize, this._cellSize, this.registeredItemsCount);
+    }
+
+    public get itemsPerCell(): number {
+        if (this.gridCells.length === 0) {
+            return 0;
+        }
+        return this.registeredItemsCount / this.gridCells.length;
+    }
+
+    public get cellSize(): number {
+        return this._cellSize;
     }
 
     /** @returns true if the cells disposition changed */
@@ -162,10 +174,16 @@ class Grid {
         const wantedGridSizeX = Math.ceil(domainSize.width / cellSize);
         const wantedGridSizeY = Math.ceil(domainSize.height / cellSize);
 
-        const hasChanged = (this.cellSize !== cellSize) ||
+        if (cellSize < MIN_CELL_SIZE) {
+            cellSize = MIN_CELL_SIZE;
+        } else if (cellSize > MAX_CELL_SIZE) {
+            cellSize = MAX_CELL_SIZE;
+        }
+
+        const hasChanged = (this._cellSize !== cellSize) ||
             (this.gridSize.width !== wantedGridSizeX) || (this.gridSize.height !== wantedGridSizeY);
 
-        this.cellSize = cellSize;
+        this._cellSize = cellSize;
         this.gridSize.width = wantedGridSizeX;
         this.gridSize.height = wantedGridSizeY;
 

@@ -149,10 +149,21 @@ class Engine {
      */
     private reindexItems(domainSize: ISize): boolean {
         if (typeof this.grid === "undefined") {
-            this.grid = new Grid({ width: 1, height: 1 }, 1);
+            this.grid = new Grid();
         }
 
-        const gridCellSize = Parameters.cellSize;
+        let gridCellSize = Parameters.cellSize;
+        if (Parameters.adaptativeGrid) {
+            const targetItemsPerCell = Parameters.targetItemsPerGridCell;
+            const lastItemsPerCell = this.grid.itemsPerCell;
+            gridCellSize = this.grid.cellSize;
+            if (lastItemsPerCell < targetItemsPerCell) {
+                gridCellSize++;
+            } else {
+                gridCellSize--;
+            }
+        }
+
         return this.grid.reset(domainSize, gridCellSize, this.initializedItemsList);
     }
 

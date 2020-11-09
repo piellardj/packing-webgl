@@ -12,13 +12,18 @@ const controlId = {
     BLACK_BACKGROUND: "black-background-checkbox-id",
     BLENDING: "blending-checkbox-id",
     INDICATORS: "indicators-checkbox-id",
+
+    // DEBUG
     MAX_TRIES_PER_FRAME: "max-tries-per-frame-range-id",
+    INSTANCING: "instancing-checkbox-id",
+    ADAPTATIVE_GRID: "adaptative-grid-checkbox-id",
+    TARGET_ITEMS_PER_GRIDCELL: "target-items-per-gridcell-checkbox-id",
     CELL_SIZE: "cell-size-range-id",
     ONE_CELL_ONLY: "one-cell-only-checkbox-id",
     SHOW_GRID: "show-grid-checkbox-id",
     CELL_X: "cell-x-range-id",
     CELL_Y: "cell-y-range-id",
-    INSTANCING: "instancing-checkbox-id",
+
     DOWNLOAD: "result-download-id",
 };
 
@@ -83,8 +88,8 @@ Page.Canvas.setIndicatorVisibility("update-zoom-time", isInDebug);
 Page.Canvas.setIndicatorVisibility("items-reclycled-count", isInDebug);
 Page.Canvas.setIndicatorVisibility("items-pending-recycling-count", isInDebug);
 Page.Canvas.setIndicatorVisibility("items-recycling-tries-count", isInDebug);
-Page.Canvas.setIndicatorVisibility("grid-size",isInDebug);
-Page.Canvas.setIndicatorVisibility("grid-cell-size",isInDebug);
+Page.Canvas.setIndicatorVisibility("grid-size", isInDebug);
+Page.Canvas.setIndicatorVisibility("grid-cell-size", isInDebug);
 Page.Canvas.setIndicatorVisibility("grid-items-per-cell", isInDebug);
 
 if (isInDebug) {
@@ -106,6 +111,14 @@ function updateIndicatorsVisibility(): void {
 }
 Page.Checkbox.addObserver(controlId.INDICATORS, updateIndicatorsVisibility);
 updateIndicatorsVisibility();
+
+function updateGridControlsVisibility(): void {
+    const adaptative = Page.Checkbox.isChecked(controlId.ADAPTATIVE_GRID);
+    Page.Controls.setVisibility(controlId.TARGET_ITEMS_PER_GRIDCELL, adaptative);
+    Page.Controls.setVisibility(controlId.CELL_SIZE, !adaptative);
+}
+Page.Checkbox.addObserver(controlId.ADAPTATIVE_GRID, updateGridControlsVisibility);
+updateGridControlsVisibility();
 
 abstract class Parameters {
     public static get spacing(): number {
@@ -150,6 +163,12 @@ abstract class Parameters {
 
     public static get maxTriesPerFrame(): number {
         return Page.Range.getValue(controlId.MAX_TRIES_PER_FRAME);
+    }
+    public static get adaptativeGrid(): boolean {
+        return Page.Checkbox.isChecked(controlId.ADAPTATIVE_GRID);
+    }
+    public static get targetItemsPerGridCell(): number {
+        return Page.Range.getValue(controlId.TARGET_ITEMS_PER_GRIDCELL);
     }
     public static get cellSize(): number {
         return Page.Range.getValue(controlId.CELL_SIZE);

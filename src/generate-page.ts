@@ -184,6 +184,27 @@ const data = {
                     step: 100
                 },
                 {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Use instancing",
+                    id: "instancing-checkbox-id",
+                    checked: true
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Adaptative grid",
+                    id: "adaptative-grid-checkbox-id",
+                    checked: true
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Target items/cell",
+                    id: "target-items-per-gridcell-checkbox-id",
+                    min: 1,
+                    max: 100,
+                    value: 10,
+                    step: 1
+                },
+                {
                     type: Demopage.supportedControls.Range,
                     title: "Cell size",
                     id: "cell-size-range-id",
@@ -221,12 +242,6 @@ const data = {
                     max: 20,
                     value: 0,
                     step: 1
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Instancing",
-                    id: "instancing-checkbox-id",
-                    checked: true
                 },
             ]
         },
