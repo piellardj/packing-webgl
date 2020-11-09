@@ -34,7 +34,11 @@ const data = {
         },
         {
             id: "items-count",
-            label: "Total items"
+            label: "Items count"
+        },
+        {
+            id: "items-visible-count",
+            label: "Visible items count"
         },
         {
             id: "items-reclycled-count",
@@ -136,7 +140,7 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
-                    title: "Indicators",
+                    title: "Metrics",
                     id: "indicators-checkbox-id",
                     checked: false
                 },

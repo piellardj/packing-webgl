@@ -63,6 +63,7 @@ function updateIndicators(): void {
     }
 
     Page.Canvas.setIndicatorText("items-count", `${itemsCount}`);
+    Page.Canvas.setIndicatorText("items-visible-count", `${(itemsCount - itemsPendingRecyclingCount / frames).toFixed(0)}`);
 
 }
 

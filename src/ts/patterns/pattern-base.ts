@@ -9,6 +9,8 @@ import { Parameters } from "../parameters";
 
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
+const MAX_SIZE = 1000000;
+
 const MAX_TEST_ID = 999999999999; // lower (for extra safety) than Number.MAX_SAFE_INTEGER (which is not supported by IE11)
 let globalLastTestId = 1;
 
@@ -44,9 +46,19 @@ abstract class PatternBase {
     }
 
     public zoomIn(zoomCenter: IPoint, zoomFactor: number): void {
-        this.center.x = (this.center.x - zoomCenter.x) * zoomFactor + zoomCenter.x;
-        this.center.y = (this.center.y - zoomCenter.y) * zoomFactor + zoomCenter.y;
-        this.size *= zoomFactor;
+        /** When an item is too big, it can lead to visual glitches due to float precision issue on GPU.
+         *  To avoid this, size down such items.
+         *  This operation should not be noticeable because at this point, the item is so big it looks like a straight line.
+         */
+        if (this.size < MAX_SIZE) {
+            this.center.x = (this.center.x - zoomCenter.x) * zoomFactor + zoomCenter.x;
+            this.center.y = (this.center.y - zoomCenter.y) * zoomFactor + zoomCenter.y;
+            this.size *= zoomFactor;
+        } else {
+            console.log("squeezing");
+            this.center.x -= zoomCenter.x * zoomFactor;
+            this.center.y -= zoomCenter.y * zoomFactor;
+        }
     }
 
     /** @returns the number of tries (regardless of the success of the reset) */
