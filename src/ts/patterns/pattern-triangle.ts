@@ -10,6 +10,26 @@ function rotatePoint(point: IPoint, cosAngle: number, sinAngle: number): IPoint 
     };
 }
 
+/** Input segments are defined by points from the equation "from + t * delta", for 0<t<1
+ * @returns if there is an intersection, the ratio dist(from2,to2) / dist(from2, intesection)
+ *           if there is no intersection, returns a negative value
+ */
+function computeSegmentsIntersection(from1: IPoint, delta1: IPoint, from2: IPoint, delta2: IPoint): number {
+    const denom = delta2.y * delta1.x - delta1.y * delta2.x;
+    if (denom !== 0) {
+        const invDenom = 1 / denom;
+        const deltaFromY = from2.y - from1.y;
+        const deltaFromX = from2.x - from1.x;
+
+        const t1 = (delta2.y * deltaFromX - delta2.x * deltaFromY) * invDenom;
+        if (0 <= t1 && t1 <= 1) {
+            const t2 = (delta1.y * deltaFromX - delta1.x * deltaFromY) * invDenom;
+            return t2;
+        }
+    }
+    return -1;
+}
+
 class PatternTriangle extends PatternBase {
     public readonly angle: number;
 
@@ -22,6 +42,11 @@ class PatternTriangle extends PatternBase {
     public readonly P2: IPoint;
     public readonly P3: IPoint;
 
+    // with a size=1
+    public readonly P1_TO_P2: IPoint;
+    public readonly P2_TO_P3: IPoint;
+    public readonly P3_TO_P1: IPoint;
+
     public constructor() {
         super();
 
@@ -32,15 +57,31 @@ class PatternTriangle extends PatternBase {
         this.P1 = rotatePoint(PatternTriangle.baseP1, cosAngle, sinAngle);
         this.P2 = rotatePoint(PatternTriangle.baseP2, cosAngle, sinAngle);
         this.P3 = rotatePoint(PatternTriangle.baseP3, cosAngle, sinAngle);
+
+        this.P1_TO_P2 = { x: this.P2.x - this.P1.x, y: this.P2.y - this.P1.y };
+        this.P2_TO_P3 = { x: this.P3.x - this.P2.x, y: this.P3.y - this.P2.y };
+        this.P3_TO_P1 = { x: this.P1.x - this.P3.x, y: this.P1.y - this.P3.y };
     }
 
     protected computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number {
-        const toPointX = pointToAvoid.x - this.center.x;
-        const toPointY = pointToAvoid.y - this.center.y;
+        if (pointToAvoid.x === this.center.x && pointToAvoid.y === this.center.y) {
+            return 0;
+        }
 
-        const maxSizeX = Math.abs(toPointX);
-        const maxSizeY = Math.abs(toPointY);
-        return 2 * Math.max(maxSizeX, maxSizeY);
+        const pointToAvoidLocal = { x: pointToAvoid.x - this.center.x, y: pointToAvoid.y - this.center.y };
+
+        let intersection = computeSegmentsIntersection(this.P1, this.P1_TO_P2, { x: 0, y: 0 }, pointToAvoidLocal);
+        if (intersection < 0) {
+            intersection = computeSegmentsIntersection(this.P2, this.P2_TO_P3, { x: 0, y: 0 }, pointToAvoidLocal);
+            if (intersection < 0) {
+                intersection = computeSegmentsIntersection(this.P3, this.P3_TO_P1, { x: 0, y: 0 }, pointToAvoidLocal);
+            }
+        }
+
+        if (intersection > 0) {
+            return 1 / intersection;
+        }
+        return 0;
     }
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternTriangle, allowOverlapping: boolean): number {
