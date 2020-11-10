@@ -10,6 +10,8 @@ import * as Statistics from "./statistics/statistics";
 
 import * as Helper from "./utils/helper";
 
+import { mainDebugCollisions } from "./debug-collisions";
+
 import "./page-interface-generated";
 
 function main(): void {
@@ -70,4 +72,8 @@ function main(): void {
     requestAnimationFrame(mainLoop);
 }
 
-main();
+if (Parameters.isInCollisionsDebug) {
+    mainDebugCollisions();
+} else {
+    main();
+}

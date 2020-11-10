@@ -23,6 +23,7 @@ const controlId = {
     SHOW_GRID: "show-grid-checkbox-id",
     CELL_X: "cell-x-range-id",
     CELL_Y: "cell-y-range-id",
+    COLLISION_TEST_TYPE: "collision-test-type-tab-id",
 
     DOWNLOAD: "result-download-id",
 };
@@ -78,8 +79,16 @@ enum EPrimitive {
     TRIANGLE = "triangle",
 }
 
+enum ECollisionTestType {
+    PRIMITIVE = "primitive",
+    POINT = "point",
+}
+
 const isInDebug = Helpers.getQueryStringValue("debug") === "1";
-Page.Sections.setVisibility("debug-section", isInDebug);
+const isInCollisionsDebug = Helpers.getQueryStringValue("debug-collisions") === "1";
+Page.Sections.setVisibility("display-section", !isInCollisionsDebug);
+Page.Sections.setVisibility("debug-section", isInDebug && !isInCollisionsDebug);
+Page.Sections.setVisibility("debug-collisions-section", isInDebug && isInCollisionsDebug);
 Page.Canvas.setIndicatorVisibility("main-loop-time", isInDebug);
 Page.Canvas.setIndicatorVisibility("draw-time", isInDebug);
 Page.Canvas.setIndicatorVisibility("update-time", isInDebug);
@@ -108,7 +117,7 @@ if (!isWebGLVersion) {
 }
 
 function updateIndicatorsVisibility(): void {
-    const visible = Page.Checkbox.isChecked(controlId.INDICATORS);
+    const visible = !isInCollisionsDebug && Page.Checkbox.isChecked(controlId.INDICATORS);
     Page.Canvas.setIndicatorsVisibility(visible);
 }
 Page.Checkbox.addObserver(controlId.INDICATORS, updateIndicatorsVisibility);
@@ -121,6 +130,10 @@ function updateGridControlsVisibility(): void {
 }
 Page.Checkbox.addObserver(controlId.ADAPTATIVE_GRID, updateGridControlsVisibility);
 updateGridControlsVisibility();
+
+Page.Button.addObserver("debug-collisions-button-id", () => {
+    window.location.href = window.location.href + "&debug-collisions=1";
+});
 
 abstract class Parameters {
     public static get spacing(): number {
@@ -156,6 +169,9 @@ abstract class Parameters {
 
     public static get isInDebug(): boolean {
         return isInDebug;
+    }
+    public static get isInCollisionsDebug(): boolean {
+        return isInCollisionsDebug;
     }
     public static get isWebGLVersion(): boolean {
         return isWebGLVersion;
@@ -196,6 +212,10 @@ abstract class Parameters {
         Page.Controls.setVisibility(controlId.INSTANCING, false);
     }
 
+    public static get currentCollisionType(): ECollisionTestType {
+        return Page.Tabs.getValues(controlId.COLLISION_TEST_TYPE)[0] as ECollisionTestType;
+    }
+
     public static addRedrawObserver(callback: RedrawObserver): void {
         redrawObservers.push(callback);
     }
@@ -213,4 +233,4 @@ abstract class Parameters {
     }
 }
 
-export { Parameters, EPrimitive }
+export { Parameters, EPrimitive, ECollisionTestType }

@@ -144,6 +144,7 @@ const data = {
         },
         {
             title: "Display",
+            id: "display-section",
             controls: [
                 {
                     type: Demopage.supportedControls.Range,
@@ -172,6 +173,12 @@ const data = {
                     id: "indicators-checkbox-id",
                     checked: false
                 },
+                {
+                    type: Demopage.supportedControls.FileDownload,
+                    id: "result-download-id",
+                    label: "Download as SVG",
+                    flat: true
+                }
             ]
         },
         {
@@ -247,17 +254,35 @@ const data = {
                     value: 0,
                     step: 1
                 },
+                {
+                    type: Demopage.supportedControls.Button,
+                    id: "debug-collisions-button-id",
+                    label: "Go debug collisions!",
+                    flat: true
+                }
             ]
         },
         {
-            title: "Output",
+            title: "Debug collisions",
+            id: "debug-collisions-section",
             controls: [
                 {
-                    type: Demopage.supportedControls.FileDownload,
-                    id: "result-download-id",
-                    label: "Download as SVG",
-                    flat: true
-                }
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Type",
+                    id: "collision-test-type-tab-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "primitive",
+                            label: "Primitive",
+                            checked: true
+                        },
+                        {
+                            value: "point",
+                            label: "Point"
+                        }
+                    ]
+                },
             ]
         }
     ]
