@@ -29,7 +29,7 @@ class PatternRectangle extends PatternBase {
 
         const maxSizeX = Math.abs(toPointX) / this.baseWidth;
         const maxSizeY = Math.abs(toPointY) / this.baseHeight;
-        return Math.max(maxSizeX, maxSizeY);
+        return 2 * Math.max(maxSizeX, maxSizeY);
     }
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternRectangle, allowOverlapping: boolean): number {

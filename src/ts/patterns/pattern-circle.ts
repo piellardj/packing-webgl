@@ -11,7 +11,7 @@ class PatternCircle extends PatternBase {
     protected computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number {
         const toPointX = pointToAvoid.x - this.center.x;
         const toPointY = pointToAvoid.y - this.center.y;
-        return Math.sqrt(toPointX * toPointX + toPointY * toPointY);
+        return 2 * Math.sqrt(toPointX * toPointX + toPointY * toPointY);
     }
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternCircle, allowOverlapping: boolean): number {

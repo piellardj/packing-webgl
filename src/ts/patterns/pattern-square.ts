@@ -14,7 +14,7 @@ class PatternSquare extends PatternBase {
 
         const maxSizeX = Math.abs(toPointX);
         const maxSizeY = Math.abs(toPointY);
-        return Math.max(maxSizeX, maxSizeY);
+        return 2 * Math.max(maxSizeX, maxSizeY);
     }
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare, allowOverlapping: boolean): number {
