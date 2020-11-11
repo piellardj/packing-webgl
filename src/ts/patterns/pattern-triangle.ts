@@ -30,6 +30,19 @@ function computeSegmentsIntersection(from1: IPoint, delta1: IPoint, from2: IPoin
     return -1;
 }
 
+const MAX_NUMBER = 100000000;
+function minPositive(...args: number[]): number {
+    let min = MAX_NUMBER;
+    for (const arg of args) {
+        if (arg >= 0 && arg < min) {
+            min = arg;
+        }
+    }
+    return (min === MAX_NUMBER) ? -1 : min;
+}
+
+const POINT_ZERO: IPoint = { x: 0, y: 0 };
+
 class PatternTriangle extends PatternBase {
     public readonly angle: number;
 
@@ -70,11 +83,11 @@ class PatternTriangle extends PatternBase {
 
         const pointToAvoidLocal = { x: pointToAvoid.x - this.center.x, y: pointToAvoid.y - this.center.y };
 
-        let intersection = computeSegmentsIntersection(this.P1, this.P1_TO_P2, { x: 0, y: 0 }, pointToAvoidLocal);
+        let intersection = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, pointToAvoidLocal);
         if (intersection < 0) {
-            intersection = computeSegmentsIntersection(this.P2, this.P2_TO_P3, { x: 0, y: 0 }, pointToAvoidLocal);
+            intersection = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, pointToAvoidLocal);
             if (intersection < 0) {
-                intersection = computeSegmentsIntersection(this.P3, this.P3_TO_P1, { x: 0, y: 0 }, pointToAvoidLocal);
+                intersection = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, pointToAvoidLocal);
             }
         }
 
@@ -85,7 +98,77 @@ class PatternTriangle extends PatternBase {
     }
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternTriangle, allowOverlapping: boolean): number {
-        return 2 * this.computeDistanceToEdge(itemToAvoid, allowOverlapping);
+        const localOtherP1: IPoint = {
+            x: itemToAvoid.center.x + itemToAvoid.P1.x * itemToAvoid.size - this.center.x,
+            y: itemToAvoid.center.y + itemToAvoid.P1.y * itemToAvoid.size - this.center.y,
+        };
+
+        const localOtherP2: IPoint = {
+            x: itemToAvoid.center.x + itemToAvoid.P2.x * itemToAvoid.size - this.center.x,
+            y: itemToAvoid.center.y + itemToAvoid.P2.y * itemToAvoid.size - this.center.y,
+        };
+
+        const localOtherP3: IPoint = {
+            x: itemToAvoid.center.x + itemToAvoid.P3.x * itemToAvoid.size - this.center.x,
+            y: itemToAvoid.center.y + itemToAvoid.P3.y * itemToAvoid.size - this.center.y,
+        };
+
+        const scaledOtherP1toP2: IPoint = {
+            x: itemToAvoid.P1_TO_P2.x * itemToAvoid.size,
+            y: itemToAvoid.P1_TO_P2.y * itemToAvoid.size,
+        };
+
+        const scaledOtherP2toP3: IPoint = {
+            x: itemToAvoid.P2_TO_P3.x * itemToAvoid.size,
+            y: itemToAvoid.P2_TO_P3.y * itemToAvoid.size,
+        };
+
+        const scaledOtherP3toP1: IPoint = {
+            x: itemToAvoid.P3_TO_P1.x * itemToAvoid.size,
+            y: itemToAvoid.P3_TO_P1.y * itemToAvoid.size,
+        };
+
+        // Check if a vertice of this may intersect a side of the other
+        let smallerTforMyVertices: number;
+        {
+            const T1_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, POINT_ZERO, this.P1);
+            const T1_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, POINT_ZERO, this.P1);
+            const T1_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, POINT_ZERO, this.P1);
+
+            const T2_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, POINT_ZERO, this.P2);
+            const T2_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, POINT_ZERO, this.P2);
+            const T2_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, POINT_ZERO, this.P2);
+
+            const T3_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, POINT_ZERO, this.P3);
+            const T3_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, POINT_ZERO, this.P3);
+            const T3_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, POINT_ZERO, this.P3);
+
+            smallerTforMyVertices = minPositive(T1_1, T1_2, T1_3, T2_1, T2_2, T2_3, T3_1, T3_2, T3_3);
+        }
+
+        let smallerTforMySides: number;
+        {
+            const T1_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, localOtherP1);
+            const T1_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, localOtherP1);
+            const T1_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, localOtherP1);
+
+            const T2_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, localOtherP2);
+            const T2_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, localOtherP2);
+            const T2_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, localOtherP2);
+
+            const T3_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, localOtherP3);
+            const T3_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, localOtherP3);
+            const T3_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, localOtherP3);
+
+            const max = Math.max(T1_1, T1_2, T1_3, T2_1, T2_2, T2_3, T3_1, T3_2, T3_3);
+            if (max !== 0) {
+                smallerTforMySides = 1 / max;
+            } else {
+                smallerTforMySides = -1;
+            }
+        }
+
+        return minPositive(smallerTforMyVertices, smallerTforMySides);
     }
 
     public computeVisibility(domainSize: ISize): EVisibility {
@@ -104,33 +187,6 @@ class PatternTriangle extends PatternBase {
             return EVisibility.VISIBLE;
         }
         return EVisibility.OUT_OF_VIEW;
-    }
-
-    private get sideLength(): number {
-        return this.size;
-    }
-
-    private computeDistanceToEdge(obstacle: PatternTriangle, allowOverlapping: boolean): number {
-        const deltaX = Math.abs(this.center.x - obstacle.center.x);
-        const deltaY = Math.abs(this.center.y - obstacle.center.y);
-        const halfSideLength = 0.5 * obstacle.sideLength;
-
-        if (deltaX < halfSideLength) {
-            if (deltaY < halfSideLength) {
-                if (allowOverlapping) {
-                    return Math.min(halfSideLength - deltaX, halfSideLength - deltaY);
-                }
-                return 0;
-            } else {
-                return deltaY - halfSideLength;
-            }
-        } else {
-            if (deltaY < halfSideLength) {
-                return deltaX - halfSideLength;
-            } else {
-                return Math.max(deltaX - halfSideLength, deltaY - halfSideLength);
-            }
-        }
     }
 }
 
