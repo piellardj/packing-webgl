@@ -1,4 +1,4 @@
-import { EVisibility, PatternBase } from "./pattern-base";
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
@@ -32,8 +32,33 @@ class PatternRectangle extends PatternBase {
         return 2 * Math.max(maxSizeX, maxSizeY);
     }
 
-    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternRectangle, allowOverlapping: boolean): number {
-        return 2 * this.computeDistanceToEdge(itemToAvoid, allowOverlapping);
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternRectangle, allowOverlapping: boolean): ISizeComputationResult {
+        const result = { size: 0, isInside: false };
+
+        const deltaX = Math.abs(this.center.x - itemToAvoid.center.x);
+        const deltaY = Math.abs(this.center.y - itemToAvoid.center.y);
+
+        const halfObstacleWidth = 0.5 * itemToAvoid.width;
+        const halfObstacleHeight = 0.5 * itemToAvoid.height;
+
+        if (deltaX < halfObstacleWidth) {
+            if (deltaY < halfObstacleHeight) {
+                if (allowOverlapping) {
+                    result.size = 2 * Math.min((halfObstacleWidth - deltaX) / this.baseWidth, (halfObstacleHeight - deltaY) / this.baseHeight);
+                    result.isInside = true;
+                }
+            } else {
+                result.size = 2 * (deltaY - halfObstacleHeight) / this.baseHeight;
+            }
+        } else {
+            if (deltaY < halfObstacleHeight) {
+                result.size = 2 * (deltaX - halfObstacleWidth) / this.baseWidth;
+            } else {
+                result.size = 2 * Math.max((deltaX - halfObstacleWidth) / this.baseWidth, (deltaY - halfObstacleHeight) / this.baseHeight);
+            }
+        }
+
+        return result;
     }
 
     public computeVisibility(domainSize: ISize): EVisibility {
@@ -61,31 +86,6 @@ class PatternRectangle extends PatternBase {
 
     public get height(): number {
         return this.size * this.baseHeight;
-    }
-
-    private computeDistanceToEdge(obstacle: PatternRectangle, allowOverlapping: boolean): number {
-        const deltaX = Math.abs(this.center.x - obstacle.center.x);
-        const deltaY = Math.abs(this.center.y - obstacle.center.y);
-
-        const halfObstacleWidth = 0.5 * obstacle.width;
-        const halfObstacleHeight = 0.5 * obstacle.height;
-
-        if (deltaX < halfObstacleWidth) {
-            if (deltaY < halfObstacleHeight) {
-                if (allowOverlapping) {
-                    return Math.min((halfObstacleWidth - deltaX) / this.baseWidth, (halfObstacleHeight - deltaY) / this.baseHeight);
-                }
-                return 0;
-            } else {
-                return (deltaY - halfObstacleHeight) / this.baseHeight;
-            }
-        } else {
-            if (deltaY < halfObstacleHeight) {
-                return (deltaX - halfObstacleWidth) / this.baseWidth;
-            } else {
-                return Math.max((deltaX - halfObstacleWidth) / this.baseWidth, (deltaY - halfObstacleHeight) / this.baseHeight);
-            }
-        }
     }
 }
 

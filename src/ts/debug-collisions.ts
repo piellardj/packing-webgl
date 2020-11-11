@@ -103,7 +103,7 @@ function mainDebugCollisions(): void {
         const drawFunction = getDrawFunction();
         if (currentTestType === ECollisionTestType.PRIMITIVE) {
             // bracket notations allows access to private fields/method while still keeping a bit of type checking
-            testitems.mobile.size = testitems.mobile["computeBiggestSizePossibleToAvoidItem"](testitems.fixed, true);
+            testitems.mobile.size = testitems.mobile["computeBiggestSizePossibleToAvoidItem"](testitems.fixed, true).size;
 
             const lines = computeSquare(testitems.fixed.size);
             plotter.initialize(Color.BLACK);

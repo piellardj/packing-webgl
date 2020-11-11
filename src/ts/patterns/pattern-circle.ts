@@ -1,4 +1,4 @@
-import { EVisibility, PatternBase } from "./pattern-base";
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
@@ -14,8 +14,24 @@ class PatternCircle extends PatternBase {
         return 2 * Math.sqrt(toPointX * toPointX + toPointY * toPointY);
     }
 
-    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternCircle, allowOverlapping: boolean): number {
-        return 2 * this.distanceToEdge(itemToAvoid, allowOverlapping);
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternCircle, allowOverlapping: boolean): ISizeComputationResult {
+        const result = { size: 0, isInside: false };
+
+        const toCenterX = this.center.x - itemToAvoid.center.x;
+        const toCenterY = this.center.y - itemToAvoid.center.y;
+
+        const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+
+        if (distance <= itemToAvoid.radius) {
+            if (allowOverlapping) {
+                result.size = 2 * (itemToAvoid.radius - distance);
+                result.isInside = true;
+            }
+        } else {
+            result.size = 2 * (distance - itemToAvoid.radius);
+        }
+
+        return result;
     }
 
     public computeVisibility(domainSize: ISize): EVisibility {
@@ -36,21 +52,6 @@ class PatternCircle extends PatternBase {
             return EVisibility.VISIBLE;
         }
         return EVisibility.OUT_OF_VIEW;
-    }
-
-    private distanceToEdge(itemToAvoid: PatternCircle, allowOverlapping: boolean): number {
-        const toCenterX = this.center.x - itemToAvoid.center.x;
-        const toCenterY = this.center.y - itemToAvoid.center.y;
-
-        const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
-
-        if (distance <= itemToAvoid.radius) {
-            if (allowOverlapping) {
-                return itemToAvoid.radius - distance;
-            }
-            return 0;
-        }
-        return distance - itemToAvoid.radius;
     }
 
     public get radius(): number {

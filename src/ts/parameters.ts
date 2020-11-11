@@ -11,6 +11,7 @@ const controlId = {
     ZOOM_SPEED: "zoom-speed-range-id",
     BLACK_BACKGROUND: "black-background-checkbox-id",
     BLENDING: "blending-checkbox-id",
+    HIGH_CONTRAST: "high-contrast-checkbox-id",
     INDICATORS: "indicators-checkbox-id",
 
     // DEBUG
@@ -38,6 +39,7 @@ function triggerRedraw(): void {
 Page.Canvas.Observers.canvasResize.push(triggerRedraw);
 Page.Checkbox.addObserver(controlId.ALLOW_OVERLAPPING, triggerRedraw);
 Page.Checkbox.addObserver(controlId.BLACK_BACKGROUND, triggerRedraw);
+Page.Checkbox.addObserver(controlId.HIGH_CONTRAST, triggerRedraw);
 Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
 Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
 Page.Checkbox.addObserver(controlId.INSTANCING, triggerRedraw);
@@ -166,6 +168,10 @@ abstract class Parameters {
 
     public static get blending(): boolean {
         return Page.Checkbox.isChecked(controlId.BLENDING);
+    }
+
+    public static get highContrast(): boolean {
+        return Page.Checkbox.isChecked(controlId.HIGH_CONTRAST);
     }
 
     public static get isInDebug(): boolean {

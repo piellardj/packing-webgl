@@ -1,4 +1,4 @@
-import { EVisibility, PatternBase } from "./pattern-base";
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
@@ -95,9 +95,15 @@ class PatternTriangle extends PatternBase {
         return 0;
     }
 
-    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternTriangle, allowOverlapping: boolean): number {
-        if (!allowOverlapping && itemToAvoid.isPointInside(this.center.x, this.center.y)) {
-            return 0;
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternTriangle, allowOverlapping: boolean): ISizeComputationResult {
+        const result = { size: 0, isInside: false };
+
+        if (itemToAvoid.isPointInside(this.center.x, this.center.y)) {
+            if (allowOverlapping) {
+                result.isInside = true;
+            } else {
+                return result;
+            }
         }
 
         const localOtherP1: IPoint = {
@@ -170,7 +176,8 @@ class PatternTriangle extends PatternBase {
             }
         }
 
-        return minPositive(smallerTforMyVertices, smallerTforMySides);
+        result.size = minPositive(smallerTforMyVertices, smallerTforMySides);
+        return result;
     }
 
     public computeVisibility(domainSize: ISize): EVisibility {

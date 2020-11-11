@@ -169,6 +169,12 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
+                    title: "High contrast",
+                    id: "high-contrast-checkbox-id",
+                    checked: false
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
                     title: "Metrics",
                     id: "indicators-checkbox-id",
                     checked: false

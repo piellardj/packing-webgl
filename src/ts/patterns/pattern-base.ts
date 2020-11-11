@@ -24,6 +24,11 @@ interface IPatternResetResult {
     nbTries: number;
 }
 
+interface ISizeComputationResult {
+    size: number;
+    isInside: boolean;
+}
+
 enum EVisibility {
     VISIBLE = 0,
     OUT_OF_VIEW = 1,
@@ -31,9 +36,21 @@ enum EVisibility {
 }
 
 abstract class PatternBase {
+    public static baseNestingLevel: number = 0;
+    public static additionalNestingLevelForColor: number = 0;
+    public static highContrastColor: boolean = false;
+
+    public static get maxBlendingTime(): number {
+        if (Parameters.blending) {
+            return 500 / (1 + Parameters.zoomSpeed);
+        }
+        return 0;
+    }
+
     public center: IPoint;
     public size: number;
-    public readonly color: Color;
+    public nestingLevel: number;
+    public readonly rawColor: Color;
 
     private lastTestId: number;
     private initializationTime: number;
@@ -41,8 +58,16 @@ abstract class PatternBase {
     protected constructor() {
         this.center = { x: 0, y: 0 };
         this.size = 0;
-        this.color = Color.random();
+        this.nestingLevel = PatternBase.baseNestingLevel + 1;
+        this.rawColor = Color.random();
         this.lastTestId = 0;
+    }
+
+    public get color(): Color {
+        if (PatternBase.highContrastColor) {
+            return ((this.nestingLevel + PatternBase.additionalNestingLevelForColor) % 2 === 0) ? Color.BLACK : Color.WHITE;
+        }
+        return this.rawColor;
     }
 
     public zoomIn(zoomCenter: IPoint, zoomFactor: number): void {
@@ -70,6 +95,7 @@ abstract class PatternBase {
 
         while (result.nbTries < maxTries && !result.success) {
             this.randomizePosition(domainSize);
+            this.nestingLevel = PatternBase.baseNestingLevel + 1;
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, allowOverlapping);
             if (acceptedSizes.isInRange(maxSize)) {
@@ -92,16 +118,9 @@ abstract class PatternBase {
         return lifetime / blendTime;
     }
 
-    public static get maxBlendingTime(): number {
-        if (Parameters.blending) {
-            return 500 / (1 + Parameters.zoomSpeed);
-        }
-        return 0;
-    }
-
     protected abstract computeBiggestSizePossibleToAvoidPoint(pointToAvoid: IPoint): number;
 
-    protected abstract computeBiggestSizePossibleToAvoidItem(itemsToAvoid: PatternBase, allowOverlapping: boolean): number;
+    protected abstract computeBiggestSizePossibleToAvoidItem(itemsToAvoid: PatternBase, allowOverlapping: boolean): ISizeComputationResult;
 
     public abstract computeVisibility(domainSize: ISize): EVisibility;
 
@@ -141,7 +160,14 @@ abstract class PatternBase {
             if (item !== this) {
                 const testedAlready = (item.lastTestId === currentTestId);
                 if (!testedAlready) {
-                    maxSize = Math.min(maxSize, this.computeBiggestSizePossibleToAvoidItem(item, allowOverlapping));
+                    const result = this.computeBiggestSizePossibleToAvoidItem(item, allowOverlapping);
+                    if (result.size < maxSize) {
+                        maxSize = result.size;
+
+                        if (result.isInside) {
+                            this.nestingLevel = item.nestingLevel + 1;
+                        }
+                    }
                     item.lastTestId = currentTestId;
                 }
             }
@@ -156,4 +182,4 @@ abstract class PatternBase {
     }
 }
 
-export { PatternBase, EVisibility }
+export { PatternBase, EVisibility, ISizeComputationResult }

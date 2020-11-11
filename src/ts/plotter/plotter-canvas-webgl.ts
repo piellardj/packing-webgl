@@ -255,13 +255,15 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
 
         for (let i = 0; i < nbItems; i++) {
+            const color = items[i].color;
+
             this.statesBuffer[4 * i + 0] = items[i].center.x;
             this.statesBuffer[4 * i + 1] = items[i].center.y;
             this.statesBuffer[4 * i + 2] = items[i].size;
             this.statesBuffer[4 * i + 3] = extraAttribute(items[i]);
-            this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
-            this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
-            this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
+            this.colorsBuffer[4 * i + 0] = color.r / 255;
+            this.colorsBuffer[4 * i + 1] = color.g / 255;
+            this.colorsBuffer[4 * i + 2] = color.b / 255;
             this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
         }
 

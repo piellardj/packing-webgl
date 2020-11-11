@@ -1,4 +1,4 @@
-import { EVisibility, PatternBase } from "./pattern-base";
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
@@ -17,8 +17,31 @@ class PatternSquare extends PatternBase {
         return 2 * Math.max(maxSizeX, maxSizeY);
     }
 
-    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare, allowOverlapping: boolean): number {
-        return 2 * this.computeDistanceToEdge(itemToAvoid, allowOverlapping);
+    protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternSquare, allowOverlapping: boolean): ISizeComputationResult {
+        const result = { size: 0, isInside: false };
+
+        const deltaX = Math.abs(this.center.x - itemToAvoid.center.x);
+        const deltaY = Math.abs(this.center.y - itemToAvoid.center.y);
+        const halfSideLength = 0.5 * itemToAvoid.sideLength;
+
+        if (deltaX < halfSideLength) {
+            if (deltaY < halfSideLength) {
+                if (allowOverlapping) {
+                    result.size = 2 * Math.min(halfSideLength - deltaX, halfSideLength - deltaY);
+                    result.isInside = true;
+                }
+            } else {
+                result.size = 2 * (deltaY - halfSideLength);
+            }
+        } else {
+            if (deltaY < halfSideLength) {
+                result.size = 2 * (deltaX - halfSideLength);
+            } else {
+                result.size = 2 * Math.max(deltaX - halfSideLength, deltaY - halfSideLength);
+            }
+        }
+
+        return result;
     }
 
     public computeVisibility(domainSize: ISize): EVisibility {
@@ -41,29 +64,6 @@ class PatternSquare extends PatternBase {
 
     private get sideLength(): number {
         return this.size;
-    }
-
-    private computeDistanceToEdge(obstacle: PatternSquare, allowOverlapping: boolean): number {
-        const deltaX = Math.abs(this.center.x - obstacle.center.x);
-        const deltaY = Math.abs(this.center.y - obstacle.center.y);
-        const halfSideLength = 0.5 * obstacle.sideLength;
-
-        if (deltaX < halfSideLength) {
-            if (deltaY < halfSideLength) {
-                if (allowOverlapping) {
-                    return Math.min(halfSideLength - deltaX, halfSideLength - deltaY);
-                }
-                return 0;
-            } else {
-                return deltaY - halfSideLength;
-            }
-        } else {
-            if (deltaY < halfSideLength) {
-                return deltaX - halfSideLength;
-            } else {
-                return Math.max(deltaX - halfSideLength, deltaY - halfSideLength);
-            }
-        }
     }
 }
 

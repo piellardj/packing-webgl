@@ -32,6 +32,7 @@ class Engine {
     private zoomCenter: IPoint;
 
     private backgroundColorOverride: Color;
+    private backgroundNestingLevel: number;
 
     public constructor() {
         this.initializedItemsList = [];
@@ -40,6 +41,7 @@ class Engine {
 
         this.zoomCenter = { x: 0, y: 0 }; // canvas center
         this.backgroundColorOverride = null;
+        this.backgroundNestingLevel = 0;
     }
 
     public reset(): void {
@@ -61,6 +63,7 @@ class Engine {
         this.uninitializedItemsList = [];
         this.currentPrimitive = primitive;
         this.backgroundColorOverride = null;
+        this.backgroundNestingLevel = 0;
         this.zoomCenter.x = 0;
         this.zoomCenter.y = 0;
     }
@@ -73,6 +76,10 @@ class Engine {
     }
 
     public draw(plotter: PlotterBase): boolean {
+        PatternBase.baseNestingLevel = this.backgroundNestingLevel;
+        PatternBase.additionalNestingLevelForColor = (Parameters.blackBackground) ? 0 : 1;
+        PatternBase.highContrastColor = Parameters.highContrast;
+
         let everythingDrawn = plotter.isReady;
         if (!Parameters.isZooming) {
             const timeSinceLastRecycling = performance.now() - this.lastRecyclingTime;
@@ -228,7 +235,9 @@ class Engine {
                 this.uninitializedItemsList.push(item); // recycle item
 
                 if (visibility === EVisibility.COVERS_VIEW) {
-                    this.backgroundColorOverride = item.color; // overrite current background to make the illusion that we are still in the item
+                    this.backgroundColorOverride = item.rawColor; // overrite current background to make the illusion that we are still in the item
+                    this.backgroundNestingLevel = item.nestingLevel % 2; // modulus to avoid rounding errors with higher nestings
+                    PatternBase.baseNestingLevel = this.backgroundNestingLevel;
                 }
             }
         }
@@ -237,10 +246,18 @@ class Engine {
     }
 
     private computeBackgroundColor(): Color {
-        if (this.backgroundColorOverride !== null) {
-            return this.backgroundColorOverride;
+        if (Parameters.highContrast) {
+            if (Parameters.blackBackground) {
+                return (this.backgroundNestingLevel % 2 === 0) ? Color.BLACK : Color.WHITE;
+            } else {
+                return (this.backgroundNestingLevel % 2 === 0) ? Color.WHITE : Color.BLACK;
+            }
+        } else {
+            if (this.backgroundColorOverride !== null) {
+                return this.backgroundColorOverride;
+            }
+            return Parameters.blackBackground ? Color.BLACK : Color.WHITE;
         }
-        return Parameters.blackBackground ? Color.BLACK : Color.WHITE;
     }
 
     private updateZoomCenter(domainSize: ISize): void {
