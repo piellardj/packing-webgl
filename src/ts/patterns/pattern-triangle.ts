@@ -178,13 +178,28 @@ class PatternTriangle extends PatternBase {
 
         const halfSize = 0.5 * this.size;
 
-        if (absX + halfDomainWidth < halfSize && absY + halfDomainHeight < halfSize) {
+        if (this.isPointInside(-halfDomainWidth, -halfDomainHeight) && this.isPointInside(halfDomainWidth, -halfDomainHeight) && this.isPointInside(-halfDomainWidth, halfDomainHeight) && this.isPointInside(halfDomainWidth, halfDomainHeight)) {
             return EVisibility.COVERS_VIEW;
         }
         if (absX - halfSize < halfDomainWidth && absY - halfSize < halfDomainHeight) {
             return EVisibility.VISIBLE;
         }
         return EVisibility.OUT_OF_VIEW;
+    }
+
+    private isPointInside(x: number, y: number): boolean {
+        x = (x - this.center.x) / this.size;
+        y = (y - this.center.y) / this.size;
+
+        function sign(p1X: number, p1Y: number, p2: IPoint, p3: IPoint): number {
+            return (p1X - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1Y - p3.y);
+        }
+
+        const d1 = sign(x, y, this.P1, this.P2);
+        const d2 = sign(x, y, this.P2, this.P3);
+        const d3 = sign(x, y, this.P3, this.P1);
+
+        return (d1 <= 0 && d2 <= 0 && d3 <= 0) || (d1 > 0 && d2 > 0 && d3 > 0);
     }
 }
 
