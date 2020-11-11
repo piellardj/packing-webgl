@@ -250,28 +250,19 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         const time = performance.now();
         const blendTime = PatternBase.maxBlendingTime;
 
-        if (typeof extraAttribute === "function") {
-            for (let i = 0; i < nbItems; i++) {
-                this.statesBuffer[4 * i + 0] = items[i].center.x;
-                this.statesBuffer[4 * i + 1] = items[i].center.y;
-                this.statesBuffer[4 * i + 2] = items[i].size;
-                this.statesBuffer[4 * i + 3] = extraAttribute(items[i]);
-                this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
-                this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
-                this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
-            }
-        } else {
-            for (let i = 0; i < nbItems; i++) {
-                this.statesBuffer[4 * i + 0] = items[i].center.x;
-                this.statesBuffer[4 * i + 1] = items[i].center.y;
-                this.statesBuffer[4 * i + 2] = items[i].size;
-                // unused this.statesBuffer[4 * i + 3]
-                this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
-                this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
-                this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
-                this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
-            }
+        if (typeof extraAttribute !== "function") {
+            extraAttribute = () => 0; // unused value
+        }
+
+        for (let i = 0; i < nbItems; i++) {
+            this.statesBuffer[4 * i + 0] = items[i].center.x;
+            this.statesBuffer[4 * i + 1] = items[i].center.y;
+            this.statesBuffer[4 * i + 2] = items[i].size;
+            this.statesBuffer[4 * i + 3] = extraAttribute(items[i]);
+            this.colorsBuffer[4 * i + 0] = items[i].color.r / 255;
+            this.colorsBuffer[4 * i + 1] = items[i].color.g / 255;
+            this.colorsBuffer[4 * i + 2] = items[i].color.b / 255;
+            this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
         }
 
         this.statesVBO.setData(this.statesBuffer);
