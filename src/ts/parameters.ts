@@ -82,6 +82,7 @@ enum EPrimitive {
 enum ECollisionTestType {
     PRIMITIVE = "primitive",
     POINT = "point",
+    VISIBILITY = "visbility",
 }
 
 const isInDebug = Helpers.getQueryStringValue("debug") === "1";

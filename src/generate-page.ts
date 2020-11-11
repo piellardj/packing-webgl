@@ -280,7 +280,11 @@ const data = {
                         {
                             value: "point",
                             label: "Point"
-                        }
+                        },
+                        {
+                            value: "visibility",
+                            label: "Visibility"
+                        },
                     ]
                 },
             ]
