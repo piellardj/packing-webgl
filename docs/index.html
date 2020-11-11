@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Simple implementation of a packing algorithm, running on CPU." />
+    <title>Packing</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="stylesheet" type="text/css" href="css/page.css">
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="https://piellardj.github.io"></a>
+    </header>
+    <main>
+      <div class="intro">
+        <h1>Packing</h1>
+
+        <div class="description">
+          <p>This is the implementation of a simple packing algorithm running on CPU. Each new item is given a random position, and then grows as big as possible without intersecting the others.</p>
+          <p>You can zoom anywhere you want by using the left mouse button.</p>
+
+          <br>
+
+          <a href="https://github.com/piellardj/packing-webgl">More on GitHub</a>
+        </div>
+      </div>
+      <div id="error-messages">
+        <noscript>
+          You need to enable Javascript to run this experiment.
+        </noscript>
+      </div>
+
+      <input type="checkbox" id="fullscreen-checkbox-id" class="hidden">
+      <div class="demo">
+        <input type="checkbox" id="side-pane-checkbox-id" class="hidden">
+        <div id="canvas-container">
+          <canvas id="canvas"></canvas>
+          <div class="loader">
+            <span></span>
+            <div class="loader-animation"></div>
+          </div>
+          <div id="indicators">
+            <div id="fps-indicator-id">
+              FPS: <span></span>
+            </div>
+            <div id="items-count-indicator-id">
+              Items count: <span></span>
+            </div>
+            <div id="items-visible-count-indicator-id">
+              Visible items count: <span></span>
+            </div>
+            <div id="main-loop-time-indicator-id">
+              Time spent in mainLoop(): <span></span>
+            </div>
+            <div id="draw-time-indicator-id">
+              Time spent in mainLoop.draw(): <span></span>
+            </div>
+            <div id="update-time-indicator-id">
+              Time spent in mainLoop.update(): <span></span>
+            </div>
+            <div id="update-reindex-time-indicator-id">
+              Time spent in mainLoop.update.reindex(): <span></span>
+            </div>
+            <div id="update-recycle-time-indicator-id">
+              Time spent in mainLoop.update.recycle(): <span></span>
+            </div>
+            <div id="update-zoom-time-indicator-id">
+              Time spent in mainLoop.update.zoom(): <span></span>
+            </div>
+            <div id="items-reclycled-count-indicator-id">
+              Items recycled per second: <span></span>
+            </div>
+            <div id="items-pending-recycling-count-indicator-id">
+              Items pending recycling: <span></span>
+            </div>
+            <div id="items-recycling-tries-count-indicator-id">
+              Items recycling tries per frame: <span></span>
+            </div>
+            <div id="grid-size-indicator-id">
+              Grid size: <span></span>
+            </div>
+            <div id="grid-cell-size-indicator-id">
+              Grid cell size: <span></span>
+            </div>
+            <div id="grid-items-per-cell-indicator-id">
+              Grid items per cell: <span></span>
+            </div>
+          </div>
+          <div id="canvas-buttons-column">
+            <label class="canvas-button" id="fullscreen-toggle-id" for="fullscreen-checkbox-id"></label>
+            <label class="canvas-button" id="side-pane-toggle-id" for="side-pane-checkbox-id"></label>
+          </div>
+        </div>
+        <div class="controls-block">
+          <label class="canvas-button" id="side-pane-close-toggle-id" for="side-pane-checkbox-id">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <line x1="22" y1="22" x2="10" y2="10" stroke-linecap="round" stroke-width="2" />
+              <line x1="22" y1="10" x2="10" y2="22" stroke-linecap="round" stroke-width="2" />
+            </svg>
+          </label>
+          <section class="controls-section">
+            <h2>Pattern</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-primitive-tab-id">
+                <div class="tabs " id="primitive-tab-id-id">
+                  <input type="radio" name="primitive-tab-id" value="square" id="primitive-tab-id-square-id" />
+                  <label for="primitive-tab-id-square-id">Square</label>
+                  <input type="radio" name="primitive-tab-id" value="circle" id="primitive-tab-id-circle-id" checked />
+                  <label for="primitive-tab-id-circle-id">Circle</label>
+                  <input type="radio" name="primitive-tab-id" value="rectangle" id="primitive-tab-id-rectangle-id" />
+                  <label for="primitive-tab-id-rectangle-id">Rectangle</label>
+                  <input type="radio" name="primitive-tab-id" value="triangle" id="primitive-tab-id-triangle-id" />
+                  <label for="primitive-tab-id-triangle-id">Triangle</label>
+                </div>
+              </div>
+              <div class="control" id="control-quantity-range-id">
+                <label>Quantity:</label>
+                <div class="range">
+                  <input type="range" min="1" max="50" value="15" step="1" class="slider" id="quantity-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section">
+            <h2>Packing</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-spacing-range-id">
+                <label>Spacing:</label>
+                <div class="range">
+                  <input type="range" min="0.01" max="0.99" value="0.25" step="0.01" class="slider" id="spacing-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-min-size-range-id">
+                <label>Min size:</label>
+                <div class="range">
+                  <input type="range" min="1" max="20" value="2" step="1" class="slider" id="min-size-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-max-tries-per-frame-range-id">
+                <label>Packing speed:</label>
+                <div class="range">
+                  <input type="range" min="1" max="30" value="2" step="1" class="slider" id="max-tries-per-frame-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-allow-overlapping-checkbox-id">
+                <label>Nesting:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="allow-overlapping-checkbox-id" checked>
+                  <label for="allow-overlapping-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section" id="section-display-section">
+            <h2>Display</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-zoom-speed-range-id">
+                <label>Zoom speed:</label>
+                <div class="range">
+                  <input type="range" min="0" max="5" value="0.2" step="0.05" class="slider" id="zoom-speed-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-black-background-checkbox-id">
+                <label>Dark:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="black-background-checkbox-id" checked>
+                  <label for="black-background-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-blending-checkbox-id">
+                <label>Blending:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="blending-checkbox-id" checked>
+                  <label for="blending-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-high-contrast-checkbox-id">
+                <label>High contrast:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="high-contrast-checkbox-id">
+                  <label for="high-contrast-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-indicators-checkbox-id">
+                <label>Metrics:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="indicators-checkbox-id">
+                  <label for="indicators-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-result-download-id">
+                <div class="file-control download ">
+                  <label class="file-control-button" id="result-download-id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                      <path d="M12 4L12 13 7 13 16 24 25 13 20 13 20 4ZM6 25L26 25 26 29 6 29Z" />
+                    </svg>
+                    <span>Download as SVG</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section" id="section-debug-section">
+            <h2>Debug</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-instancing-checkbox-id">
+                <label>Use instancing:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="instancing-checkbox-id" checked>
+                  <label for="instancing-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-adaptative-grid-checkbox-id">
+                <label>Adaptative grid:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="adaptative-grid-checkbox-id" checked>
+                  <label for="adaptative-grid-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-target-items-per-gridcell-checkbox-id">
+                <label>Target items/cell:</label>
+                <div class="range">
+                  <input type="range" min="1" max="100" value="10" step="1" class="slider" id="target-items-per-gridcell-checkbox-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-cell-size-range-id">
+                <label>Cell size:</label>
+                <div class="range">
+                  <input type="range" min="10" max="500" value="100" step="10" class="slider" id="cell-size-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-one-cell-only-checkbox-id">
+                <label>One cell only:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="one-cell-only-checkbox-id">
+                  <label for="one-cell-only-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-show-grid-checkbox-id">
+                <label>Show grid:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="show-grid-checkbox-id" checked>
+                  <label for="show-grid-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-cell-x-range-id">
+                <label>Cell X:</label>
+                <div class="range">
+                  <input type="range" min="0" max="20" value="0" step="1" class="slider" id="cell-x-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-cell-y-range-id">
+                <label>Cell Y:</label>
+                <div class="range">
+                  <input type="range" min="0" max="20" value="0" step="1" class="slider" id="cell-y-range-id">
+                  <span class="tooltip"></span>
+                </div>
+              </div>
+              <div class="control" id="control-debug-collisions-button-id">
+                <button class="button  flat" id="debug-collisions-button-id">Go debug collisions!</button>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section" id="section-debug-collisions-section">
+            <h2>Debug collisions</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-collision-test-type-tab-id">
+                <label>Type:</label>
+                <div class="tabs compact" id="collision-test-type-tab-id-id">
+                  <input type="radio" name="collision-test-type-tab-id" value="primitive" id="collision-test-type-tab-id-primitive-id" checked />
+                  <label for="collision-test-type-tab-id-primitive-id">Primitive</label>
+                  <input type="radio" name="collision-test-type-tab-id" value="point" id="collision-test-type-tab-id-point-id" />
+                  <label for="collision-test-type-tab-id-point-id">Point</label>
+                  <input type="radio" name="collision-test-type-tab-id" value="visibility" id="collision-test-type-tab-id-visibility-id" />
+                  <label for="collision-test-type-tab-id-visibility-id">Visibility</label>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="badge-shelf">
+        <a class="badge" href="mailto:jeremie.piellard@gmail.com" title="Email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M512 85V448H0V85l256 224L512 85zM488 64H24L256 267 488 64z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://github.com/piellardj" title="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 1024 1024">
+            <path d="M512 0C229 0 0 229 0 512c0 226 147 418 350 486 26 5 35-11 35-25 0-12 0-53-1-95C242 909 212 818 212 818c-23-59-57-75-57-75-47-32 4-31 4-31 51 4 78 53 78 53 46 78 120 56 149 43 5-33 18-56 33-68C305 725 185 682 185 485c0-56 20-102 53-137-5-13-23-65 5-136 0 0 43-14 141 53 41-11 85-17 128-17 44 0 87 6 128 17 98-66 141-52 141-52 28 71 10 123 5 136 33 36 53 81 53 137 0 197-120 240-234 253 18 16 35 47 35 95 0 68-1 124-1 141 0 14 9 30 35 25C877 930 1024 738 1024 512 1024 229 795 0 512 0z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://www.linkedin.com/in/jeremie-piellard/" title="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M30 177l93-1v304l-93 1v-304z" />
+            <path d="M200 177l89-1v39l0 11c26-26 53-45 97-45 51 0 100 21 100 91v208l-90 1v-159c0-35-9-58-51-58-37 0-52 7-52 55v160l-92 1v-304z" />
+            <path d="M128 81c0 28-23 51-51 51s-51-23-51-51c0-28 23-51 51-51 28 0 51 23 51 51z" />
+          </svg>
+        </a>
+      </div>
+    </footer>
+    <script src="script/page.min.js"></script>
+    <script src="script/main.min.js"></script>
+  </body>
+
+</html>
