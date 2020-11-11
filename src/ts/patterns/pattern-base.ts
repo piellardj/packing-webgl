@@ -42,6 +42,7 @@ abstract class PatternBase {
     /* When an item is too big, it can lead to visual glitches due to float precision issue on GPU.
      *  To avoid this, remove items that are too big. */
     public static readonly MAX_SIZE: number = 1000000;
+
     private static readonly MAX_SIZE_LOWER: number = 0.75 * PatternBase.MAX_SIZE;
     private static readonly MAX_SIZE_GAP: number = PatternBase.MAX_SIZE - PatternBase.MAX_SIZE_LOWER;
 
@@ -108,7 +109,7 @@ abstract class PatternBase {
     public computeOpacity(time: number, blendTime: number): number {
         if (this.size > PatternBase.MAX_SIZE_LOWER) {
             const r = (this.size - PatternBase.MAX_SIZE_LOWER) / PatternBase.MAX_SIZE_GAP;
-            return ( r > 1) ? 0 : 1 - r;
+            return (r > 1) ? 0 : 1 - r;
         }
 
         const lifetime = time - this.initializationTime;

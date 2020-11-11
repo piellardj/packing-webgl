@@ -130,7 +130,7 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
-                    title: "Overlap",
+                    title: "Nesting",
                     id: "allow-overlapping-checkbox-id",
                     checked: true
                 },
