@@ -187,7 +187,7 @@ abstract class Parameters {
     /* === DEBUG SECTION === */
 
     public static get maxTriesPerFrame(): number {
-        return Page.Range.getValue(controlId.MAX_TRIES_PER_FRAME);
+        return 100 * Page.Range.getValue(controlId.MAX_TRIES_PER_FRAME);
     }
     public static get adaptativeGrid(): boolean {
         return Page.Checkbox.isChecked(controlId.ADAPTATIVE_GRID);

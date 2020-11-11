@@ -135,6 +135,15 @@ const data = {
                     checked: true
                 },
                 {
+                    type: Demopage.supportedControls.Range,
+                    title: "Packing speed",
+                    id: "max-tries-per-frame-range-id",
+                    min: 1,
+                    max: 100,
+                    value: 2,
+                    step: 1
+                },
+                {
                     type: Demopage.supportedControls.Button,
                     id: "new-item-button-id",
                     label: "New item",
@@ -191,15 +200,6 @@ const data = {
             title: "Debug",
             id: "debug-section",
             controls: [
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Max tries per frame",
-                    id: "max-tries-per-frame-range-id",
-                    min: 100,
-                    max: 10000,
-                    value: 200,
-                    step: 100
-                },
                 {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Use instancing",
