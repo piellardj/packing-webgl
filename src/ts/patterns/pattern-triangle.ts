@@ -191,13 +191,9 @@ class PatternTriangle extends PatternBase {
         x = (x - this.center.x) / this.size;
         y = (y - this.center.y) / this.size;
 
-        function sign(p1X: number, p1Y: number, p2: IPoint, p3: IPoint): number {
-            return (p1X - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1Y - p3.y);
-        }
-
-        const d1 = sign(x, y, this.P1, this.P2);
-        const d2 = sign(x, y, this.P2, this.P3);
-        const d3 = sign(x, y, this.P3, this.P1);
+        const d1 = this.P1_TO_P2.x * (y - this.P2.y) - (x - this.P2.x) * this.P1_TO_P2.y;
+        const d2 = this.P2_TO_P3.x * (y - this.P3.y) - (x - this.P3.x) * this.P2_TO_P3.y;
+        const d3 = this.P3_TO_P1.x * (y - this.P1.y) - (x - this.P1.x) * this.P3_TO_P1.y;
 
         return (d1 <= 0 && d2 <= 0 && d3 <= 0) || (d1 > 0 && d2 > 0 && d3 > 0);
     }
