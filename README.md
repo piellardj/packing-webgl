@@ -5,7 +5,7 @@ This is the implementation of a simple packing algorithm running on CPU.
 
 You can zoom anywhere you want by using the left mouse button.
 
-See it live [here](https://piellardj.github.io/packing-webgl?page%3Acanvas%3Afullscreen=true).
+See it live [here](https://piellardj.github.io/packing-webgl/?page%3Acanvas%3Afullscreen=true).
 
 ![Screenshot](src/readme/circles.png)
 ![Screenshot](src/readme/rectangles.png)
