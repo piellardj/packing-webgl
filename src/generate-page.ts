@@ -7,9 +7,10 @@ const data = {
     title: "Packing",
     description: "Simple implementation of a packing algorithm, running on CPU.",
     introduction: [
-        "PLACEHOLDER_INTRODUCTION"
+        "This is the implementation of a simple packing algorithm running on CPU. Each new item is given a random position, and then grows as big as possible without intersecting the others.",
+        "You can zoom anywhere you want by using the left mouse button."
     ],
-    githubProjectName: "packing",
+    githubProjectName: "packing-webgl",
     additionalLinks: [],
     styleFiles: [],
     scriptFiles: [
