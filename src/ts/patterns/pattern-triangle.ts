@@ -10,20 +10,20 @@ function rotatePoint(point: IPoint, cosAngle: number, sinAngle: number): IPoint 
     };
 }
 
-/** Input segments are defined by points from the equation "from + t * delta", for 0<t<1
- * @returns if there is an intersection, the ratio dist(from2,to2) / dist(from2, intesection)
- *           if there is no intersection, returns a negative value
+/** Computes intersection between a segment and a semiline, both defined with parametric equations.
+ * The first segment is defined with "from1 + t1 * delta1" for 0 <= t1 <= 2
+ * The semi line is defined with "0 + t2 * delta2" for 0 <= t2
+ * @returns if there is an intersection, t2 >= 0
+ *          if there is no intersection, returns a negative value
  */
-function computeSegmentsIntersection(from1: IPoint, delta1: IPoint, from2: IPoint, delta2: IPoint): number {
+function computeSegmentsIntersection(from1: IPoint, delta1: IPoint, delta2: IPoint): number {
     const denom = delta2.y * delta1.x - delta1.y * delta2.x;
     if (denom !== 0) {
         const invDenom = 1 / denom;
-        const deltaFromY = from2.y - from1.y;
-        const deltaFromX = from2.x - from1.x;
 
-        const t1 = (delta2.y * deltaFromX - delta2.x * deltaFromY) * invDenom;
+        const t1 = (delta2.x * from1.y - delta2.y * from1.x) * invDenom;
         if (0 <= t1 && t1 <= 1) {
-            const t2 = (delta1.y * deltaFromX - delta1.x * deltaFromY) * invDenom;
+            const t2 = (delta1.x * from1.y - delta1.y * from1.x) * invDenom;
             return t2;
         }
     }
@@ -40,8 +40,6 @@ function minPositive(...args: number[]): number {
     }
     return (min === MAX_NUMBER) ? -1 : min;
 }
-
-const POINT_ZERO: IPoint = { x: 0, y: 0 };
 
 class PatternTriangle extends PatternBase {
     public readonly angle: number;
@@ -83,11 +81,11 @@ class PatternTriangle extends PatternBase {
 
         const pointToAvoidLocal = { x: pointToAvoid.x - this.center.x, y: pointToAvoid.y - this.center.y };
 
-        let intersection = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, pointToAvoidLocal);
+        let intersection = computeSegmentsIntersection(this.P1, this.P1_TO_P2, pointToAvoidLocal);
         if (intersection < 0) {
-            intersection = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, pointToAvoidLocal);
+            intersection = computeSegmentsIntersection(this.P2, this.P2_TO_P3, pointToAvoidLocal);
             if (intersection < 0) {
-                intersection = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, pointToAvoidLocal);
+                intersection = computeSegmentsIntersection(this.P3, this.P3_TO_P1, pointToAvoidLocal);
             }
         }
 
@@ -131,34 +129,34 @@ class PatternTriangle extends PatternBase {
         // Check if a vertice of this may intersect a side of the other
         let smallerTforMyVertices: number;
         {
-            const T1_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, POINT_ZERO, this.P1);
-            const T1_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, POINT_ZERO, this.P1);
-            const T1_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, POINT_ZERO, this.P1);
+            const T1_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, this.P1);
+            const T1_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, this.P1);
+            const T1_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, this.P1);
 
-            const T2_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, POINT_ZERO, this.P2);
-            const T2_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, POINT_ZERO, this.P2);
-            const T2_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, POINT_ZERO, this.P2);
+            const T2_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, this.P2);
+            const T2_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, this.P2);
+            const T2_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, this.P2);
 
-            const T3_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, POINT_ZERO, this.P3);
-            const T3_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, POINT_ZERO, this.P3);
-            const T3_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, POINT_ZERO, this.P3);
+            const T3_1 = computeSegmentsIntersection(localOtherP1, scaledOtherP1toP2, this.P3);
+            const T3_2 = computeSegmentsIntersection(localOtherP2, scaledOtherP2toP3, this.P3);
+            const T3_3 = computeSegmentsIntersection(localOtherP3, scaledOtherP3toP1, this.P3);
 
             smallerTforMyVertices = minPositive(T1_1, T1_2, T1_3, T2_1, T2_2, T2_3, T3_1, T3_2, T3_3);
         }
 
         let smallerTforMySides: number;
         {
-            const T1_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, localOtherP1);
-            const T1_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, localOtherP1);
-            const T1_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, localOtherP1);
+            const T1_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, localOtherP1);
+            const T1_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, localOtherP1);
+            const T1_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, localOtherP1);
 
-            const T2_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, localOtherP2);
-            const T2_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, localOtherP2);
-            const T2_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, localOtherP2);
+            const T2_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, localOtherP2);
+            const T2_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, localOtherP2);
+            const T2_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, localOtherP2);
 
-            const T3_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, POINT_ZERO, localOtherP3);
-            const T3_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, POINT_ZERO, localOtherP3);
-            const T3_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, POINT_ZERO, localOtherP3);
+            const T3_1 = computeSegmentsIntersection(this.P1, this.P1_TO_P2, localOtherP3);
+            const T3_2 = computeSegmentsIntersection(this.P2, this.P2_TO_P3, localOtherP3);
+            const T3_3 = computeSegmentsIntersection(this.P3, this.P3_TO_P1, localOtherP3);
 
             const max = Math.max(T1_1, T1_2, T1_3, T2_1, T2_2, T2_3, T3_1, T3_2, T3_3);
             if (max !== 0) {
