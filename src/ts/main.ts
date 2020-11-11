@@ -19,11 +19,9 @@ function main(): void {
 
     const engine = new Engine();
 
-    let needToAddItems = false;
     let needToRedraw = true;
 
     Parameters.addRedrawObserver(() => needToRedraw = true);
-    Parameters.addItemObserver(() => needToAddItems = true);
     Parameters.addClearObserver(() => {
         engine.reset();
         needToRedraw = true;
@@ -47,10 +45,8 @@ function main(): void {
         const deltaTimeInSeconds = 0.001 * (time - lastRunTime);
         lastRunTime = time;
 
-        if (needToAddItems) {
-            engine.addItems(1000);
-            needToAddItems = false;
-        }
+        const wantedItemsCount = 1000 * Parameters.quantity;
+        engine.setItemsCount(wantedItemsCount);
 
         Statistics.timeSpentInUpdate.start();
         const updateChangedSomething = engine.udpate(deltaTimeInSeconds, canvasPlotter.size);

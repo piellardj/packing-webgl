@@ -84,7 +84,7 @@ const data = {
     },
     controlsSections: [
         {
-            title: "Packing",
+            title: "Pattern",
             controls: [
                 {
                     type: Demopage.supportedControls.Tabs,
@@ -94,11 +94,11 @@ const data = {
                         {
                             value: "square",
                             label: "Square",
-                            checked: true
                         },
                         {
                             value: "circle",
-                            label: "Circle"
+                            label: "Circle",
+                            checked: true,
                         },
                         {
                             value: "rectangle",
@@ -112,11 +112,25 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Range,
+                    title: "Quantity",
+                    id: "quantity-range-id",
+                    min: 1,
+                    max: 50,
+                    value: 15,
+                    step: 1
+                },
+            ],
+        },
+        {
+            title: "Packing",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Range,
                     title: "Spacing",
                     id: "spacing-range-id",
                     min: 0.01,
                     max: 0.99,
-                    value: 0.5,
+                    value: 0.25,
                     step: 0.01
                 },
                 {
@@ -125,7 +139,16 @@ const data = {
                     id: "min-size-range-id",
                     min: 1,
                     max: 20,
-                    value: 6,
+                    value: 2,
+                    step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Packing speed",
+                    id: "max-tries-per-frame-range-id",
+                    min: 1,
+                    max: 30,
+                    value: 2,
                     step: 1
                 },
                 {
@@ -133,21 +156,6 @@ const data = {
                     title: "Nesting",
                     id: "allow-overlapping-checkbox-id",
                     checked: true
-                },
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Packing speed",
-                    id: "max-tries-per-frame-range-id",
-                    min: 1,
-                    max: 100,
-                    value: 2,
-                    step: 1
-                },
-                {
-                    type: Demopage.supportedControls.Button,
-                    id: "new-item-button-id",
-                    label: "New item",
-                    flat: true
                 },
             ]
         },
@@ -161,7 +169,7 @@ const data = {
                     id: "zoom-speed-range-id",
                     min: 0,
                     max: 5,
-                    value: 0,
+                    value: 0.2,
                     step: 0.05
                 },
                 {

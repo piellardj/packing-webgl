@@ -68,10 +68,24 @@ class Engine {
         this.zoomCenter.y = 0;
     }
 
-    public addItems(count: number): void {
-        for (let i = 0; i < count; i++) {
-            const newItem = this.createItem();
-            this.uninitializedItemsList.push(newItem);
+    public setItemsCount(wantedCount: number): void {
+        const initializedCount = this.initializedItemsList.length;
+        const uninitializedCount = this.uninitializedItemsList.length;
+
+        const totalItemsCount = initializedCount + uninitializedCount;
+        if (wantedCount > totalItemsCount) { // items to add
+            const itemsToAdd = wantedCount - totalItemsCount;
+            for (let i = 0; i < itemsToAdd; i++) {
+                const newItem = this.createItem();
+                this.uninitializedItemsList.push(newItem);
+            }
+        } else if (wantedCount < totalItemsCount) { // items to remove
+            if (wantedCount > initializedCount) {
+                this.uninitializedItemsList.length = wantedCount - initializedCount;
+            } else {
+                this.uninitializedItemsList = [];
+                this.initializedItemsList.length = wantedCount;
+            }
         }
     }
 

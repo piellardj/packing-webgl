@@ -7,7 +7,7 @@ const controlId = {
     SPACING: "spacing-range-id",
     MIN_SIZE: "min-size-range-id",
     ALLOW_OVERLAPPING: "allow-overlapping-checkbox-id",
-    NEW_ITEM: "new-item-button-id",
+    QUANTITY: "quantity-range-id",
     ZOOM_SPEED: "zoom-speed-range-id",
     BLACK_BACKGROUND: "black-background-checkbox-id",
     BLENDING: "blending-checkbox-id",
@@ -43,17 +43,9 @@ Page.Checkbox.addObserver(controlId.HIGH_CONTRAST, triggerRedraw);
 Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
 Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
 Page.Checkbox.addObserver(controlId.INSTANCING, triggerRedraw);
+Page.Range.addObserver(controlId.QUANTITY, triggerRedraw);
 Page.Range.addObserver(controlId.CELL_X, triggerRedraw);
 Page.Range.addObserver(controlId.CELL_Y, triggerRedraw);
-
-type AddItemObserver = () => unknown;
-const addItemObservers: AddItemObserver[] = [];
-function triggerAddItem(): void {
-    for (const observer of addItemObservers) {
-        observer();
-    }
-}
-Page.Button.addObserver(controlId.NEW_ITEM, triggerAddItem);
 
 type ClearObserver = () => unknown;
 const clearObservers: ClearObserver[] = [];
@@ -139,6 +131,10 @@ Page.Button.addObserver("debug-collisions-button-id", () => {
 });
 
 abstract class Parameters {
+    public static get quantity(): number {
+        return Page.Range.getValue(controlId.QUANTITY);
+    }
+
     public static get spacing(): number {
         return Page.Range.getValue(controlId.SPACING);
     }
@@ -225,10 +221,6 @@ abstract class Parameters {
 
     public static addRedrawObserver(callback: RedrawObserver): void {
         redrawObservers.push(callback);
-    }
-
-    public static addItemObserver(callback: AddItemObserver): void {
-        addItemObservers.push(callback);
     }
 
     public static addClearObserver(callback: ClearObserver): void {
