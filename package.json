@@ -1,6 +1,6 @@
 {
-  "name": "packing",
-  "homepage": "https://piellardj.github.io/packing",
+  "name": "packing-webgl",
+  "homepage": "https://piellardj.github.io/packing-webgl",
   "description": "Simple implementation of a packing algorithm, running on CPU.",
   "main": "build/index.js",
   "scripts": {
