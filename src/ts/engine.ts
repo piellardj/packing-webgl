@@ -228,7 +228,13 @@ class Engine {
         for (const item of this.initializedItemsList) {
             item.zoomIn(this.zoomCenter, zoomSpeed);
 
-            const visibility = item.computeVisibility(domainSize);
+            let visibility: EVisibility;
+            if (item.size > PatternBase.MAX_SIZE) {
+                visibility = EVisibility.OUT_OF_VIEW;
+            } else {
+                visibility = item.computeVisibility(domainSize);
+            }
+
             if (visibility === EVisibility.VISIBLE) {
                 newInitializedArray.push(item);
             } else {

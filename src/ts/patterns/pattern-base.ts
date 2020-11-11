@@ -9,8 +9,6 @@ import { Parameters } from "../parameters";
 
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
-const MAX_SIZE = 1000000;
-
 const MAX_TEST_ID = 999999999999; // lower (for extra safety) than Number.MAX_SAFE_INTEGER (which is not supported by IE11)
 let globalLastTestId = 1;
 
@@ -39,6 +37,13 @@ abstract class PatternBase {
     public static baseNestingLevel: number = 0;
     public static additionalNestingLevelForColor: number = 0;
     public static highContrastColor: boolean = false;
+
+
+    /* When an item is too big, it can lead to visual glitches due to float precision issue on GPU.
+     *  To avoid this, remove items that are too big. */
+    public static readonly MAX_SIZE: number = 1000000;
+    private static readonly MAX_SIZE_LOWER: number = 0.75 * PatternBase.MAX_SIZE;
+    private static readonly MAX_SIZE_GAP: number = PatternBase.MAX_SIZE - PatternBase.MAX_SIZE_LOWER;
 
     public static get maxBlendingTime(): number {
         if (Parameters.blending) {
@@ -71,19 +76,9 @@ abstract class PatternBase {
     }
 
     public zoomIn(zoomCenter: IPoint, zoomFactor: number): void {
-        /** When an item is too big, it can lead to visual glitches due to float precision issue on GPU.
-         *  To avoid this, size down such items.
-         *  This operation should not be noticeable because at this point, the item is so big it looks like a straight line.
-         */
-        if (this.size < MAX_SIZE) {
-            this.center.x = (this.center.x - zoomCenter.x) * zoomFactor + zoomCenter.x;
-            this.center.y = (this.center.y - zoomCenter.y) * zoomFactor + zoomCenter.y;
-            this.size *= zoomFactor;
-        } else {
-            console.log("squeezing");
-            this.center.x -= zoomCenter.x * zoomFactor;
-            this.center.y -= zoomCenter.y * zoomFactor;
-        }
+        this.center.x = (this.center.x - zoomCenter.x) * zoomFactor + zoomCenter.x;
+        this.center.y = (this.center.y - zoomCenter.y) * zoomFactor + zoomCenter.y;
+        this.size *= zoomFactor;
     }
 
     /** @returns the number of tries (regardless of the success of the reset) */
@@ -111,6 +106,11 @@ abstract class PatternBase {
     }
 
     public computeOpacity(time: number, blendTime: number): number {
+        if (this.size > PatternBase.MAX_SIZE_LOWER) {
+            const r = (this.size - PatternBase.MAX_SIZE_LOWER) / PatternBase.MAX_SIZE_GAP;
+            return ( r > 1) ? 0 : 1 - r;
+        }
+
         const lifetime = time - this.initializationTime;
         if (lifetime > blendTime) {
             return 1;
