@@ -120,6 +120,12 @@ const data = {
                     value: 15,
                     step: 1
                 },
+                {
+                    type: Demopage.supportedControls.Button,
+                    id: "reset-button-id",
+                    label: "Reset",
+                    flat: true
+                }
             ],
         },
         {

@@ -4,6 +4,7 @@ import "./page-interface-generated";
 
 const controlId = {
     PRIMITIVE: "primitive-tab-id",
+    RESET: "reset-button-id",
     SPACING: "spacing-range-id",
     MIN_SIZE: "min-size-range-id",
     ALLOW_OVERLAPPING: "allow-overlapping-checkbox-id",
@@ -54,6 +55,7 @@ function triggerClear(): void {
         observer();
     }
 }
+Page.Button.addObserver(controlId.RESET, triggerClear);
 Page.Tabs.addObserver(controlId.PRIMITIVE, triggerClear);
 Page.Range.addObserver(controlId.SPACING, () => {
     if (!Parameters.isZooming) {
