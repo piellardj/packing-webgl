@@ -1,5 +1,5 @@
 import { ISize } from "../utils/i-size";
-import { Color } from "../utils/color";
+import { Color } from "../color/color";
 import { PlotterBase } from "./plotter-base";
 
 import "../page-interface-generated";

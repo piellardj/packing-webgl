@@ -1,5 +1,5 @@
 import { ILine } from "../utils/i-line";
-import { Color } from "../utils/color";
+import { Color } from "../color/color";
 
 import { PlotterCanvasBase } from "./plotter-canvas-base";
 

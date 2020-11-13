@@ -10,7 +10,7 @@ import { PlotterBase } from "./plotter/plotter-base";
 
 import { Grid } from "./space-grid/grid";
 
-import { Color } from "./utils/color";
+import { Color } from "./color/color";
 import { ISize } from "./utils/i-size";
 import { IPoint } from "./utils/i-point";
 import { NumberRange } from "./utils/number-range";

@@ -1,4 +1,4 @@
-import { Color } from "../utils/color";
+import { Color } from "../color/color";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 

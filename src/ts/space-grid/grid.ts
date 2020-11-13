@@ -1,6 +1,6 @@
 import { PatternBase } from "../patterns/pattern-base";
 import { PlotterBase } from "../plotter/plotter-base";
-import { Color } from "../utils/color";
+import { Color } from "../color/color";
 import { ILine } from "../utils/i-line";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";

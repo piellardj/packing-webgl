@@ -5,7 +5,7 @@ import { PatternRectangle } from "./patterns/pattern-rectangle";
 import { PatternSquare } from "./patterns/pattern-square";
 import { PatternTriangle } from "./patterns/pattern-triangle";
 import { PlotterCanvas2D } from "./plotter/plotter-canvas-2d";
-import { Color } from "./utils/color";
+import { Color } from "./color/color";
 import { ILine } from "./utils/i-line";
 import { ISize } from "./utils/i-size";
 
