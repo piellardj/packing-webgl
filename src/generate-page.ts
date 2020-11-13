@@ -180,10 +180,21 @@ const data = {
             id: "display-section",
             controls: [
                 {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Dark",
-                    id: "black-background-checkbox-id",
-                    checked: true
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Background",
+                    id: "background-tab-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "dark",
+                            label: "Dark",
+                            checked: true,
+                        },
+                        {
+                            value: "light",
+                            label: "Light"
+                        },
+                    ]
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,

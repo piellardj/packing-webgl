@@ -10,7 +10,7 @@ const controlId = {
     ALLOW_OVERLAPPING: "allow-overlapping-checkbox-id",
     QUANTITY: "quantity-range-id",
     ZOOM_SPEED: "zoom-speed-range-id",
-    BLACK_BACKGROUND: "black-background-checkbox-id",
+    BACKGROUND: "background-tab-id",
     BLENDING: "blending-checkbox-id",
     HIGH_CONTRAST: "high-contrast-checkbox-id",
     INDICATORS: "indicators-checkbox-id",
@@ -39,7 +39,7 @@ function triggerRedraw(): void {
 }
 Page.Canvas.Observers.canvasResize.push(triggerRedraw);
 Page.Checkbox.addObserver(controlId.ALLOW_OVERLAPPING, triggerRedraw);
-Page.Checkbox.addObserver(controlId.BLACK_BACKGROUND, triggerRedraw);
+Page.Tabs.addObserver(controlId.BACKGROUND, triggerRedraw);
 Page.Checkbox.addObserver(controlId.HIGH_CONTRAST, triggerRedraw);
 Page.Checkbox.addObserver(controlId.ONE_CELL_ONLY, triggerRedraw);
 Page.Checkbox.addObserver(controlId.SHOW_GRID, triggerRedraw);
@@ -161,7 +161,7 @@ abstract class Parameters {
     }
 
     public static get blackBackground(): boolean {
-        return Page.Checkbox.isChecked(controlId.BLACK_BACKGROUND);
+        return Page.Tabs.getValues(controlId.BACKGROUND)[0] === "dark";
     }
 
     public static get blending(): boolean {
