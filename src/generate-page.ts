@@ -121,17 +121,6 @@ const data = {
                     step: 1
                 },
                 {
-                    type: Demopage.supportedControls.Button,
-                    id: "reset-button-id",
-                    label: "Reset",
-                    flat: true
-                }
-            ],
-        },
-        {
-            title: "Packing",
-            controls: [
-                {
                     type: Demopage.supportedControls.Range,
                     title: "Spacing",
                     id: "spacing-range-id",
@@ -148,6 +137,26 @@ const data = {
                     max: 20,
                     value: 2,
                     step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Button,
+                    id: "reset-button-id",
+                    label: "Reset",
+                    flat: true
+                }
+            ],
+        },
+        {
+            title: "Packing",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Zoom speed",
+                    id: "zoom-speed-range-id",
+                    min: 0,
+                    max: 5,
+                    value: 0.2,
+                    step: 0.05
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -170,15 +179,6 @@ const data = {
             title: "Display",
             id: "display-section",
             controls: [
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Zoom speed",
-                    id: "zoom-speed-range-id",
-                    min: 0,
-                    max: 5,
-                    value: 0.2,
-                    step: 0.05
-                },
                 {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Dark",
