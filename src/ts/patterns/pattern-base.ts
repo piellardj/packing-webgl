@@ -56,6 +56,7 @@ abstract class PatternBase {
     public nestingLevel: number;
     public readonly rawColor: Color;
 
+    private parentItem: PatternBase | null; // used only momentarily during resetting
     private lastTestId: number;
     private initializationTime: number;
 
@@ -78,7 +79,7 @@ abstract class PatternBase {
     }
 
     /** @returns the number of tries (regardless of the success of the reset) */
-    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, allowOverlapping: boolean, parentPattern: IPattern, maxTries: number): IPatternResetResult {
+    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, allowOverlapping: boolean, backgroundPattern: IPattern, maxTries: number): IPatternResetResult {
         const result: IPatternResetResult = {
             nbTries: 0,
             success: false,
@@ -86,13 +87,16 @@ abstract class PatternBase {
 
         while (result.nbTries < maxTries && !result.success) {
             this.randomizePosition(domainSize);
-            this.nestingLevel = parentPattern.nestingLevel + 1;
+            this.parentItem = null;
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, allowOverlapping);
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.initializationTime = performance.now();
                 result.success = true;
+
+                const parentNestingLevel = (this.parentItem !== null) ? this.parentItem.nestingLevel : backgroundPattern.nestingLevel;
+                this.nestingLevel = parentNestingLevel + 1;
             }
 
             result.nbTries++;
@@ -161,7 +165,7 @@ abstract class PatternBase {
                         maxSize = result.size;
 
                         if (result.isInside) {
-                            this.nestingLevel = item.nestingLevel + 1;
+                            this.parentItem = item;
                         }
                     }
                     item.lastTestId = currentTestId;
