@@ -1,4 +1,6 @@
 import { Color } from "../color/color";
+import { ColorPicker } from "../color/color-picker";
+
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
 
@@ -35,10 +37,6 @@ enum EVisibility {
 }
 
 abstract class PatternBase {
-    public static additionalNestingLevelForColor: number = 0;
-    public static highContrastColor: boolean = false;
-
-
     /* When an item is too big, it can lead to visual glitches due to float precision issue on GPU.
      *  To avoid this, remove items that are too big. */
     public static readonly MAX_SIZE: number = 1000000;
@@ -70,10 +68,7 @@ abstract class PatternBase {
     }
 
     public get color(): Color {
-        if (PatternBase.highContrastColor) {
-            return ((this.nestingLevel + PatternBase.additionalNestingLevelForColor) % 2 === 0) ? Color.BLACK : Color.WHITE;
-        }
-        return this.rawColor;
+        return ColorPicker.getDisplayColor(this.rawColor, this.nestingLevel);
     }
 
     public zoomIn(zoomCenter: IPoint, zoomFactor: number): void {

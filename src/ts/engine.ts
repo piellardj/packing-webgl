@@ -12,6 +12,8 @@ import { PlotterBase } from "./plotter/plotter-base";
 import { Grid } from "./space-grid/grid";
 
 import { Color } from "./color/color";
+import { ColorPicker } from "./color/color-picker";
+
 import { ISize } from "./utils/i-size";
 import { IPoint } from "./utils/i-point";
 import { NumberRange } from "./utils/number-range";
@@ -90,8 +92,8 @@ class Engine {
 
     public draw(plotter: PlotterBase): boolean {
         Engine.DEFAULT_BACKGROUND_ITEM.color = (Parameters.blackBackground) ? Color.BLACK : Color.WHITE;
-        PatternBase.additionalNestingLevelForColor = (Parameters.blackBackground) ? 0 : 1;
-        PatternBase.highContrastColor = Parameters.highContrast;
+        ColorPicker.darkMode = Parameters.blackBackground;
+        ColorPicker.highContrastMode = Parameters.highContrast;
 
         let everythingDrawn = plotter.isReady;
         if (!Parameters.isZooming) {
@@ -268,16 +270,7 @@ class Engine {
 
     private computeBackgroundColor(): Color {
         const backgroundItem = this.backgroundItem;
-
-        if (Parameters.highContrast) {
-            if (Parameters.blackBackground) {
-                return (backgroundItem.nestingLevel % 2 === 0) ? Color.BLACK : Color.WHITE;
-            } else {
-                return (backgroundItem.nestingLevel % 2 === 0) ? Color.WHITE : Color.BLACK;
-            }
-        } else {
-            return this.backgroundItem.color;
-        }
+        return ColorPicker.getDisplayColor(backgroundItem.color, backgroundItem.nestingLevel);
     }
 
     private updateZoomCenter(domainSize: ISize): void {
