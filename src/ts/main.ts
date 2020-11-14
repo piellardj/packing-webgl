@@ -1,3 +1,5 @@
+import { ColorPicker } from "./color/color-picker";
+
 import { mainDebugCollisions } from "./debug-collisions";
 
 import { Engine } from "./engine";
@@ -47,6 +49,8 @@ function main(): void {
 
         const wantedItemsCount = 1000 * Parameters.quantity;
         engine.setItemsCount(wantedItemsCount);
+
+        ColorPicker.setPalette(Parameters.paletteId);
 
         Statistics.timeSpentInUpdate.start();
         const updateChangedSomething = engine.udpate(deltaTimeInSeconds, canvasPlotter.size);

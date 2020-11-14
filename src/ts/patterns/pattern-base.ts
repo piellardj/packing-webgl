@@ -55,7 +55,7 @@ abstract class PatternBase {
     public readonly center: IPoint;
     public size: number;
     public nestingLevel: number;
-    public readonly rawColor: Color;
+    public rawColor: Color;
 
     private parentItem: PatternBase | null; // used only momentarily during resetting
     private lastTestId: number;
@@ -96,8 +96,13 @@ abstract class PatternBase {
                 this.initializationTime = performance.now();
                 result.success = true;
 
-                const parentNestingLevel = (this.parentItem !== null) ? this.parentItem.nestingLevel : backgroundPattern.nestingLevel;
+                const parentNestingLevel: number = (this.parentItem !== null) ? this.parentItem.nestingLevel : backgroundPattern.nestingLevel;
                 this.nestingLevel = parentNestingLevel + 1;
+
+                if (ColorPicker.usePalette) {
+                    const parentColor: Color = (this.parentItem !== null) ? this.parentItem.rawColor : backgroundPattern.color;
+                    this.rawColor = ColorPicker.getDifferentColorFromPalette(parentColor);
+                }
             }
 
             result.nbTries++;

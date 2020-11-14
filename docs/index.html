@@ -180,6 +180,23 @@
             <h2>Display</h2>
 
             <div class="controls-list">
+              <div class="control" id="control-palette-picker-id">
+                <label>Palette:</label>
+                <div class="inline-picker compact" id="palette-picker-id" style='flex:1'>
+                  <div class="picker-button left">&nbsp;</div>
+                  <span></span>
+                  <div class="picker-button right">&nbsp;</div>
+                  <input type="radio" name="palette-picker-id" value="-1" checked data-label="All colors">
+                  <input type="radio" name="palette-picker-id" value="0" data-label="Summer">
+                  <input type="radio" name="palette-picker-id" value="1" data-label="Forest">
+                  <input type="radio" name="palette-picker-id" value="2" data-label="Ocean">
+                  <input type="radio" name="palette-picker-id" value="3" data-label="Rust">
+                  <input type="radio" name="palette-picker-id" value="4" data-label="Greyscale">
+                  <input type="radio" name="palette-picker-id" value="5" data-label="Neon">
+                  <input type="radio" name="palette-picker-id" value="6" data-label="Desert">
+                  <input type="radio" name="palette-picker-id" value="7" data-label="Flashy">
+                </div>
+              </div>
               <div class="control" id="control-background-tab-id">
                 <label>Background:</label>
                 <div class="tabs compact" id="background-tab-id-id">
@@ -189,18 +206,18 @@
                   <label for="background-tab-id-light-id">Light</label>
                 </div>
               </div>
-              <div class="control" id="control-blending-checkbox-id">
-                <label>Blending:</label>
-                <div class="checkbox">
-                  <input type="checkbox" id="blending-checkbox-id" checked>
-                  <label for="blending-checkbox-id" class="checkmark"></label>
-                </div>
-              </div>
               <div class="control" id="control-high-contrast-checkbox-id">
                 <label>High contrast:</label>
                 <div class="checkbox">
                   <input type="checkbox" id="high-contrast-checkbox-id">
                   <label for="high-contrast-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-blending-checkbox-id">
+                <label>Blending:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="blending-checkbox-id" checked>
+                  <label for="blending-checkbox-id" class="checkmark"></label>
                 </div>
               </div>
               <div class="control" id="control-indicators-checkbox-id">

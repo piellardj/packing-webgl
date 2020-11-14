@@ -180,6 +180,50 @@ const data = {
             id: "display-section",
             controls: [
                 {
+                    type: Demopage.supportedControls.Picker,
+                    title: "Palette",
+                    id: "palette-picker-id",
+                    options: [
+                        {
+                            value: "-1",
+                            label: "All colors",
+                            checked: true
+                        },
+                        {
+                            value: "0",
+                            label: "Summer"
+                        },
+                        {
+                            value: "1",
+                            label: "Forest"
+                        },
+                        {
+                            value: "2",
+                            label: "Ocean"
+                        },
+                        {
+                            value: "3",
+                            label: "Rust"
+                        },
+                        {
+                            value: "4",
+                            label: "Greyscale"
+                        },
+                        {
+                            value: "5",
+                            label: "Neon"
+                        },
+                        {
+                            value: "6",
+                            label: "Desert"
+                        },
+                        {
+                            value: "7",
+                            label: "Flashy"
+                        }
+                    ]
+                },
+                {
                     type: Demopage.supportedControls.Tabs,
                     title: "Background",
                     id: "background-tab-id",
@@ -198,15 +242,15 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
-                    title: "Blending",
-                    id: "blending-checkbox-id",
-                    checked: true
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
                     title: "High contrast",
                     id: "high-contrast-checkbox-id",
                     checked: false
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Blending",
+                    id: "blending-checkbox-id",
+                    checked: true
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,

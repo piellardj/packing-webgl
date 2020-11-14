@@ -11,6 +11,7 @@ const controlId = {
     QUANTITY: "quantity-range-id",
     ZOOM_SPEED: "zoom-speed-range-id",
     BACKGROUND: "background-tab-id",
+    PALETTE: "palette-picker-id",
     BLENDING: "blending-checkbox-id",
     HIGH_CONTRAST: "high-contrast-checkbox-id",
     INDICATORS: "indicators-checkbox-id",
@@ -67,6 +68,12 @@ Page.Range.addObserver(controlId.MIN_SIZE, () => {
         triggerClear();
     }
 });
+
+Page.Picker.addObserver(controlId.PALETTE, () => {
+    if (!Parameters.isZooming) {
+        triggerClear();
+    }
+})
 
 enum EPrimitive {
     SQUARE = "square",
@@ -166,6 +173,10 @@ abstract class Parameters {
 
     public static get blending(): boolean {
         return Page.Checkbox.isChecked(controlId.BLENDING);
+    }
+
+    public static get paletteId(): number {
+        return +Page.Picker.getValue(controlId.PALETTE);
     }
 
     public static get highContrast(): boolean {
