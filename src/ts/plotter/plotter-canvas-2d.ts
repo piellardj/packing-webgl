@@ -1,14 +1,15 @@
 import { Color } from "../color/color";
+import "../page-interface-generated";
+import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternRectangle } from "../patterns/pattern-rectangle";
+import { PatternSquare } from "../patterns/pattern-square";
+import { PatternTriangle } from "../patterns/pattern-triangle";
 import { ILine } from "../utils/i-line";
-
 import { PlotterCanvasBase } from "./plotter-canvas-base";
 
-import { PatternCircle } from "../patterns/pattern-circle";
-import { PatternSquare } from "../patterns/pattern-square";
-import { PatternRectangle } from "../patterns/pattern-rectangle";
-import { PatternTriangle } from "../patterns/pattern-triangle";
 
-import "../page-interface-generated";
+
+
 
 class PlotterCanvas2D extends PlotterCanvasBase {
     private readonly context: CanvasRenderingContext2D;
@@ -111,4 +112,3 @@ class PlotterCanvas2D extends PlotterCanvasBase {
 }
 
 export { PlotterCanvas2D };
-

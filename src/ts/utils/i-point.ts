@@ -19,4 +19,4 @@ function rotate(p: IPoint, angle: number): IPoint {
     };
 }
 
-export { IPoint, distance, rotate }
+export { IPoint, distance, rotate };

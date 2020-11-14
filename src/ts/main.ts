@@ -1,3 +1,5 @@
+import { mainDebugCollisions } from "./debug-collisions";
+
 import { Engine } from "./engine";
 
 import { Parameters } from "./parameters";
@@ -9,8 +11,6 @@ import { PlotterSVG } from "./plotter/plotter-svg";
 import * as Statistics from "./statistics/statistics";
 
 import * as Helper from "./utils/helper";
-
-import { mainDebugCollisions } from "./debug-collisions";
 
 import "./page-interface-generated";
 

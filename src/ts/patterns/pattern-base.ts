@@ -1,13 +1,14 @@
 import { Color } from "../color/color";
 import { ColorPicker } from "../color/color-picker";
 
-import { IPoint } from "../utils/i-point";
-import { ISize } from "../utils/i-size";
+import { Parameters } from "../parameters";
 
 import { Grid } from "../space-grid/grid";
 
+import { IPoint } from "../utils/i-point";
+import { ISize } from "../utils/i-size";
 import { NumberRange } from "../utils/number-range";
-import { Parameters } from "../parameters";
+
 import { IPattern } from "./i-pattern";
 
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
@@ -182,4 +183,4 @@ abstract class PatternBase {
     }
 }
 
-export { PatternBase, EVisibility, ISizeComputationResult }
+export { PatternBase, EVisibility, ISizeComputationResult };

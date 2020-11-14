@@ -42,4 +42,4 @@ class StopWatch {
     }
 }
 
-export { StopWatch }
+export { StopWatch };

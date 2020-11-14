@@ -1,3 +1,6 @@
+import { Color } from "./color/color";
+import { ColorPicker } from "./color/color-picker";
+
 import { EPrimitive, Parameters } from "./parameters";
 
 import { IPattern } from "./patterns/i-pattern";
@@ -11,14 +14,11 @@ import { PlotterBase } from "./plotter/plotter-base";
 
 import { Grid } from "./space-grid/grid";
 
-import { Color } from "./color/color";
-import { ColorPicker } from "./color/color-picker";
-
-import { ISize } from "./utils/i-size";
-import { IPoint } from "./utils/i-point";
-import { NumberRange } from "./utils/number-range";
-
 import * as Statistics from "./statistics/statistics";
+
+import { IPoint } from "./utils/i-point";
+import { ISize } from "./utils/i-size";
+import { NumberRange } from "./utils/number-range";
 
 import "./page-interface-generated";
 
@@ -298,4 +298,4 @@ class Engine {
     }
 }
 
-export { Engine }
+export { Engine };

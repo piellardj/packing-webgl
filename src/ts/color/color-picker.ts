@@ -13,4 +13,4 @@ abstract class ColorPicker {
     }
 }
 
-export { ColorPicker }
+export { ColorPicker };

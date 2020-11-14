@@ -1,7 +1,7 @@
-import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
-
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
+
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 class PatternCircle extends PatternBase {
     public constructor() {
@@ -59,4 +59,4 @@ class PatternCircle extends PatternBase {
     }
 }
 
-export { PatternCircle }
+export { PatternCircle };

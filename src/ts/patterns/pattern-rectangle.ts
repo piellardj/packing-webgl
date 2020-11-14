@@ -1,7 +1,7 @@
-import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
-
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
+
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 const ASPECT_RATIO_VARIATION = 0.5; // must be in [0,1]
 
@@ -89,4 +89,4 @@ class PatternRectangle extends PatternBase {
     }
 }
 
-export { PatternRectangle }
+export { PatternRectangle };

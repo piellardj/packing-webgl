@@ -1,5 +1,7 @@
-import { ISize } from "../utils/i-size";
 import { Color } from "../color/color";
+
+import { ISize } from "../utils/i-size";
+
 import { PlotterBase } from "./plotter-base";
 
 import "../page-interface-generated";
@@ -45,4 +47,3 @@ abstract class PlotterCanvasBase extends PlotterBase {
 }
 
 export { PlotterCanvasBase };
-

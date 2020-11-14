@@ -53,4 +53,4 @@ class Color {
     }
 }
 
-export { Color }
+export { Color };

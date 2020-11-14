@@ -1,8 +1,10 @@
+import { Parameters } from "../parameters";
+
+import { ISize } from "../utils/i-size";
+
 import { StopWatch } from "./stop-watch";
 
 import "../page-interface-generated";
-import { Parameters } from "../parameters";
-import { ISize } from "../utils/i-size";
 
 const VERBOSE_INTERVAL = 1000;
 
@@ -149,4 +151,4 @@ export {
     timeSpentInReindex,
     timeSpentInRecycle,
     timeSpentInZoom,
-}
+};

@@ -3,4 +3,4 @@ interface ISize {
     height: number;
 }
 
-export { ISize }
+export { ISize };

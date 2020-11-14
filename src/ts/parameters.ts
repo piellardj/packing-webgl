@@ -1,6 +1,6 @@
+import "./page-interface-generated";
 import * as Helpers from "./utils/helper";
 
-import "./page-interface-generated";
 
 const controlId = {
     PRIMITIVE: "primitive-tab-id",
@@ -234,4 +234,4 @@ abstract class Parameters {
     }
 }
 
-export { Parameters, EPrimitive, ECollisionTestType }
+export { Parameters, EPrimitive, ECollisionTestType };

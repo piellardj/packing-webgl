@@ -1,21 +1,23 @@
-import { ILine } from "../utils/i-line";
 import { Color } from "../color/color";
 
-import { PlotterCanvasBase } from "./plotter-canvas-base";
-
-import { PatternBase } from "../patterns/pattern-base";
-import { PatternCircle } from "../patterns/pattern-circle";
-import { PatternSquare } from "../patterns/pattern-square";
-import { PatternRectangle } from "../patterns/pattern-rectangle";
-import { PatternTriangle } from "../patterns/pattern-triangle";
-
-import { initGL, gl } from "../gl-utils/gl-canvas";
+import { gl, initGL } from "../gl-utils/gl-canvas";
 import { Shader } from "../gl-utils/shader";
 import * as ShaderManager from "../gl-utils/shader-manager";
 import { VBO } from "../gl-utils/vbo";
 
-import "../page-interface-generated";
 import { EPrimitive, Parameters } from "../parameters";
+
+import { PatternBase } from "../patterns/pattern-base";
+import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternRectangle } from "../patterns/pattern-rectangle";
+import { PatternSquare } from "../patterns/pattern-square";
+import { PatternTriangle } from "../patterns/pattern-triangle";
+
+import { ILine } from "../utils/i-line";
+
+import { PlotterCanvasBase } from "./plotter-canvas-base";
+
+import "../page-interface-generated";
 
 type AffectShaderFunction = (shader: Shader) => unknown;
 type ExtraAttributeFunction = (item: PatternBase) => number;

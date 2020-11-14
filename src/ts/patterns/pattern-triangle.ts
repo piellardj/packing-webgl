@@ -1,7 +1,7 @@
-import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
-
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
+
+import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 function rotatePoint(point: IPoint, cosAngle: number, sinAngle: number): IPoint {
     return {
@@ -210,4 +210,4 @@ class PatternTriangle extends PatternBase {
     }
 }
 
-export { PatternTriangle }
+export { PatternTriangle };

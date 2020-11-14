@@ -5,4 +5,4 @@ interface ILine {
     to: IPoint;
 }
 
-export { ILine }
+export { ILine };

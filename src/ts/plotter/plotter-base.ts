@@ -1,11 +1,12 @@
 import { Color } from "../color/color";
-import { ILine } from "../utils/i-line";
-import { ISize } from "../utils/i-size";
 
 import { PatternCircle } from "../patterns/pattern-circle";
-import { PatternSquare } from "../patterns/pattern-square";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
+import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
+
+import { ILine } from "../utils/i-line";
+import { ISize } from "../utils/i-size";
 
 abstract class PlotterBase {
     public abstract get size(): ISize;
@@ -25,4 +26,3 @@ abstract class PlotterBase {
 }
 
 export { PlotterBase };
-

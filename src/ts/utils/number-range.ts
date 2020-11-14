@@ -6,4 +6,4 @@ class NumberRange {
     }
 }
 
-export { NumberRange }
+export { NumberRange };

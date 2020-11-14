@@ -49,4 +49,4 @@ function getQueryStringValue(name: string): string | null {
 export {
     downloadTextFile,
     getQueryStringValue,
-}
+};

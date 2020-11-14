@@ -1,11 +1,14 @@
-import { PatternBase } from "../patterns/pattern-base";
-import { PlotterBase } from "../plotter/plotter-base";
+import * as Statistics from "..//statistics/statistics";
+
 import { Color } from "../color/color";
+
+import { PatternBase } from "../patterns/pattern-base";
+
+import { PlotterBase } from "../plotter/plotter-base";
+
 import { ILine } from "../utils/i-line";
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
-
-import * as Statistics from "..//statistics/statistics";
 
 type GridCell = PatternBase[];
 

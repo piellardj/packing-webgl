@@ -5,4 +5,4 @@ interface IPattern {
     color: Color;
 }
 
-export { IPattern }
+export { IPattern };
