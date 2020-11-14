@@ -6,6 +6,7 @@ import { Grid } from "../space-grid/grid";
 
 import { NumberRange } from "../utils/number-range";
 import { Parameters } from "../parameters";
+import { IPattern } from "./i-pattern";
 
 const CANVAS_CENTER: IPoint = { x: 0, y: 0 };
 
@@ -34,7 +35,6 @@ enum EVisibility {
 }
 
 abstract class PatternBase {
-    public static baseNestingLevel: number = 0;
     public static additionalNestingLevelForColor: number = 0;
     public static highContrastColor: boolean = false;
 
@@ -64,7 +64,7 @@ abstract class PatternBase {
     protected constructor() {
         this.center = { x: 0, y: 0 };
         this.size = 0;
-        this.nestingLevel = PatternBase.baseNestingLevel + 1;
+        this.nestingLevel = 0;
         this.rawColor = Color.random();
         this.lastTestId = 0;
     }
@@ -83,7 +83,7 @@ abstract class PatternBase {
     }
 
     /** @returns the number of tries (regardless of the success of the reset) */
-    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, allowOverlapping: boolean, maxTries: number): IPatternResetResult {
+    public reset(domainSize: ISize, grid: Grid, sizeFactor: number, acceptedSizes: NumberRange, allowOverlapping: boolean, parentPattern: IPattern, maxTries: number): IPatternResetResult {
         const result: IPatternResetResult = {
             nbTries: 0,
             success: false,
@@ -91,7 +91,7 @@ abstract class PatternBase {
 
         while (result.nbTries < maxTries && !result.success) {
             this.randomizePosition(domainSize);
-            this.nestingLevel = PatternBase.baseNestingLevel + 1;
+            this.nestingLevel = parentPattern.nestingLevel + 1;
 
             const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, allowOverlapping);
             if (acceptedSizes.isInRange(maxSize)) {

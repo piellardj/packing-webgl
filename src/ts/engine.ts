@@ -1,5 +1,6 @@
 import { EPrimitive, Parameters } from "./parameters";
 
+import { IPattern } from "./patterns/i-pattern";
 import { EVisibility, PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
 import { PatternRectangle } from "./patterns/pattern-rectangle";
@@ -31,8 +32,8 @@ class Engine {
 
     private zoomCenter: IPoint;
 
-    private backgroundColorOverride: Color;
-    private backgroundNestingLevel: number;
+    private static readonly DEFAULT_BACKGROUND_ITEM: IPattern = { nestingLevel: 0, color: Color.BLACK };
+    private currentBackgroundItem: IPattern | null;
 
     public constructor() {
         this.initializedItemsList = [];
@@ -40,8 +41,7 @@ class Engine {
         this.lastRecyclingTime = 0;
 
         this.zoomCenter = { x: 0, y: 0 }; // canvas center
-        this.backgroundColorOverride = null;
-        this.backgroundNestingLevel = 0;
+        this.currentBackgroundItem = null;
     }
 
     public reset(): void {
@@ -62,8 +62,7 @@ class Engine {
         this.initializedItemsList = [];
         this.uninitializedItemsList = [];
         this.currentPrimitive = primitive;
-        this.backgroundColorOverride = null;
-        this.backgroundNestingLevel = 0;
+        this.currentBackgroundItem = null;
         this.zoomCenter.x = 0;
         this.zoomCenter.y = 0;
     }
@@ -90,7 +89,7 @@ class Engine {
     }
 
     public draw(plotter: PlotterBase): boolean {
-        PatternBase.baseNestingLevel = this.backgroundNestingLevel;
+        Engine.DEFAULT_BACKGROUND_ITEM.color = (Parameters.blackBackground) ? Color.BLACK : Color.WHITE;
         PatternBase.additionalNestingLevelForColor = (Parameters.blackBackground) ? 0 : 1;
         PatternBase.highContrastColor = Parameters.highContrast;
 
@@ -200,12 +199,13 @@ class Engine {
         const sizeFactor = 1 - Parameters.spacing;
         const acceptedSizesForNewItems = new NumberRange(Parameters.minSize, 1000000);
         const maxTries = Parameters.maxTriesPerFrame;
+        const backgroundItem = this.backgroundItem;
 
         let triesLeft = maxTries;
         while (this.uninitializedItemsList.length > 0 && triesLeft > 0) {
             const currentItem = this.uninitializedItemsList.pop();
 
-            const resetResult = currentItem.reset(domainSize, this.grid, sizeFactor, acceptedSizesForNewItems, allowOverlapping, triesLeft);
+            const resetResult = currentItem.reset(domainSize, this.grid, sizeFactor, acceptedSizesForNewItems, allowOverlapping, backgroundItem, triesLeft);
             triesLeft -= resetResult.nbTries;
             if (resetResult.success) {
                 this.initializedItemsList.push(currentItem);
@@ -255,9 +255,10 @@ class Engine {
                 this.uninitializedItemsList.push(item); // recycle item
 
                 if (visibility === EVisibility.COVERS_VIEW) {
-                    this.backgroundColorOverride = item.rawColor; // overrite current background to make the illusion that we are still in the item
-                    this.backgroundNestingLevel = item.nestingLevel % 2; // modulus to avoid rounding errors with higher nestings
-                    PatternBase.baseNestingLevel = this.backgroundNestingLevel;
+                    this.currentBackgroundItem = {
+                        nestingLevel: item.nestingLevel % 100000, // make ensting levels loop
+                        color: item.rawColor,
+                    };
                 }
             }
         }
@@ -266,17 +267,16 @@ class Engine {
     }
 
     private computeBackgroundColor(): Color {
+        const backgroundItem = this.backgroundItem;
+
         if (Parameters.highContrast) {
             if (Parameters.blackBackground) {
-                return (this.backgroundNestingLevel % 2 === 0) ? Color.BLACK : Color.WHITE;
+                return (backgroundItem.nestingLevel % 2 === 0) ? Color.BLACK : Color.WHITE;
             } else {
-                return (this.backgroundNestingLevel % 2 === 0) ? Color.WHITE : Color.BLACK;
+                return (backgroundItem.nestingLevel % 2 === 0) ? Color.WHITE : Color.BLACK;
             }
         } else {
-            if (this.backgroundColorOverride !== null) {
-                return this.backgroundColorOverride;
-            }
-            return Parameters.blackBackground ? Color.BLACK : Color.WHITE;
+            return this.backgroundItem.color;
         }
     }
 
@@ -301,6 +301,10 @@ class Engine {
         } else if (this.zoomCenter.y > halfHeight) {
             this.zoomCenter.y = halfHeight;
         }
+    }
+
+    private get backgroundItem(): IPattern {
+        return (this.currentBackgroundItem !== null) ? this.currentBackgroundItem : Engine.DEFAULT_BACKGROUND_ITEM;
     }
 }
 
