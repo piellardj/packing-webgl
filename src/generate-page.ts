@@ -244,7 +244,7 @@ const data = {
                     id: "target-items-per-gridcell-checkbox-id",
                     min: 1,
                     max: 100,
-                    value: 10,
+                    value: 16,
                     step: 1
                 },
                 {
