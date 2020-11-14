@@ -30,9 +30,9 @@ class Engine {
     private currentPrimitive: EPrimitive;
     private createItem: () => PatternBase;
 
-    private grid: Grid; // used to index the items' positions for faster recycling
+    private readonly grid: Grid; // used to index the items' positions for faster recycling
 
-    private zoomCenter: IPoint;
+    private readonly zoomCenter: IPoint;
 
     private static readonly DEFAULT_BACKGROUND_ITEM: IPattern = { nestingLevel: 0, color: Color.BLACK };
     private currentBackgroundItem: IPattern | null;
@@ -42,6 +42,7 @@ class Engine {
         this.uninitializedItemsList = [];
         this.lastRecyclingTime = 0;
 
+        this.grid = new Grid();
         this.zoomCenter = { x: 0, y: 0 }; // canvas center
         this.currentBackgroundItem = null;
     }
@@ -175,10 +176,6 @@ class Engine {
      * @returns true if a redraw is required
      */
     private reindexItems(domainSize: ISize): boolean {
-        if (typeof this.grid === "undefined") {
-            this.grid = new Grid();
-        }
-
         let gridCellSize = Parameters.cellSize;
         if (Parameters.adaptativeGrid) {
             const targetItemsPerCell = Parameters.targetItemsPerGridCell;

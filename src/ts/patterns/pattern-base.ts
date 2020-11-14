@@ -51,7 +51,7 @@ abstract class PatternBase {
         return 0;
     }
 
-    public center: IPoint;
+    public readonly center: IPoint;
     public size: number;
     public nestingLevel: number;
     public readonly rawColor: Color;
