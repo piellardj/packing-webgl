@@ -248,7 +248,7 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
-                    title: "Blending",
+                    title: "Fade in",
                     id: "blending-checkbox-id",
                     checked: true
                 },
