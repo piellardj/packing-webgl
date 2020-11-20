@@ -186,11 +186,13 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private drawPrimitives(pointsShader: Shader, instancedShader: Shader, items: PatternBase[], primitive: EPrimitive, extraAttributeFunction?: ExtraAttributeFunction): void {
         this.updateStateAndColorVBOs(items, extraAttributeFunction);
 
+        Statistics.timeSpentInDrawDrawX.start();
         if (this.useInstancing && instancedShader !== null) {
             this.drawInstanced(instancedShader, items, primitive);
         } else {
             this.drawAsPoints(pointsShader, items);
         }
+        Statistics.timeSpentInDrawDrawX.stop();
     }
 
     private drawInstanced(shader: Shader, items: PatternBase[], primitive: EPrimitive): void {
@@ -275,8 +277,10 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
         Statistics.timeSpentInDrawFillBuffer.stop();
 
+        Statistics.timeSpentInDrawUploadVBO.start();
         this.statesVBO.setData(this.statesBuffer);
         this.colorsVBO.setData(this.colorsBuffer);
+        Statistics.timeSpentInDrawUploadVBO.stop();
     }
 
     private set enableBlending(value: boolean) {

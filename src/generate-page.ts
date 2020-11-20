@@ -46,6 +46,14 @@ const data = {
             label: "Time spent in mainLoop.draw.fillBuffer()"
         },
         {
+            id: "draw-uploadvbo-time",
+            label: "Time spent in mainLoop.draw.uploadVBO()"
+        },
+        {
+            id: "draw-drawX-time",
+            label: "Time spent in mainLoop.draw.drawX()"
+        },
+        {
             id: "update-time",
             label: "Time spent in mainLoop.update()"
         },

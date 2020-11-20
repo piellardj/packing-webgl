@@ -15,6 +15,8 @@ const timeSpentInMainLoop = new StopWatch();
 const timeSpentInDraw = new StopWatch();
 const timeSpentInDrawAllocateBuffer = new StopWatch();
 const timeSpentInDrawFillBuffer = new StopWatch();
+const timeSpentInDrawUploadVBO = new StopWatch();
+const timeSpentInDrawDrawX = new StopWatch();
 const timeSpentInUpdate = new StopWatch();
 const timeSpentInReindex = new StopWatch();
 const timeSpentInReindexResetDomain = new StopWatch();
@@ -68,6 +70,12 @@ function updateIndicators(): void {
     const averageDrawFillBufferTime = timeSpentInDrawFillBuffer.totalTime / frames;
     const drawFillBufferTimeRelative = averageDrawFillBufferTime / averageDrawTime;
 
+    const averageDrawUploadVBOTime = timeSpentInDrawUploadVBO.totalTime / frames;
+    const drawDrawUploadVBOTimeRelative = averageDrawUploadVBOTime / averageDrawTime;
+
+    const averageDrawDrawXTime = timeSpentInDrawDrawX.totalTime / frames;
+    const drawDrawXTimeRelative = averageDrawDrawXTime / averageDrawTime;
+
     const averageUpdateTime = timeSpentInUpdate.totalTime / frames;
     const updateTimeRelative = averageUpdateTime / averageMainLoopTime;
 
@@ -92,6 +100,8 @@ function updateIndicators(): void {
         Page.Canvas.setIndicatorText("draw-time", `${averageDrawTime.toFixed(2)} ms (${(100 * drawTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("draw-allocatebuffer-time", `${averageDrawAllocateBufferTime.toFixed(2)} ms (${(100 * drawAllocateBufferTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("draw-fillbuffer-time", `${averageDrawFillBufferTime.toFixed(2)} ms (${(100 * drawFillBufferTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("draw-uploadvbo-time", `${averageDrawUploadVBOTime.toFixed(2)} ms (${(100 * drawDrawUploadVBOTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("draw-drawX-time", `${averageDrawDrawXTime.toFixed(2)} ms (${(100 * drawDrawXTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-time", `${averageUpdateTime.toFixed(2)} ms (${(100 * updateTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-reindex-time", `${averageUpdateReindexTime.toFixed(2)} ms (${(100 * updateReindexTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-reindex-resetdomain-time", `${averageUpdateReindexResetDomainTime.toFixed(2)} ms (${(100 * updateReindexResetDomainTimeRelative).toFixed(1)} %)`);
@@ -128,6 +138,8 @@ function resetAll(): void {
     timeSpentInDraw.reset();
     timeSpentInDrawAllocateBuffer.reset();
     timeSpentInDrawFillBuffer.reset();
+    timeSpentInDrawUploadVBO.reset();
+    timeSpentInDrawDrawX.reset();
     timeSpentInUpdate.reset();
     timeSpentInReindex.reset();
     timeSpentInReindexResetDomain.reset();
@@ -173,6 +185,8 @@ export {
     timeSpentInDraw,
     timeSpentInDrawAllocateBuffer,
     timeSpentInDrawFillBuffer,
+    timeSpentInDrawUploadVBO,
+    timeSpentInDrawDrawX,
     timeSpentInUpdate,
     timeSpentInReindex,
     timeSpentInReindexResetDomain,
