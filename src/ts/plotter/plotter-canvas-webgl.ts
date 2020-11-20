@@ -236,18 +236,18 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
 
         Statistics.timeSpentInDrawFillBuffer.start();
-        // for (let i = 0; i < nbItems; i++) {
-        //     // const color = items[i].color;
+        for (let i = 0; i < nbItems; i++) {
+            const color = items[i].color;
 
-        //     // this.primitivesBuffer[8 * i + 0] = items[i].center.x;
-        //     // this.primitivesBuffer[8 * i + 1] = items[i].center.y;
-        //     // this.primitivesBuffer[8 * i + 2] = items[i].size;
-        //     // this.primitivesBuffer[8 * i + 3] = extraAttribute(items[i]);
-        //     // this.primitivesBuffer[8 * i + 4] = color.r / 255;
-        //     // this.primitivesBuffer[8 * i + 5] = color.g / 255;
-        //     // this.primitivesBuffer[8 * i + 6] = color.b / 255;
-        //     this.primitivesBuffer[8 * i + 7] = items[i].computeOpacity(time, blendTime);
-        // }
+            this.primitivesBuffer[8 * i + 0] = items[i].center.x;
+            this.primitivesBuffer[8 * i + 1] = items[i].center.y;
+            this.primitivesBuffer[8 * i + 2] = items[i].size;
+            this.primitivesBuffer[8 * i + 3] = extraAttribute(items[i]);
+            this.primitivesBuffer[8 * i + 4] = color.r / 255;
+            this.primitivesBuffer[8 * i + 5] = color.g / 255;
+            this.primitivesBuffer[8 * i + 6] = color.b / 255;
+            this.primitivesBuffer[8 * i + 7] = items[i].computeOpacity(time, blendTime);
+        }
         Statistics.timeSpentInDrawFillBuffer.stop();
 
         Statistics.timeSpentInDrawUploadVBO.start();
