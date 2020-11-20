@@ -52,11 +52,8 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private linesBuffer: Float32Array;
     private readonly linesVBO: VBO;
 
-    private statesBuffer: Float32Array;
-    private readonly statesVBO: VBO;
-
-    private colorsBuffer: Float32Array;
-    private readonly colorsVBO: VBO;
+    private primitivesBuffer: Float32Array;
+    private readonly primitivesVBOId: WebGLBuffer;
 
     private readonly geometryVBO: VBO;
 
@@ -86,11 +83,8 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.linesBuffer = new Float32Array([]);
         this.linesVBO = new VBO(gl, new Float32Array(this.linesBuffer), 2, gl.FLOAT, false);
 
-        this.statesBuffer = new Float32Array([]);
-        this.statesVBO = new VBO(gl, this.statesBuffer, 4, gl.FLOAT, false);
-
-        this.colorsBuffer = new Float32Array([]);
-        this.colorsVBO = new VBO(gl, this.colorsBuffer, 4, gl.FLOAT, false);
+        this.primitivesBuffer = new Float32Array([]);
+        this.primitivesVBOId = gl.createBuffer();
 
         const geometryBuffer = SQUARE_GEOMETRY.concat(TRIANGLE_GEOMETRY);
         this.geometryVBO = new VBO(gl, new Float32Array(geometryBuffer), 2, gl.FLOAT, true);
@@ -184,7 +178,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     }
 
     private drawPrimitives(pointsShader: Shader, instancedShader: Shader, items: PatternBase[], primitive: EPrimitive, extraAttributeFunction?: ExtraAttributeFunction): void {
-        this.updateStateAndColorVBOs(items, extraAttributeFunction);
+        this.updatePrimitivesVBO(items, extraAttributeFunction);
 
         Statistics.timeSpentInDrawDrawX.start();
         if (this.useInstancing && instancedShader !== null) {
@@ -198,15 +192,9 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private drawInstanced(shader: Shader, items: PatternBase[], primitive: EPrimitive): void {
         const nbItems = items.length;
         if (this.supportsInstancing && shader !== null && nbItems > 0) {
-            shader.u["uScreenSize"].value = [this._size.width, this._size.height];
-
             shader.use();
-            shader.bindUniforms();
-
+            this.bindCommonUniformsAndAttributes(shader, true);
             this.geometryVBO.bind(shader.a["aVertex"].loc);
-            this.statesVBO.bindInstanced(shader.a["aState"].loc, this.instancingExt, 1);
-            this.colorsVBO.bindInstanced(shader.a["aColor"].loc, this.instancingExt, 1);
-            this.needToResetInstancingDivision = true;
 
             if (primitive === EPrimitive.TRIANGLE) {
                 this.instancingExt.drawArraysInstancedANGLE(gl.TRIANGLES, 4, 3, nbItems);
@@ -219,38 +207,23 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private drawAsPoints(shader: Shader, items: PatternBase[]): void {
         const nbItems = items.length;
         if (shader !== null && nbItems > 0) {
-            shader.a["aState"].VBO = this.statesVBO;
-            shader.a["aColor"].VBO = this.colorsVBO;
-            shader.u["uScreenSize"].value = [this._size.width, this._size.height];
-
             shader.use();
+            this.bindCommonUniformsAndAttributes(shader, false);
 
-            if (this.needToResetInstancingDivision) {
-                this.statesVBO.bindInstanced(shader.a["aState"].loc, this.instancingExt, 0);
-                this.colorsVBO.bindInstanced(shader.a["aColor"].loc, this.instancingExt, 0);
-                this.needToResetInstancingDivision = false;
-            }
-
-            shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.POINTS, 0, nbItems);
         }
     }
 
-    private updateStateAndColorVBOs(items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
+    private updatePrimitivesVBO(items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
         const nbItems = items.length;
 
         Statistics.timeSpentInDrawAllocateBuffer.start();
         // try not to resize the buffers too often to avoid GC
         const nbItemsRounded = 1024 * Math.ceil(nbItems / 1024);
 
-        const wantedStatesBufferLength = 4 * nbItemsRounded;
-        if (this.statesBuffer.length !== wantedStatesBufferLength) {
-            this.statesBuffer = new Float32Array(wantedStatesBufferLength);
-        }
-
-        const wantedColorsBufferLength = 4 * nbItemsRounded;
-        if (this.colorsBuffer.length !== wantedColorsBufferLength) {
-            this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
+        const wantedPrimitivesBufferLength = 8 * nbItemsRounded;
+        if (this.primitivesBuffer.length !== wantedPrimitivesBufferLength) {
+            this.primitivesBuffer = new Float32Array(wantedPrimitivesBufferLength);
         }
         Statistics.timeSpentInDrawAllocateBuffer.stop();
 
@@ -263,24 +236,52 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         }
 
         Statistics.timeSpentInDrawFillBuffer.start();
-        for (let i = 0; i < nbItems; i++) {
-            const color = items[i].color;
+        // for (let i = 0; i < nbItems; i++) {
+        //     // const color = items[i].color;
 
-            this.statesBuffer[4 * i + 0] = items[i].center.x;
-            this.statesBuffer[4 * i + 1] = items[i].center.y;
-            this.statesBuffer[4 * i + 2] = items[i].size;
-            this.statesBuffer[4 * i + 3] = extraAttribute(items[i]);
-            this.colorsBuffer[4 * i + 0] = color.r / 255;
-            this.colorsBuffer[4 * i + 1] = color.g / 255;
-            this.colorsBuffer[4 * i + 2] = color.b / 255;
-            this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
-        }
+        //     // this.primitivesBuffer[8 * i + 0] = items[i].center.x;
+        //     // this.primitivesBuffer[8 * i + 1] = items[i].center.y;
+        //     // this.primitivesBuffer[8 * i + 2] = items[i].size;
+        //     // this.primitivesBuffer[8 * i + 3] = extraAttribute(items[i]);
+        //     // this.primitivesBuffer[8 * i + 4] = color.r / 255;
+        //     // this.primitivesBuffer[8 * i + 5] = color.g / 255;
+        //     // this.primitivesBuffer[8 * i + 6] = color.b / 255;
+        //     this.primitivesBuffer[8 * i + 7] = items[i].computeOpacity(time, blendTime);
+        // }
         Statistics.timeSpentInDrawFillBuffer.stop();
 
         Statistics.timeSpentInDrawUploadVBO.start();
-        this.statesVBO.setData(this.statesBuffer);
-        this.colorsVBO.setData(this.colorsBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.primitivesVBOId);
+        gl.bufferData(gl.ARRAY_BUFFER, this.primitivesBuffer, gl.DYNAMIC_DRAW);
         Statistics.timeSpentInDrawUploadVBO.stop();
+    }
+
+    private bindCommonUniformsAndAttributes(shader: Shader, instanced: boolean): void {
+        shader.u["uScreenSize"].value = [this._size.width, this._size.height];
+        shader.bindUniforms();
+
+        const BYTES_PER_FLOAT = 4;
+        const stateAttribLoc = shader.a["aState"].loc;
+        const colorAttribLoc = shader.a["aColor"].loc;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.primitivesVBOId);
+        gl.enableVertexAttribArray(stateAttribLoc);
+        gl.vertexAttribPointer(stateAttribLoc, 4, gl.FLOAT, false, 8 * BYTES_PER_FLOAT, 0);
+        if (instanced) {
+            this.instancingExt.vertexAttribDivisorANGLE(stateAttribLoc, 1);
+        } else if (this.needToResetInstancingDivision) {
+            this.instancingExt.vertexAttribDivisorANGLE(stateAttribLoc, 0);
+        }
+
+        gl.enableVertexAttribArray(colorAttribLoc);
+        gl.vertexAttribPointer(colorAttribLoc, 4, gl.FLOAT, false, 8 * BYTES_PER_FLOAT, 4 * BYTES_PER_FLOAT);
+        if (instanced) {
+            this.instancingExt.vertexAttribDivisorANGLE(colorAttribLoc, 1);
+        } else if (this.needToResetInstancingDivision) {
+            this.instancingExt.vertexAttribDivisorANGLE(colorAttribLoc, 0);
+        }
+
+        this.needToResetInstancingDivision = instanced;
     }
 
     private set enableBlending(value: boolean) {

@@ -57,14 +57,6 @@ class VBO extends GLResource {
         gl.vertexAttribPointer(location, this.size, this.type, this.normalize, this.stride, this.offset);
     }
 
-    public bindInstanced(location: GLuint, ext: ANGLE_instanced_arrays, divisor: number): void {
-        const gl = super.gl();
-        gl.enableVertexAttribArray(location);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.id);
-        gl.vertexAttribPointer(location, this.size, this.type, this.normalize, this.stride, this.offset);
-        ext.vertexAttribDivisorANGLE(location, divisor);
-    }
-
     public setData(array: any): void {
         const gl = super.gl();
 
