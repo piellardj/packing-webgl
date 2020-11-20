@@ -34,11 +34,15 @@ class Grid {
     /** @returns true if the grid needs to be redrawn */
     public reset(domainSize: ISize, cellSize: number, items: PatternBase[]): boolean {
         this.registeredItemsCount = 0;
+        Statistics.timeSpentInReindexResetDomain.start();
         const gridHasChanged = this.resetDomain(domainSize, cellSize);
+        Statistics.timeSpentInReindexResetDomain.stop();
 
+        Statistics.timeSpentInReindexReindexItems.start();
         for (const item of items) {
             this.registerItem(item);
         }
+        Statistics.timeSpentInReindexReindexItems.stop();
 
         return gridHasChanged;
     }

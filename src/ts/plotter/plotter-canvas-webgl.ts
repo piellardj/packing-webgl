@@ -13,6 +13,8 @@ import { PatternRectangle } from "../patterns/pattern-rectangle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
 
+import * as Statistics from "../statistics/statistics";
+
 import { ILine } from "../utils/i-line";
 
 import { PlotterCanvasBase } from "./plotter-canvas-base";
@@ -235,6 +237,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private updateStateAndColorVBOs(items: PatternBase[], extraAttribute?: ExtraAttributeFunction): void {
         const nbItems = items.length;
 
+        Statistics.timeSpentInDrawAllocateBuffer.start();
         // try not to resize the buffers too often to avoid GC
         const nbItemsRounded = 1024 * Math.ceil(nbItems / 1024);
 
@@ -247,6 +250,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         if (this.colorsBuffer.length !== wantedColorsBufferLength) {
             this.colorsBuffer = new Float32Array(wantedColorsBufferLength);
         }
+        Statistics.timeSpentInDrawAllocateBuffer.stop();
 
         this.enableBlending = Parameters.blending;
         const time = performance.now();
@@ -256,6 +260,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
             extraAttribute = () => 0; // unused value
         }
 
+        Statistics.timeSpentInDrawFillBuffer.start();
         for (let i = 0; i < nbItems; i++) {
             const color = items[i].color;
 
@@ -268,6 +273,7 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
             this.colorsBuffer[4 * i + 2] = color.b / 255;
             this.colorsBuffer[4 * i + 3] = items[i].computeOpacity(time, blendTime);
         }
+        Statistics.timeSpentInDrawFillBuffer.stop();
 
         this.statesVBO.setData(this.statesBuffer);
         this.colorsVBO.setData(this.colorsBuffer);

@@ -38,12 +38,28 @@ const data = {
             label: "Time spent in mainLoop.draw()"
         },
         {
+            id: "draw-allocatebuffer-time",
+            label: "Time spent in mainLoop.draw.allocateBuffer()"
+        },
+        {
+            id: "draw-fillbuffer-time",
+            label: "Time spent in mainLoop.draw.fillBuffer()"
+        },
+        {
             id: "update-time",
             label: "Time spent in mainLoop.update()"
         },
         {
             id: "update-reindex-time",
             label: "Time spent in mainLoop.update.reindex()"
+        },
+        {
+            id: "update-reindex-resetdomain-time",
+            label: "Time spent in mainLoop.update.reindex.resetDomain()"
+        },
+        {
+            id: "update-reindex-reindexitems-time",
+            label: "Time spent in mainLoop.update.reindex.reindexIntems()"
         },
         {
             id: "update-recycle-time",

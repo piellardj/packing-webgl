@@ -13,8 +13,12 @@ const timeSinceLastVerboseFrame = new StopWatch();
 let frames = 0;
 const timeSpentInMainLoop = new StopWatch();
 const timeSpentInDraw = new StopWatch();
+const timeSpentInDrawAllocateBuffer = new StopWatch();
+const timeSpentInDrawFillBuffer = new StopWatch();
 const timeSpentInUpdate = new StopWatch();
 const timeSpentInReindex = new StopWatch();
+const timeSpentInReindexResetDomain = new StopWatch();
+const timeSpentInReindexReindexItems = new StopWatch();
 const timeSpentInRecycle = new StopWatch();
 const timeSpentInZoom = new StopWatch();
 
@@ -58,11 +62,23 @@ function updateIndicators(): void {
     const averageDrawTime = timeSpentInDraw.totalTime / frames;
     const drawTimeRelative = averageDrawTime / averageMainLoopTime;
 
+    const averageDrawAllocateBufferTime = timeSpentInDrawAllocateBuffer.totalTime / frames;
+    const drawAllocateBufferTimeRelative = averageDrawAllocateBufferTime / averageDrawTime;
+
+    const averageDrawFillBufferTime = timeSpentInDrawFillBuffer.totalTime / frames;
+    const drawFillBufferTimeRelative = averageDrawFillBufferTime / averageDrawTime;
+
     const averageUpdateTime = timeSpentInUpdate.totalTime / frames;
     const updateTimeRelative = averageUpdateTime / averageMainLoopTime;
 
     const averageUpdateReindexTime = timeSpentInReindex.totalTime / frames;
     const updateReindexTimeRelative = averageUpdateReindexTime / averageUpdateTime;
+
+    const averageUpdateReindexResetDomainTime = timeSpentInReindexResetDomain.totalTime / frames;
+    const updateReindexResetDomainTimeRelative = averageUpdateReindexResetDomainTime / averageUpdateReindexTime;
+
+    const averageUpdateReindexReindexItemsTime = timeSpentInReindexReindexItems.totalTime / frames;
+    const updateReindexReindexItemsTimeRelative = averageUpdateReindexReindexItemsTime / averageUpdateReindexTime;
 
     const averageUpdateRecycleTime = timeSpentInRecycle.totalTime / frames;
     const updateRecycleTimeRelative = averageUpdateRecycleTime / averageUpdateTime;
@@ -74,8 +90,12 @@ function updateIndicators(): void {
         Page.Canvas.setIndicatorText("fps", `${fps.toFixed(0)} (${averageFrameTime.toFixed(2)} ms)`);
         Page.Canvas.setIndicatorText("main-loop-time", `${averageMainLoopTime.toFixed(2)} ms (${(100 * mainLoopTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("draw-time", `${averageDrawTime.toFixed(2)} ms (${(100 * drawTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("draw-allocatebuffer-time", `${averageDrawAllocateBufferTime.toFixed(2)} ms (${(100 * drawAllocateBufferTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("draw-fillbuffer-time", `${averageDrawFillBufferTime.toFixed(2)} ms (${(100 * drawFillBufferTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-time", `${averageUpdateTime.toFixed(2)} ms (${(100 * updateTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-reindex-time", `${averageUpdateReindexTime.toFixed(2)} ms (${(100 * updateReindexTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("update-reindex-resetdomain-time", `${averageUpdateReindexResetDomainTime.toFixed(2)} ms (${(100 * updateReindexResetDomainTimeRelative).toFixed(1)} %)`);
+        Page.Canvas.setIndicatorText("update-reindex-reindexitems-time", `${averageUpdateReindexReindexItemsTime.toFixed(2)} ms (${(100 * updateReindexReindexItemsTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-recycle-time", `${averageUpdateRecycleTime.toFixed(2)} ms (${(100 * updateRecycleTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("update-zoom-time", `${averageUpdateZoomTime.toFixed(2)} ms (${(100 * updateZoomTimeRelative).toFixed(1)} %)`);
 
@@ -106,8 +126,12 @@ function resetAll(): void {
     frames = 0;
     timeSpentInMainLoop.reset();
     timeSpentInDraw.reset();
+    timeSpentInDrawAllocateBuffer.reset();
+    timeSpentInDrawFillBuffer.reset();
     timeSpentInUpdate.reset();
     timeSpentInReindex.reset();
+    timeSpentInReindexResetDomain.reset();
+    timeSpentInReindexReindexItems.reset();
     timeSpentInRecycle.reset();
     timeSpentInZoom.reset();
 
@@ -147,8 +171,12 @@ export {
     registerRecyclingStats,
     timeSpentInMainLoop,
     timeSpentInDraw,
+    timeSpentInDrawAllocateBuffer,
+    timeSpentInDrawFillBuffer,
     timeSpentInUpdate,
     timeSpentInReindex,
+    timeSpentInReindexResetDomain,
+    timeSpentInReindexReindexItems,
     timeSpentInRecycle,
     timeSpentInZoom,
 };
