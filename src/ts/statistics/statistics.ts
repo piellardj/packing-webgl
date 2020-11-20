@@ -56,45 +56,46 @@ function isVerboseFrame(): boolean {
 
 function updateIndicators(): void {
     const fps = 1000 * frames / timeSinceLastVerboseFrame.totalTime;
-    const averageFrameTime = timeSinceLastVerboseFrame.totalTime / frames;
-
-    const averageMainLoopTime = timeSpentInMainLoop.totalTime / frames;
-    const mainLoopTimeRelative = averageMainLoopTime / averageFrameTime;
-
-    const averageDrawTime = timeSpentInDraw.totalTime / frames;
-    const drawTimeRelative = averageDrawTime / averageMainLoopTime;
-
-    const averageDrawAllocateBufferTime = timeSpentInDrawAllocateBuffer.totalTime / frames;
-    const drawAllocateBufferTimeRelative = averageDrawAllocateBufferTime / averageDrawTime;
-
-    const averageDrawFillBufferTime = timeSpentInDrawFillBuffer.totalTime / frames;
-    const drawFillBufferTimeRelative = averageDrawFillBufferTime / averageDrawTime;
-
-    const averageDrawUploadVBOTime = timeSpentInDrawUploadVBO.totalTime / frames;
-    const drawDrawUploadVBOTimeRelative = averageDrawUploadVBOTime / averageDrawTime;
-
-    const averageDrawDrawXTime = timeSpentInDrawDrawX.totalTime / frames;
-    const drawDrawXTimeRelative = averageDrawDrawXTime / averageDrawTime;
-
-    const averageUpdateTime = timeSpentInUpdate.totalTime / frames;
-    const updateTimeRelative = averageUpdateTime / averageMainLoopTime;
-
-    const averageUpdateReindexTime = timeSpentInReindex.totalTime / frames;
-    const updateReindexTimeRelative = averageUpdateReindexTime / averageUpdateTime;
-
-    const averageUpdateReindexResetDomainTime = timeSpentInReindexResetDomain.totalTime / frames;
-    const updateReindexResetDomainTimeRelative = averageUpdateReindexResetDomainTime / averageUpdateReindexTime;
-
-    const averageUpdateReindexReindexItemsTime = timeSpentInReindexReindexItems.totalTime / frames;
-    const updateReindexReindexItemsTimeRelative = averageUpdateReindexReindexItemsTime / averageUpdateReindexTime;
-
-    const averageUpdateRecycleTime = timeSpentInRecycle.totalTime / frames;
-    const updateRecycleTimeRelative = averageUpdateRecycleTime / averageUpdateTime;
-
-    const averageUpdateZoomTime = timeSpentInZoom.totalTime / frames;
-    const updateZoomTimeRelative = averageUpdateZoomTime / averageUpdateTime;
 
     if (Parameters.isInDebug) {
+        const averageFrameTime = timeSinceLastVerboseFrame.totalTime / frames;
+
+        const averageMainLoopTime = timeSpentInMainLoop.totalTime / frames;
+        const mainLoopTimeRelative = averageMainLoopTime / averageFrameTime;
+
+        const averageDrawTime = timeSpentInDraw.totalTime / frames;
+        const drawTimeRelative = averageDrawTime / averageMainLoopTime;
+
+        const averageDrawAllocateBufferTime = timeSpentInDrawAllocateBuffer.totalTime / frames;
+        const drawAllocateBufferTimeRelative = averageDrawAllocateBufferTime / averageDrawTime;
+
+        const averageDrawFillBufferTime = timeSpentInDrawFillBuffer.totalTime / frames;
+        const drawFillBufferTimeRelative = averageDrawFillBufferTime / averageDrawTime;
+
+        const averageDrawUploadVBOTime = timeSpentInDrawUploadVBO.totalTime / frames;
+        const drawDrawUploadVBOTimeRelative = averageDrawUploadVBOTime / averageDrawTime;
+
+        const averageDrawDrawXTime = timeSpentInDrawDrawX.totalTime / frames;
+        const drawDrawXTimeRelative = averageDrawDrawXTime / averageDrawTime;
+
+        const averageUpdateTime = timeSpentInUpdate.totalTime / frames;
+        const updateTimeRelative = averageUpdateTime / averageMainLoopTime;
+
+        const averageUpdateReindexTime = timeSpentInReindex.totalTime / frames;
+        const updateReindexTimeRelative = averageUpdateReindexTime / averageUpdateTime;
+
+        const averageUpdateReindexResetDomainTime = timeSpentInReindexResetDomain.totalTime / frames;
+        const updateReindexResetDomainTimeRelative = averageUpdateReindexResetDomainTime / averageUpdateReindexTime;
+
+        const averageUpdateReindexReindexItemsTime = timeSpentInReindexReindexItems.totalTime / frames;
+        const updateReindexReindexItemsTimeRelative = averageUpdateReindexReindexItemsTime / averageUpdateReindexTime;
+
+        const averageUpdateRecycleTime = timeSpentInRecycle.totalTime / frames;
+        const updateRecycleTimeRelative = averageUpdateRecycleTime / averageUpdateTime;
+
+        const averageUpdateZoomTime = timeSpentInZoom.totalTime / frames;
+        const updateZoomTimeRelative = averageUpdateZoomTime / averageUpdateTime;
+
         Page.Canvas.setIndicatorText("fps", `${fps.toFixed(0)} (${averageFrameTime.toFixed(2)} ms)`);
         Page.Canvas.setIndicatorText("main-loop-time", `${averageMainLoopTime.toFixed(2)} ms (${(100 * mainLoopTimeRelative).toFixed(1)} %)`);
         Page.Canvas.setIndicatorText("draw-time", `${averageDrawTime.toFixed(2)} ms (${(100 * drawTimeRelative).toFixed(1)} %)`);
