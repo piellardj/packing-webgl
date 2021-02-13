@@ -90,7 +90,7 @@ abstract class PatternBase {
             this.randomizePosition(domainSize);
             this.parentItem = null;
 
-            const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, allowOverlapping);
+            const maxSize = sizeFactor * this.computeBiggestSizePossible(grid, acceptedSizes.from, allowOverlapping);
             if (acceptedSizes.isInRange(maxSize)) {
                 this.size = 2 * Math.floor(0.5 * maxSize); // need to be even to avoid aliasing
                 this.initializationTime = performance.now();
@@ -130,7 +130,7 @@ abstract class PatternBase {
 
     public abstract computeVisibility(domainSize: ISize): EVisibility;
 
-    private computeBiggestSizePossible(grid: Grid, allowOverlapping: boolean): number {
+    private computeBiggestSizePossible(grid: Grid, minSizeAllowed: number, allowOverlapping: boolean): number {
         const currentTestId = generateTestId();
 
         const biggestSizeToAvoidCenter = this.computeBiggestSizePossibleToAvoidPoint(CANVAS_CENTER);
@@ -141,7 +141,7 @@ abstract class PatternBase {
 
         const exactCellId = grid.getCellId(this.center);
         const existingItemsFromExactCell = grid.getItemsFromCell(exactCellId.x, exactCellId.y);
-        const biggestSizeToAvoidClosestItems = this.computeBiggestSizePossibleToAvoidItems(existingItemsFromExactCell, allowOverlapping, currentTestId);
+        const biggestSizeToAvoidClosestItems = this.computeBiggestSizePossibleToAvoidItems(existingItemsFromExactCell, minSizeAllowed, allowOverlapping, currentTestId);
         rawMaxSize = Math.min(rawMaxSize, biggestSizeToAvoidClosestItems);
 
         // the closest items were maybe not enough, test items that are a bit further
@@ -152,26 +152,32 @@ abstract class PatternBase {
             const maxCellId = grid.getCellId(bottomRightPoint);
 
             const additionalItemsToTest = grid.getItemsFromCellsGroup(minCellId.x, minCellId.y, maxCellId.x, maxCellId.y);
-            const biggestSizeToAvoidFurtherItems = this.computeBiggestSizePossibleToAvoidItems(additionalItemsToTest, allowOverlapping, currentTestId);
+            const biggestSizeToAvoidFurtherItems = this.computeBiggestSizePossibleToAvoidItems(additionalItemsToTest, minSizeAllowed, allowOverlapping, currentTestId);
             rawMaxSize = Math.min(rawMaxSize, biggestSizeToAvoidFurtherItems);
         }
 
         return rawMaxSize;
     }
 
-    private computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[], allowOverlapping: boolean, currentTestId: number): number {
+    private computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[], minSizeAllowed: number, allowOverlapping: boolean, currentTestId: number): number {
         let maxSize = 100000;
 
+        let keepTesting = true;
         for (const item of itemsToAvoid) {
             if (item !== this) {
                 const testedAlready = (item.lastTestId === currentTestId);
                 if (!testedAlready) {
-                    const result = this.computeBiggestSizePossibleToAvoidItem(item, allowOverlapping);
-                    if (result.size < maxSize) {
-                        maxSize = result.size;
+                    if (keepTesting) {
+                        const result = this.computeBiggestSizePossibleToAvoidItem(item, allowOverlapping);
+                        if (result.size < minSizeAllowed || (!allowOverlapping && result.isInside)) {
+                            maxSize = 0;
+                            keepTesting = false;
+                        } else if (result.size < maxSize) {
+                            maxSize = result.size;
 
-                        if (result.isInside) {
-                            this.parentItem = item;
+                            if (result.isInside) {
+                                this.parentItem = item;
+                            }
                         }
                     }
                     item.lastTestId = currentTestId;
