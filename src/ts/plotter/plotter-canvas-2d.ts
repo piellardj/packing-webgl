@@ -1,6 +1,7 @@
 import { Color } from "../color/color";
 import "../page-interface-generated";
 import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternHeart } from "../patterns/pattern-heart";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
@@ -9,7 +10,7 @@ import { PlotterCanvasBase } from "./plotter-canvas-base";
 
 
 
-
+const TWO_PI = 2 * Math.PI;
 
 class PlotterCanvas2D extends PlotterCanvasBase {
     private readonly context: CanvasRenderingContext2D;
@@ -47,7 +48,6 @@ class PlotterCanvas2D extends PlotterCanvasBase {
     public drawCircles(circles: PatternCircle[]): void {
         const halfWidth = 0.5 * this._size.width;
         const halfHeight = 0.5 * this._size.height;
-        const TWO_PI = 2 * Math.PI;
 
         for (const circle of circles) {
             const centerX = circle.center.x + halfWidth;
@@ -87,6 +87,29 @@ class PlotterCanvas2D extends PlotterCanvasBase {
             this.context.moveTo(centerX + triangle.P1.x * triangle.size, centerY + triangle.P1.y * triangle.size);
             this.context.lineTo(centerX + triangle.P2.x * triangle.size, centerY + triangle.P2.y * triangle.size);
             this.context.lineTo(centerX + triangle.P3.x * triangle.size, centerY + triangle.P3.y * triangle.size);
+            this.context.fill();
+            this.context.closePath();
+        }
+    }
+
+    public drawHearts(hearts: PatternHeart[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+
+        for (const heart of hearts) {
+            const centerX = heart.center.x + halfWidth;
+            const centerY = heart.center.y + halfHeight;
+
+            const scaledA = heart.size * PatternHeart.a;
+            const scaledC = heart.size * PatternHeart.c;
+
+            this.context.fillStyle = heart.color.toString();
+            this.context.beginPath();
+            this.context.moveTo(centerX + scaledA, centerY);
+            this.context.lineTo(centerX, centerY + scaledA);
+            this.context.lineTo(centerX - scaledA, centerY);
+            this.context.arc(centerX - 0.5 * scaledA, centerY - 0.5 * scaledA, scaledC, 3 / 4 * Math.PI, -1 / 4 * Math.PI);
+            this.context.arc(centerX + 0.5 * scaledA, centerY - 0.5 * scaledA, scaledC, 5 / 4 * Math.PI, 1 / 4 * Math.PI);
             this.context.fill();
             this.context.closePath();
         }

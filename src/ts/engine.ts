@@ -6,6 +6,7 @@ import { EPrimitive, Parameters } from "./parameters";
 import { IPattern } from "./patterns/i-pattern";
 import { EVisibility, PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
+import { PatternHeart } from "./patterns/pattern-heart";
 import { PatternRectangle } from "./patterns/pattern-rectangle";
 import { PatternSquare } from "./patterns/pattern-square";
 import { PatternTriangle } from "./patterns/pattern-triangle";
@@ -58,6 +59,8 @@ class Engine {
             this.createItem = () => new PatternRectangle();
         } else if (primitive === EPrimitive.TRIANGLE) {
             this.createItem = () => new PatternTriangle();
+        } else if (primitive === EPrimitive.HEART) {
+            this.createItem = () => new PatternHeart();
         } else {
             throw new Error(`Invalid primitive "${primitive}.`);
         }
@@ -123,6 +126,10 @@ class Engine {
             plotter.drawRectangles(itemsToDraw as PatternRectangle[]);
         } else if (this.currentPrimitive === EPrimitive.TRIANGLE) {
             plotter.drawTriangles(itemsToDraw as PatternTriangle[]);
+        } else if (this.currentPrimitive === EPrimitive.HEART) {
+            plotter.drawHearts(itemsToDraw as PatternHeart[]);
+        } else {
+            throw new Error(`Unsupported primitive ${this.currentPrimitive} for drawing.`);
         }
 
         if (Parameters.showGrid) {

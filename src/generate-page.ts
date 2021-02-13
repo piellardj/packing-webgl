@@ -133,6 +133,10 @@ const data = {
                             value: "triangle",
                             label: "Triangle"
                         },
+                        {
+                            value: "heart",
+                            label: "Heart"
+                        },
                     ]
                 },
                 {

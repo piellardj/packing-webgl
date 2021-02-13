@@ -80,6 +80,7 @@ enum EPrimitive {
     CIRCLE = "circle",
     RECTANGLE = "rectangle",
     TRIANGLE = "triangle",
+    HEART = "heart",
 }
 
 enum ECollisionTestType {

@@ -9,6 +9,7 @@ import { EPrimitive, Parameters } from "../parameters";
 
 import { PatternBase } from "../patterns/pattern-base";
 import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternHeart } from "../patterns/pattern-heart";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
@@ -41,11 +42,13 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     private circlesShader: Shader | null;
     private rectanglesShader: Shader | null;
     private trianglesShader: Shader | null;
+    private heartsShader: Shader | null;
 
     private squaresInstancedShader: Shader | null;
     private circlesInstancedShader: Shader | null;
     private rectanglesInstancedShader: Shader | null;
     private trianglesInstancedShader: Shader | null;
+    private heartsInstancedShader: Shader | null;
 
     private blending: boolean;
 
@@ -94,21 +97,25 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
         this.circlesShader = null;
         this.rectanglesShader = null;
         this.trianglesShader = null;
+        this.heartsShader = null;
         this.loadAndBuildShader("point/lines.vert", "point/lines.frag", "lines", (shader: Shader) => this.linesShader = shader);
         this.loadAndBuildShader("point/items.vert", "point/squares.frag", "squares", (shader: Shader) => this.squaresShader = shader);
         this.loadAndBuildShader("point/items.vert", "point/circles.frag", "circles", (shader: Shader) => this.circlesShader = shader);
         this.loadAndBuildShader("point/rectangles.vert", "point/rectangles.frag", "rectangles", (shader: Shader) => this.rectanglesShader = shader);
         this.loadAndBuildShader("point/triangles.vert", "point/triangles.frag", "triangles", (shader: Shader) => this.trianglesShader = shader);
+        this.loadAndBuildShader("point/items.vert", "point/hearts.frag", "hearts", (shader: Shader) => this.heartsShader = shader);
 
         this.squaresInstancedShader = null;
         this.circlesInstancedShader = null;
         this.rectanglesInstancedShader = null;
         this.trianglesInstancedShader = null;
+        this.heartsInstancedShader = null;
         if (this.supportsInstancing) {
             this.loadAndBuildShader("instanced/simpleGeometry.vert", "instanced/fillColor.frag", "instanced squares", (shader: Shader) => this.squaresInstancedShader = shader);
-            this.loadAndBuildShader("instanced/circles.vert", "instanced/circles.frag", "instanced squares", (shader: Shader) => this.circlesInstancedShader = shader);
+            this.loadAndBuildShader("instanced/squareToDiscard.vert", "instanced/circles.frag", "instanced squares", (shader: Shader) => this.circlesInstancedShader = shader);
             this.loadAndBuildShader("instanced/rectangles.vert", "instanced/fillColor.frag", "instanced circles", (shader: Shader) => this.rectanglesInstancedShader = shader);
             this.loadAndBuildShader("instanced/triangles.vert", "instanced/fillColor.frag", "instanced triangles", (shader: Shader) => this.trianglesInstancedShader = shader);
+            this.loadAndBuildShader("instanced/squareToDiscard.vert", "instanced/hearts.frag", "instanced hearts", (shader: Shader) => this.heartsInstancedShader = shader);
         }
     }
 
@@ -147,6 +154,10 @@ class PlotterCanvasWebGL extends PlotterCanvasBase {
     public drawTriangles(triangles: PatternTriangle[]): void {
         const extraAttributeFunction = (item: PatternBase) => (item as PatternTriangle).angle;
         this.drawPrimitives(this.trianglesShader, this.trianglesInstancedShader, triangles, EPrimitive.TRIANGLE, extraAttributeFunction);
+    }
+
+    public drawHearts(hearts: PatternHeart[]): void {
+        this.drawPrimitives(this.heartsShader, this.heartsInstancedShader, hearts, EPrimitive.HEART);
     }
 
     public drawLines(lines: ILine[], color: Color): void {

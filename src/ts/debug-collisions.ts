@@ -4,6 +4,7 @@ import { ECollisionTestType, EPrimitive, Parameters } from "./parameters";
 
 import { EVisibility, PatternBase } from "./patterns/pattern-base";
 import { PatternCircle } from "./patterns/pattern-circle";
+import { PatternHeart } from "./patterns/pattern-heart";
 import { PatternRectangle } from "./patterns/pattern-rectangle";
 import { PatternSquare } from "./patterns/pattern-square";
 import { PatternTriangle } from "./patterns/pattern-triangle";
@@ -42,6 +43,11 @@ const testedTriangles: ITestedPattern<PatternTriangle> = {
     mobile: new PatternTriangle(),
 };
 
+const testedHears: ITestedPattern<PatternHeart> = {
+    fixed: new PatternHeart(),
+    mobile: new PatternHeart(),
+};
+
 function getCurrentTestItems(): ITest {
     const primitive = Parameters.primitive;
     if (primitive === EPrimitive.SQUARE) {
@@ -50,8 +56,10 @@ function getCurrentTestItems(): ITest {
         return testedCircles;
     } else if (primitive === EPrimitive.RECTANGLE) {
         return testedRectangles;
-    } else { //  if (primitive === EPrimitive.TRIANGLE) {
+    } else if (primitive === EPrimitive.TRIANGLE) {
         return testedTriangles
+    } else {
+        return testedHears;
     }
 }
 
@@ -80,8 +88,10 @@ function mainDebugCollisions(): void {
             return (items: PatternBase[]) => plotter.drawCircles(items as PatternCircle[]);
         } else if (primitive === EPrimitive.RECTANGLE) {
             return (items: PatternBase[]) => plotter.drawRectangles(items as PatternRectangle[]);
-        } else { // if (primitive === EPrimitive.TRIANGLE) {
+        } else if (primitive === EPrimitive.TRIANGLE) {
             return (items: PatternBase[]) => plotter.drawTriangles(items as PatternTriangle[]);
+        } else {
+            return (items: PatternBase[]) => plotter.drawHearts(items as PatternHeart[]);
         }
     }
 

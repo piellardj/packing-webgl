@@ -1,6 +1,7 @@
 import { Color } from "../color/color";
 
 import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternHeart } from "../patterns/pattern-heart";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
@@ -20,6 +21,7 @@ abstract class PlotterBase {
     public abstract drawCircles(circles: PatternCircle[]): void;
     public abstract drawRectangles(rectangles: PatternRectangle[]): void;
     public abstract drawTriangles(triangles: PatternTriangle[]): void;
+    public abstract drawHearts(hearts: PatternHeart[]): void;
 
     /* Lines have  a 1 pixel thickness */
     public abstract drawLines(lines: ILine[], color: Color): void;

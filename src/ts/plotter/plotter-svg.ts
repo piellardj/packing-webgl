@@ -1,6 +1,7 @@
 import { Color } from "../color/color";
 
 import { PatternCircle } from "../patterns/pattern-circle";
+import { PatternHeart } from "../patterns/pattern-heart";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
@@ -98,6 +99,23 @@ class PlotterSVG extends PlotterBase {
             const centerY = triangle.center.y + halfHeight;
 
             this.stringParts.push(`\t\t<polygon fill="${triangle.color}" points="${centerX + triangle.P1.x * triangle.size},${centerY + triangle.P1.y * triangle.size} ${centerX + triangle.P2.x * triangle.size},${centerY + triangle.P2.y * triangle.size} ${centerX + triangle.P3.x * triangle.size},${centerY + triangle.P3.y * triangle.size}"/>\n`);
+        }
+        this.stringParts.push(`\t</g>\n`);
+    }
+
+    // tslint:disable-next-line
+    public drawHearts(hearts: PatternHeart[]): void {
+        const halfWidth = 0.5 * this._size.width;
+        const halfHeight = 0.5 * this._size.height;
+        const id = `heart_${Math.round(100000 * Math.random())}`;
+
+        this.stringParts.push(`\t<defs>\n`);
+        this.stringParts.push(`\t\t<path id="${id}" d="M${PatternHeart.a},0L0,${PatternHeart.a} ${-PatternHeart.a},0 A ${PatternHeart.c} ${PatternHeart.c} 0 0 1 0,${-PatternHeart.a} A ${PatternHeart.c} ${PatternHeart.c} 0 0 1 ${PatternHeart.a},0Z"/>\n`);
+        this.stringParts.push(`\t</defs>\n`);
+
+        this.stringParts.push(`\t<g stroke="none">\n`);
+        for (const heart of hearts) {
+            this.stringParts.push(`\t\t<use href="#${id}" fill="${heart.color}" transform="translate(${heart.center.x + halfWidth}, ${heart.center.y + halfHeight}) scale(${heart.size})"/>\n`);
         }
         this.stringParts.push(`\t</g>\n`);
     }
