@@ -56,24 +56,19 @@ function triggerClear(): void {
         observer();
     }
 }
+
+function triggerClearIfNotZooming(): void {
+    if (!Parameters.isZooming) {
+        triggerClear();
+    }
+}
+
 Page.Button.addObserver(controlId.RESET, triggerClear);
 Page.Tabs.addObserver(controlId.PRIMITIVE, triggerClear);
-Page.Range.addObserver(controlId.SPACING, () => {
-    if (!Parameters.isZooming) {
-        triggerClear();
-    }
-});
-Page.Range.addObserver(controlId.MIN_SIZE, () => {
-    if (!Parameters.isZooming) {
-        triggerClear();
-    }
-});
-
-Page.Picker.addObserver(controlId.PALETTE, () => {
-    if (!Parameters.isZooming) {
-        triggerClear();
-    }
-})
+Page.Range.addObserver(controlId.SPACING, triggerClearIfNotZooming);
+Page.Range.addObserver(controlId.MIN_SIZE, triggerClearIfNotZooming);
+Page.Picker.addObserver(controlId.PALETTE, triggerClearIfNotZooming);
+Page.Checkbox.addObserver(controlId.ALLOW_OVERLAPPING, triggerClearIfNotZooming);
 
 enum EPrimitive {
     SQUARE = "square",
