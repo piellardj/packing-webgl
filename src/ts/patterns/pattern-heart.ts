@@ -5,6 +5,15 @@ import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base
 
 const INVERT_SQRT_2 = 1 / Math.sqrt(2);
 
+function clamp(x: number, min: number, max: number): number {
+    if (x < min) {
+        return min;
+    } else if (x > max) {
+        return max;
+    }
+    return x;
+}
+
 class PatternHeart extends PatternBase {
     public static readonly a: number = 0.5 * 0.82842712474; // 2 / (1 + sqrt(2))
     public static readonly b: number = 0.5 * 1.17157287525; // sqrt(2) * a
@@ -74,25 +83,46 @@ class PatternHeart extends PatternBase {
             result.size = this.computeBiggestSizePossibleToAvoidPoint(otherBottomPoint);
         }
 
-        if (result.size <= 0) {
-            // in this area, I didn't find any easy way to compute the exact max size.
-            // approximate it by sampling the border of the item to avoid
-            const otherHalfA = 0.5 * itemToAvoid.size * PatternHeart.a;
-            const otherC = itemToAvoid.size * PatternHeart.c;
+        if (result.size > 0) { // we found the exact perfect size
+            return result;
+        }
 
-            const side = (this.center.x >= itemToAvoid.center.x) ? 1 : -1;
-            const nbPoints = Math.max(10, Math.min(200, Math.round(0.1 * itemToAvoid.size)));
-            result.size = 900000000000;
+        // In these areas, I didn't find any easy way to compute the exact max size.
+        // I approximate it by sampling the border of the item to avoid
+        // I make several passes with increasing precision
+
+        let angleSpan = Math.PI;
+        let angleMiddle = Math.PI / 4;
+        const otherHalfA = 0.5 * itemToAvoid.size * PatternHeart.a;
+        const otherC = itemToAvoid.size * PatternHeart.c;
+
+        const side = (this.center.x >= itemToAvoid.center.x) ? 1 : -1;
+
+        result.size = 900000000000; // absurd initial value
+        const testSamples = (nbPoints: number): void => {
+            const startAngle = clamp(angleMiddle - 0.5 * angleSpan, -Math.PI / 4, 3 / 4 * Math.PI);
+            const endAngle = clamp(angleMiddle + 0.5 * angleSpan, -Math.PI / 4, 3 / 4 * Math.PI);
+
             for (let i = 0; i <= nbPoints; i++) {
-                const angle = Math.PI * (i / nbPoints - 0.25);
+                const angle = startAngle + (endAngle - startAngle) * (i / nbPoints);
                 const pointToAvoid: IPoint = {
                     x: itemToAvoid.center.x + side * (otherHalfA + otherC * Math.cos(angle)),
                     y: itemToAvoid.center.y - (otherHalfA + otherC * Math.sin(angle)),
                 };
-                result.size = Math.min(result.size, this.computeBiggestSizePossibleToAvoidPoint(pointToAvoid));
+
+                const maxSizeToAvoidThisPoint = this.computeBiggestSizePossibleToAvoidPoint(pointToAvoid);
+                if (result.size > maxSizeToAvoidThisPoint) {
+                    result.size = maxSizeToAvoidThisPoint;
+                    angleMiddle = angle;
+                }
             }
+
+            angleSpan /= 2;
         }
 
+        for (let i = 0; i < 12; i++) {
+            testSamples(5);
+        }
         return result;
     }
 
