@@ -248,6 +248,10 @@ const data = {
                         {
                             value: "7",
                             label: "Flashy"
+                        },
+                        {
+                            value: "8",
+                            label: "Valentine"
                         }
                     ]
                 },

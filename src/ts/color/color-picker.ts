@@ -72,6 +72,14 @@ const FLASHY: Palette = [
     new Color(255,123,0),
 ];
 
+const VALENTINE: Palette = [
+    new Color(85,21,37),
+    new Color(220,37,82),
+    new Color(243,81,120),
+    new Color(250,153,185),
+    new Color(249,235,209),
+]
+
 const palettes: Palette[] = [
     SUMMER,
     FOREST,
@@ -80,7 +88,8 @@ const palettes: Palette[] = [
     GREYSCALE,
     NEON,
     DESERT,
-    FLASHY
+    FLASHY,
+    VALENTINE,
 ];
 
 abstract class ColorPicker {
