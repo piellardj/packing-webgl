@@ -23,9 +23,9 @@ class PatternCircle extends PatternBase {
         const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
 
         if (distance <= itemToAvoid.radius) {
+            result.isInside = true;
             if (allowOverlapping) {
                 result.size = 2 * (itemToAvoid.radius - distance);
-                result.isInside = true;
             }
         } else {
             result.size = 2 * (distance - itemToAvoid.radius);

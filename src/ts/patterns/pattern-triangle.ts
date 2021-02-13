@@ -96,14 +96,13 @@ class PatternTriangle extends PatternBase {
     }
 
     protected computeBiggestSizePossibleToAvoidItem(itemToAvoid: PatternTriangle, allowOverlapping: boolean): ISizeComputationResult {
-        const result = { size: 0, isInside: false };
+        const result = {
+            size: 0,
+            isInside: itemToAvoid.isPointInside(this.center.x, this.center.y),
+        };
 
-        if (itemToAvoid.isPointInside(this.center.x, this.center.y)) {
-            if (allowOverlapping) {
-                result.isInside = true;
-            } else {
-                return result;
-            }
+        if (result.isInside && !allowOverlapping) {
+            return result;
         }
 
         const localOtherP1: IPoint = {

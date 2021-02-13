@@ -26,9 +26,9 @@ class PatternSquare extends PatternBase {
 
         if (deltaX < halfSideLength) {
             if (deltaY < halfSideLength) {
+                result.isInside = true;
                 if (allowOverlapping) {
                     result.size = 2 * Math.min(halfSideLength - deltaX, halfSideLength - deltaY);
-                    result.isInside = true;
                 }
             } else {
                 result.size = 2 * (deltaY - halfSideLength);

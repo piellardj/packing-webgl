@@ -43,9 +43,9 @@ class PatternRectangle extends PatternBase {
 
         if (deltaX < halfObstacleWidth) {
             if (deltaY < halfObstacleHeight) {
+                result.isInside = true;
                 if (allowOverlapping) {
                     result.size = 2 * Math.min((halfObstacleWidth - deltaX) / this.baseWidth, (halfObstacleHeight - deltaY) / this.baseHeight);
-                    result.isInside = true;
                 }
             } else {
                 result.size = 2 * (deltaY - halfObstacleHeight) / this.baseHeight;
