@@ -1,14 +1,16 @@
 import { Color } from "../color/color";
-import "../page-interface-generated";
+
 import { PatternCircle } from "../patterns/pattern-circle";
 import { PatternHeart } from "../patterns/pattern-heart";
 import { PatternRectangle } from "../patterns/pattern-rectangle";
 import { PatternSquare } from "../patterns/pattern-square";
 import { PatternTriangle } from "../patterns/pattern-triangle";
+
 import { ILine } from "../utils/i-line";
+
 import { PlotterCanvasBase } from "./plotter-canvas-base";
 
-
+import "../page-interface-generated";
 
 const TWO_PI = 2 * Math.PI;
 
