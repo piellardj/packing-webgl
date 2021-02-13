@@ -162,16 +162,14 @@ abstract class PatternBase {
     private computeBiggestSizePossibleToAvoidItems(itemsToAvoid: PatternBase[], minSizeAllowed: number, allowOverlapping: boolean, currentTestId: number): number {
         let maxSize = 100000;
 
-        let keepTesting = true;
         for (const item of itemsToAvoid) {
             if (item !== this) {
                 const testedAlready = (item.lastTestId === currentTestId);
                 if (!testedAlready) {
-                    if (keepTesting) {
+                    if (maxSize > minSizeAllowed) {
                         const result = this.computeBiggestSizePossibleToAvoidItem(item, allowOverlapping);
                         if (result.size < minSizeAllowed || (!allowOverlapping && result.isInside)) {
                             maxSize = 0;
-                            keepTesting = false;
                         } else if (result.size < maxSize) {
                             maxSize = result.size;
 
