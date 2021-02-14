@@ -1,18 +1,10 @@
 import { IPoint } from "../utils/i-point";
 import { ISize } from "../utils/i-size";
+import { NumberRange } from "../utils/number-range";
 
 import { EVisibility, ISizeComputationResult, PatternBase } from "./pattern-base";
 
 const INVERT_SQRT_2 = 1 / Math.sqrt(2);
-
-function clamp(x: number, min: number, max: number): number {
-    if (x < min) {
-        return min;
-    } else if (x > max) {
-        return max;
-    }
-    return x;
-}
 
 class PatternHeart extends PatternBase {
     public static readonly a: number = 0.5 * 0.82842712474; // 2 / (1 + sqrt(2))
@@ -91,37 +83,46 @@ class PatternHeart extends PatternBase {
         // I approximate it by sampling the border of the item to avoid
         // I make several passes with increasing precision
 
-        let angleSpan = Math.PI;
-        let angleMiddle = Math.PI / 4;
         const otherHalfA = 0.5 * itemToAvoid.size * PatternHeart.a;
-        const otherC = itemToAvoid.size * PatternHeart.c;
-
-        const side = (this.center.x >= itemToAvoid.center.x) ? 1 : -1;
+        const otherCircleCenter: IPoint = {
+            x: (this.center.x >= itemToAvoid.center.x) ? itemToAvoid.center.x + otherHalfA : itemToAvoid.center.x - otherHalfA,
+            y: itemToAvoid.center.y - otherHalfA,
+        };
+        const otherCircleRadius = itemToAvoid.size * PatternHeart.c;
 
         result.size = 900000000000; // absurd initial value
-        const testSamples = (nbPoints: number): void => {
-            const startAngle = clamp(angleMiddle - 0.5 * angleSpan, -Math.PI / 4, 3 / 4 * Math.PI);
-            const endAngle = clamp(angleMiddle + 0.5 * angleSpan, -Math.PI / 4, 3 / 4 * Math.PI);
-
-            for (let i = 0; i <= nbPoints; i++) {
-                const angle = startAngle + (endAngle - startAngle) * (i / nbPoints);
+        const testCircleSamples = (nbPoints: number, angleRange: NumberRange): void => {
+            nbPoints = Math.max(4, Math.round(nbPoints));
+            const angleRangeSpan = angleRange.span;
+            const angleStep = angleRangeSpan / (nbPoints - 1);
+            let bestAngle = (angleRange.from + angleRange.to) / 2;
+            for (let i = 0; i < nbPoints; i++) {
+                const angle = angleRange.from + angleStep * i;
                 const pointToAvoid: IPoint = {
-                    x: itemToAvoid.center.x + side * (otherHalfA + otherC * Math.cos(angle)),
-                    y: itemToAvoid.center.y - (otherHalfA + otherC * Math.sin(angle)),
+                    x: otherCircleCenter.x + otherCircleRadius * Math.cos(angle),
+                    y: otherCircleCenter.y - otherCircleRadius * Math.sin(angle),
                 };
 
                 const maxSizeToAvoidThisPoint = this.computeBiggestSizePossibleToAvoidPoint(pointToAvoid);
                 if (result.size > maxSizeToAvoidThisPoint) {
                     result.size = maxSizeToAvoidThisPoint;
-                    angleMiddle = angle;
+                    bestAngle = angle;
                 }
             }
 
-            angleSpan /= 2;
+            if (angleRangeSpan < 0) {
+                console.log(angleRangeSpan);
+            }
+            angleRange.from = angleRange.clamp(bestAngle - angleStep);
+            angleRange.to = angleRange.clamp(bestAngle + angleStep);
         }
 
-        for (let i = 0; i < 12; i++) {
-            testSamples(5);
+        const maxAnglesRange = (this.center.x >= itemToAvoid.center.x) ?
+            new NumberRange(-Math.PI / 4, 3 * Math.PI / 4) :
+            new NumberRange(Math.PI / 4, 5 * Math.PI / 4);
+        const narrowedRange = new NumberRange(maxAnglesRange.from, maxAnglesRange.to);
+        for (let i = 0; i < 11; i++) {
+            testCircleSamples(6, narrowedRange);
         }
         return result;
     }
