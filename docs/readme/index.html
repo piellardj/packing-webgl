@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Readme page of my project 'Packing'. Simple implementation of a packing algorithm, running on CPU." />
+    <title>Packing - Explanations</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="stylesheet" type="text/css" href="css/page.css?v=2023-04-15T20%3A27%3A00.338Z">
+  </head>
+
+  <body>
+    <header>
+      <a class="logo logo-animate-fill" href="https://piellardj.github.io/packing-webgl/" id="seep-live-button" title="Live project" aria-label="Live project">
+        <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+          <g stroke-width="2">
+            <path fill="none" stroke-linejoin="round" d="M24,20v24L46,32z" />
+        </svg>
+      </a>
+    </header>
+    <main>
+      <div class="contents">
+        <h1 id="packingwebgl">packing-webgl</h1>
+        <h2 id="description">Description</h2>
+        <p>This is the implementation of a simple packing algorithm running on CPU. </p>
+        <p>You can zoom anywhere you want by using the left mouse button.</p>
+        <p>See it live <a href="https://piellardj.github.io/packing-webgl/?page%3Acanvas%3Afullscreen=true">here</a>.</p>
+        <p><img src="https://github.com/piellardj/packing-webgl/raw/master/src/readme/circles.png" alt="Screenshot" />
+          <img src="https://github.com/piellardj/packing-webgl/raw/master/src/readme/rectangles.png" alt="Screenshot" />
+          <img src="https://github.com/piellardj/packing-webgl/raw/master/src/readme/triangles.png" alt="Screenshot" />
+          <img src="https://github.com/piellardj/packing-webgl/raw/master/src/readme/cheese.png" alt="Screenshot" />
+        </p>
+        <h2 id="details">Details</h2>
+        <h3 id="packing">Packing</h3>
+        <p>Each new item is given a random position on screen, and then grows without intersecting the others.</p>
+        <p>The growing part is performed by computing exact the exact intersections between the new item and the others to determine the maximum size possible. The new item is then given only a part of this maximum size.</p>
+        <p>For better performance (especially when handling 20000+ items), I fraction the canvas into a grid to have a simple spacial indexing. This way, a new item no longer needs to check intersections with every other item, but can simply look at its closest neighbours. This grid adjusts its size from one frame to another so that there is always a constant number of items per cell.</p>
+        <h3 id="display">Display</h3>
+        <p>I first used a Canvas2D context because it is easy to use. However it is extremely slow when drawing a lot of shapes (circles especially, but also trivial ones like rectangles).</p>
+        <p>I eventually switched to WebGL for better performance. For each frame I reupload to the GPU the whole scene. I could have optimized this part since the geometry doesn't change much from one frame to the other: most items are preserved (they are only stretched by zooming), and the new items are not very numerous. I didn't implemented this optimization because the drawing part is now way faster than the packing part, even with my simple implementation.</p>
+        <p>The WebGL rendering uses instancing to render the shapes. However it requires an extension that is not always supported, so for devices that don't support it, I have a fallback that uses GL<em>POINTS and carves the shape by discarding fragments in the fragment shader. It is not perfect because GPUs have a maximum size for GL</em>POINTS, and it can lead to visual glitches.</p>
+        <p>To test the renderers I implemented:</p>
+        <ul>
+          <li>add "webgl=0" in the URL to use the Canvas2D</li>
+          <li>in the WebGL version, add "debug=1" in the URL to gain access to a checkbox toggling between instancing/GL_POINTS</li>
+        </ul>
+        <h3 id="zooming">Zooming</h3>
+        <p>The colors are random, in the RGB cube.</p>
+        <p>When zooming, I need to correctly handle items for performance, so:</p>
+        <ul>
+          <li>each item that goes out of view is recycled and reinjected at a random position into the view. When zooming, maybe I should favor reinjecting around the focal point, because it is a bit silly to reinject an item near the sceen border when it will disappear in hte next few frames.</li>
+          <li>each item that ends up covering the whole screen is also recycled. I just remember its color and use it as a background color from now on. This gives the illusion that we are still zooming into this item.</li>
+        </ul>
+        <p>If someone zooms just at the border of an item, this item ends up covering half the screen and in theory can never be recycled because it stays in view and never covers the whole screen, so it grows indefinitely. However, I encountered visual glitches with gigantic items, due to insufficent floating point precision during the rasterization process. This is why I chose to recycle any item that goes beyond a certain size.</p>
+        <h3 id="testing">Testing</h3>
+        <p>I discovered a useful trick during this project.
+          I needed to test the private method of a class (in theory only public methods should be tested but…). I found 2 ways to do this:</p>
+        <ul>
+          <li>either cast the object to 'any', but then you lose type checking</li>
+          <li>or use bracket notation to call the method. This way, at compile-time Typescript checks that the provided arguments match the method signature :). However this is not a perfect solution, because the compiler doesn't warn you if the method doesn't exist, so it is not rename-safe.</li>
+        </ul>
+      </div>
+    </main>
+
+    <footer>
+      <div class="badge-shelf">
+        <a class="badge" href="mailto:jeremie.piellard@gmail.com" title="Email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M512 85V448H0V85l256 224L512 85zM488 64H24L256 267 488 64z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://github.com/piellardj" title="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 1024 1024">
+            <path d="M512 0C229 0 0 229 0 512c0 226 147 418 350 486 26 5 35-11 35-25 0-12 0-53-1-95C242 909 212 818 212 818c-23-59-57-75-57-75-47-32 4-31 4-31 51 4 78 53 78 53 46 78 120 56 149 43 5-33 18-56 33-68C305 725 185 682 185 485c0-56 20-102 53-137-5-13-23-65 5-136 0 0 43-14 141 53 41-11 85-17 128-17 44 0 87 6 128 17 98-66 141-52 141-52 28 71 10 123 5 136 33 36 53 81 53 137 0 197-120 240-234 253 18 16 35 47 35 95 0 68-1 124-1 141 0 14 9 30 35 25C877 930 1024 738 1024 512 1024 229 795 0 512 0z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://www.linkedin.com/in/jeremie-piellard/" title="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M30 177l93-1v304l-93 1v-304z" />
+            <path d="M200 177l89-1v39l0 11c26-26 53-45 97-45 51 0 100 21 100 91v208l-90 1v-159c0-35-9-58-51-58-37 0-52 7-52 55v160l-92 1v-304z" />
+            <path d="M128 81c0 28-23 51-51 51s-51-23-51-51c0-28 23-51 51-51 28 0 51 23 51 51z" />
+          </svg>
+        </a>
+      </div>
+    </footer>
+  </body>
+
+</html>

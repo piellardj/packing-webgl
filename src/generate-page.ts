@@ -11,6 +11,10 @@ const data = {
         "You can zoom anywhere you want by using the left mouse button."
     ],
     githubProjectName: "packing-webgl",
+    readme: {
+        filepath: path.join(__dirname, "..", "README.md"),
+        branchName: "master"
+    },
     additionalLinks: [],
     styleFiles: [],
     scriptFiles: [
