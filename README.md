@@ -7,6 +7,8 @@ You can zoom anywhere you want by using the left mouse button.
 
 See it live [here](https://piellardj.github.io/packing-webgl/?page%3Acanvas%3Afullscreen=true).
 
+[![Donate](https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg)](https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E)
+
 ![Screenshot](src/readme/circles.png)
 ![Screenshot](src/readme/rectangles.png)
 ![Screenshot](src/readme/triangles.png)
